@@ -1,0 +1,199 @@
+/**
+ *    Copyright 2012-2013 Trento RISE
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package eu.trentorise.smartcampus.filestorage.services.impl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.activemq.util.ByteArrayInputStream;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.session.AccessTokenPair;
+import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.client2.session.Session;
+import com.dropbox.client2.session.WebAuthSession;
+
+import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.Configuration;
+import eu.trentorise.smartcampus.filestorage.model.Metadata;
+import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
+import eu.trentorise.smartcampus.filestorage.model.Resource;
+import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.services.MetadataService;
+import eu.trentorise.smartcampus.filestorage.services.StorageService;
+
+@Service
+public class DropboxStorage implements StorageService {
+
+	AppKeyPair app;
+
+	@Value("${dropbox.app.key}")
+	private String appKey;
+
+	@Value("${dropbox.app.secret}")
+	private String appSecret;
+
+	private static final String USER_KEY = "USER_KEY";
+	private static final String USER_SECRET = "USER_SECRET";
+
+	@PostConstruct
+	@SuppressWarnings("unused")
+	private void init() {
+		app = new AppKeyPair(appKey, appSecret);
+	}
+
+	@Autowired
+	UserAccountManager accountManager;
+
+	@Autowired
+	MetadataService metaService;
+
+	@Override
+	public Resource store(String accountId, Resource resource)
+			throws AlreadyStoredException, SmartcampusException {
+
+		// check if file already exists int
+		try {
+			metaService.getResourceByFilename(accountId, resource.getName());
+			throw new AlreadyStoredException();
+		} catch (NotFoundException e1) {
+
+			AccessTokenPair token;
+			try {
+				token = getUserToken(accountId);
+			} catch (NotFoundException e2) {
+				throw new SmartcampusException(e2);
+			}
+
+			WebAuthSession sourceSession = new WebAuthSession(app,
+					Session.AccessType.APP_FOLDER, token);
+			DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+					sourceSession);
+
+			InputStream in = new ByteArrayInputStream(resource.getContent());
+			try {
+				sourceClient.putFile(resource.getName(), in,
+						resource.getContent().length, null, null);
+				sourceSession.unlink();
+				in.close();
+				if (resource.getId() == null) {
+					resource.setId(new ObjectId().toString());
+				}
+				return resource;
+			} catch (IOException e) {
+				throw new SmartcampusException(e);
+			} catch (DropboxException e) {
+				throw new SmartcampusException(e);
+			}
+		}
+
+	}
+
+	@Override
+	public void replace(String accountId, Resource resource)
+			throws NotFoundException, SmartcampusException {
+		// TODO check if there is a change of content type
+		if (resource.getId() == null) {
+			throw new NotFoundException();
+		}
+
+		AccessTokenPair token;
+		try {
+			token = getUserToken(accountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
+
+		Metadata meta = metaService.getMetadata(resource.getId());
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		InputStream in = new ByteArrayInputStream(resource.getContent());
+		try {
+			sourceClient.putFileOverwrite(meta.getName(), in,
+					resource.getContent().length, null);
+			sourceSession.unlink();
+			in.close();
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		} catch (DropboxException e) {
+			throw new SmartcampusException(e);
+		}
+	}
+
+	@Override
+	public void remove(String accountId, String rid) throws NotFoundException,
+			SmartcampusException {
+		// get user token
+		UserAccount account = accountManager.findById(accountId);
+		AccessTokenPair token = getUserToken(account.getConfigurations());
+
+		// find resource name
+		Metadata metadata = metaService.getMetadata(rid);
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		try {
+			sourceClient.delete(metadata.getName());
+			sourceSession.unlink();
+		} catch (DropboxException e) {
+			throw new SmartcampusException(e);
+		}
+
+	}
+
+	private AccessTokenPair getUserToken(String accountId)
+			throws NotFoundException {
+		UserAccount account = accountManager.findById(accountId);
+
+		return getUserToken(account.getConfigurations());
+	}
+
+	private AccessTokenPair getUserToken(List<Configuration> confs) {
+		String userKey = null;
+		String userSecret = null;
+		if (confs == null) {
+			return null;
+		}
+		for (Configuration tmp : confs) {
+			if (tmp.getName().equals(USER_KEY)) {
+				userKey = tmp.getValue();
+			}
+			if (tmp.getName().equals(USER_SECRET)) {
+				userSecret = tmp.getValue();
+			}
+		}
+
+		return new AccessTokenPair(userKey, userSecret);
+	}
+}
