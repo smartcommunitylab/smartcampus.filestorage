@@ -18,6 +18,7 @@ package eu.trentorise.smartcampus.filestorage.services.impl;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,11 +28,13 @@ import org.springframework.stereotype.Service;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
-import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 
 @Service
 public class MongoMetadataService implements MetadataService {
+
+	private static final Logger logger = Logger
+			.getLogger(MongoMetadataService.class);
 
 	@Autowired
 	MongoTemplate db;
@@ -41,6 +44,7 @@ public class MongoMetadataService implements MetadataService {
 		Criteria criteria = new Criteria("eid").is(eid);
 		Metadata meta = db.findOne(Query.query(criteria), Metadata.class);
 		if (meta == null) {
+			logger.error("Metadata not found: " + eid);
 			throw new NotFoundException();
 		} else {
 			return meta.getRid();
@@ -54,17 +58,10 @@ public class MongoMetadataService implements MetadataService {
 	}
 
 	@Override
-	public StorageType getResourceStorage(String rid) throws NotFoundException {
-		// FIXME not correct
-		Metadata meta = getMetadata(rid);
-		return null;
-	}
-
-	@Override
 	public Metadata getMetadata(String rid) throws NotFoundException {
-		Criteria criteria = new Criteria("rid").is(rid);
-		Metadata meta = db.findOne(Query.query(criteria), Metadata.class);
+		Metadata meta = db.findById(rid, Metadata.class);
 		if (meta == null) {
+			logger.error("Metadata not found: " + rid);
 			throw new NotFoundException();
 		} else {
 			return meta;
@@ -75,6 +72,7 @@ public class MongoMetadataService implements MetadataService {
 	public void save(Metadata metadata) throws AlreadyStoredException {
 		if (metadata.getRid() != null
 				&& db.findById(metadata.getRid(), Metadata.class) != null) {
+			logger.error("Metadata already stored: " + metadata.getRid());
 			throw new AlreadyStoredException();
 		}
 		db.save(metadata);
@@ -95,9 +93,12 @@ public class MongoMetadataService implements MetadataService {
 					Query.query(new Criteria("rid").is(metadata.getRid())),
 					Metadata.class).size();
 			if (results < 1) {
+				logger.error("Metadata not found: " + metadata.getRid());
 				throw new NotFoundException();
 			}
 			if (results > 1) {
+				logger.error("Found more than one metadata: "
+						+ metadata.getRid());
 				throw new IllegalArgumentException("Found more than one result");
 			}
 			db.save(metadata);
@@ -115,11 +116,23 @@ public class MongoMetadataService implements MetadataService {
 		criteria.and("name").is(filename);
 		List<Metadata> results = db.find(Query.query(criteria), Metadata.class);
 		if (results.size() < 1) {
+			logger.error(String.format("Metadata not found: %s - %s", filename,
+					accountId));
 			throw new NotFoundException();
 		}
 		if (results.size() > 1) {
+			logger.error(String.format("More than one metadata: %s - %s",
+					filename, accountId));
 			throw new IllegalArgumentException("Found more than one result");
 		}
 		return results.get(0).getRid();
+	}
+
+	@Override
+	public List<Metadata> getAccountMetadata(String accountId)
+			throws NotFoundException {
+		Criteria criteria = new Criteria();
+		criteria.and("accountId").is(accountId);
+		return db.find(Query.query(criteria), Metadata.class);
 	}
 }

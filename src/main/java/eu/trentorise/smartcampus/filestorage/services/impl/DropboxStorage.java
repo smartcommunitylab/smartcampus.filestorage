@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxLink;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
@@ -42,6 +43,7 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -116,7 +118,6 @@ public class DropboxStorage implements StorageService {
 	@Override
 	public void replace(String accountId, Resource resource)
 			throws NotFoundException, SmartcampusException {
-		// TODO check if there is a change of content type
 		if (resource.getId() == null) {
 			throw new NotFoundException();
 		}
@@ -195,5 +196,32 @@ public class DropboxStorage implements StorageService {
 		}
 
 		return new AccessTokenPair(userKey, userSecret);
+	}
+
+	@Override
+	public Token getToken(String accountId, String rid)
+			throws NotFoundException, SmartcampusException {
+		// get user token
+		UserAccount account = accountManager.findById(accountId);
+		AccessTokenPair dropboxToken = getUserToken(account.getConfigurations());
+
+		// find resource name
+		Metadata metadata = metaService.getMetadata(rid);
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, dropboxToken);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		DropboxLink link;
+		try {
+			link = sourceClient.media("/" + metadata.getName(), true);
+		} catch (DropboxException e) {
+			throw new SmartcampusException();
+		}
+		Token token = new Token();
+		token.setUrl(link.url);
+		token.setMethodREST("GET");
+		return token;
 	}
 }

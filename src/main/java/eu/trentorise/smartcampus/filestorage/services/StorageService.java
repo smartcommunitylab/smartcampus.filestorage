@@ -20,6 +20,7 @@ import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Token;
 
 public interface StorageService {
 
@@ -31,5 +32,8 @@ public interface StorageService {
 
 	public void remove(String accountId, String rid) throws NotFoundException,
 			SmartcampusException;
+
+	public Token getToken(String accountId, String rid)
+			throws NotFoundException, SmartcampusException;
 
 }

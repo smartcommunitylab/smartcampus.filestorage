@@ -16,37 +16,43 @@
 
 package eu.trentorise.smartcampus.filestorage.services.impl;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.SocialManager;
+import eu.trentorise.smartcampus.filestorage.model.Metadata;
+import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
+import eu.trentorise.smartcampus.filestorage.services.StorageService;
+import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
 
 @Service
 public class ScAcl implements ACLService {
 
+	private static final Logger logger = Logger.getLogger(ScAcl.class);
 	@Autowired
 	MetadataService metaService;
 
 	@Autowired
 	SocialManager socialManager;
 
+	@Autowired
+	StorageUtils storageUtils;
+
 	@Override
 	public boolean isPermitted(Operation operation, String rid, User user) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new IllegalArgumentException("Operation not implemented");
 	}
 
 	@Override
 	public Operation[] getPermissions(String rid, User user) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalArgumentException("Operation not implemented");
 	}
 
 	@Override
@@ -56,11 +62,17 @@ public class ScAcl implements ACLService {
 		switch (operation) {
 		case DOWNLOAD:
 			try {
-				StorageType type = metaService.getResourceStorage(rid);
 				if (socialManager.checkPermission(user,
 						metaService.getEntityByResource(rid))) {
-					token = generateToken(type, rid);
+					logger.info(String.format(
+							"Download permission ok, user: %s, resource: %s",
+							user.getId(), rid));
+					token = generateToken(rid);
+					logger.info("Session token for download operation created successfully");
 				} else {
+					logger.error(String
+							.format("User %s not have download permission to resource %s",
+									user.getId(), rid));
 					throw new SecurityException(
 							"User has not permission on this resource");
 				}
@@ -75,11 +87,11 @@ public class ScAcl implements ACLService {
 		return token;
 	}
 
-	private Token generateToken(StorageType storageType, String rid) {
-		Token token = new Token();
-		token.setUrl("https://api.dropbox.com/r/resource");
-		token.setMethodREST("GET");
-
-		return token;
+	private Token generateToken(String rid) throws NotFoundException,
+			SmartcampusException {
+		Metadata meta = metaService.getMetadata(rid);
+		StorageService storageService = storageUtils.getStorageService(meta
+				.getAccountId());
+		return storageService.getToken(meta.getAccountId(), rid);
 	}
 }

@@ -16,10 +16,11 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
+import java.util.List;
+
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
-import eu.trentorise.smartcampus.filestorage.model.StorageType;
 
 public interface MetadataService {
 
@@ -30,9 +31,10 @@ public interface MetadataService {
 
 	public String getEntityByResource(String rid) throws NotFoundException;
 
-	public StorageType getResourceStorage(String rid) throws NotFoundException;
-
 	public Metadata getMetadata(String rid) throws NotFoundException;
+
+	public List<Metadata> getAccountMetadata(String accountId)
+			throws NotFoundException;
 
 	public void save(Metadata metadata) throws AlreadyStoredException;
 

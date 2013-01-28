@@ -16,9 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
@@ -28,10 +26,9 @@ import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
-import eu.trentorise.smartcampus.filestorage.services.impl.DropboxStorage;
+import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
 
 @Service
 public class MediaManager {
@@ -43,55 +40,37 @@ public class MediaManager {
 	ACLService scAcl;
 
 	@Autowired
-	UserAccountManager accountManager;
+	StorageUtils storageUtils;
 
 	public void storage(String accountId, User user, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 
-		StorageService storageService = getStorageService(accountId);
+		StorageService storageService = storageUtils
+				.getStorageService(accountId);
 		resource = storageService.store(accountId, resource);
 		metadataManager.create(accountId, user, resource);
 	}
 
 	public void remove(String accountId, User user, String resourceId)
 			throws SmartcampusException, NotFoundException {
-		StorageService storageService = getStorageService(accountId);
+		StorageService storageService = storageUtils
+				.getStorageService(accountId);
 		storageService.remove(accountId, resourceId);
 		metadataManager.delete(resourceId);
 	}
 
 	public void replace(String accountId, User user, Resource resource)
 			throws NotFoundException, SmartcampusException {
-		StorageService storageService = getStorageService(accountId);
+		StorageService storageService = storageUtils
+				.getStorageService(accountId);
 		storageService.replace(accountId, resource);
 		metadataManager.update(resource);
 	}
 
 	public Token getResourceToken(User user, String rid, Operation op)
 			throws SmartcampusException {
+
 		return scAcl.getSessionToken(op, user, rid);
-	}
-
-	private StorageService getStorageService(String accountId)
-			throws SmartcampusException {
-		BeanFactory beanFactory = new ClassPathXmlApplicationContext(
-				"spring/SpringAppDispatcher-servlet.xml");
-		UserAccount account;
-		try {
-			account = accountManager.findById(accountId);
-		} catch (NotFoundException e) {
-			throw new SmartcampusException("Account doesn't exist");
-		}
-		StorageService service = null;
-		switch (account.getStorage()) {
-		case DROPBOX:
-			service = beanFactory.getBean(DropboxStorage.class);
-			break;
-		default:
-			throw new SmartcampusException("Storage type not supported");
-		}
-
-		return service;
 	}
 
 }

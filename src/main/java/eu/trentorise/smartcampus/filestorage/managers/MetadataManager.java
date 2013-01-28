@@ -18,6 +18,7 @@ package eu.trentorise.smartcampus.filestorage.managers;
 
 import it.unitn.disi.sweb.webapi.client.WebApiException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 @Service
 public class MetadataManager {
 
+	private static final Logger logger = Logger.getLogger(Metadata.class);
 	@Autowired
 	MetadataService metadataSrv;
 
@@ -46,12 +48,15 @@ public class MetadataManager {
 	public void delete(String rid) throws NotFoundException,
 			SmartcampusException {
 		metadataSrv.delete(rid);
+		String eid = null;
 		try {
-			socialManager.deleteEntity(Long.parseLong(metadataSrv
-					.getEntityByResource(rid)));
+			eid = metadataSrv.getEntityByResource(rid);
+			socialManager.deleteEntity(Long.parseLong(eid));
 		} catch (NumberFormatException e) {
+			logger.error("Exception parsing entity id: " + eid);
 			throw new NotFoundException();
 		} catch (WebApiException e) {
+			logger.error("Exception invoking social engine", e);
 			throw new SmartcampusException(
 					"Social engine error deleting entity");
 		}
@@ -80,6 +85,7 @@ public class MetadataManager {
 			metadata.setEid(socialManager.createEntity(resource, user)
 					.toString());
 		} catch (WebApiException e) {
+			logger.error("Exception invoking social engine", e);
 			throw new SmartcampusException(
 					"Social engine error creating entity");
 		}

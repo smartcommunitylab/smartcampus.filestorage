@@ -18,6 +18,7 @@ package eu.trentorise.smartcampus.filestorage.managers;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -32,12 +33,15 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 @Service
 public class UserAccountManager {
 
+	private static final Logger logger = Logger
+			.getLogger(UserAccountManager.class);
 	@Autowired
 	MongoTemplate db;
 
 	public void save(UserAccount ua) throws AlreadyStoredException {
 		if (ua.getId() != null
 				&& db.findById(ua.getId(), UserAccount.class) != null) {
+			logger.error("UserAccount already stored, " + ua.getId());
 			throw new AlreadyStoredException();
 		}
 		db.save(ua);
@@ -60,6 +64,7 @@ public class UserAccountManager {
 	public UserAccount findById(String accountId) throws NotFoundException {
 		UserAccount account = db.findById(accountId, UserAccount.class);
 		if (account == null) {
+			logger.error("UserAccount not found: " + accountId);
 			throw new NotFoundException();
 		}
 		return account;
