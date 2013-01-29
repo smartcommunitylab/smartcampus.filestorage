@@ -52,9 +52,9 @@ public class MediaController extends RestController {
 	@Autowired
 	ACLService scAcl;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}")
+	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}")
 	public @ResponseBody
-	void storeResource(HttpServletRequest request,
+	Resource storeResource(HttpServletRequest request,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource) throws IOException,
 			AlreadyStoredException, SmartcampusException, NotFoundException {
@@ -64,11 +64,11 @@ public class MediaController extends RestController {
 			throw new SecurityException();
 		}
 
-		mediaManager.storage(accountId, user, getResource(resource));
+		return mediaManager.storage(accountId, user, getResource(resource));
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}/{rid}")
-	public boolean replaceResource(HttpServletRequest request,
+	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
+	public void replaceResource(HttpServletRequest request,
 			@PathVariable("rid") String rid,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource)
@@ -80,10 +80,9 @@ public class MediaController extends RestController {
 		}
 
 		mediaManager.replace(accountId, user, getResource(resource));
-		return false;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}/{rid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
 	public @ResponseBody
 	void removeResource(HttpServletRequest request,
 			@PathVariable("accountId") String accountId,
@@ -97,7 +96,7 @@ public class MediaController extends RestController {
 		mediaManager.remove(accountId, user, rid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/eu.trentorise.smartcampus.filestorage.Resource/{rid}")
 	public @ResponseBody
 	Token getResource(HttpServletRequest request, @PathVariable String rid)
 			throws SmartcampusException, SecurityException {

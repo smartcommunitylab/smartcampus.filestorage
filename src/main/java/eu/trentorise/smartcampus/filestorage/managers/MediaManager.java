@@ -42,13 +42,14 @@ public class MediaManager {
 	@Autowired
 	StorageUtils storageUtils;
 
-	public void storage(String accountId, User user, Resource resource)
+	public Resource storage(String accountId, User user, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 
 		StorageService storageService = storageUtils
 				.getStorageService(accountId);
 		resource = storageService.store(accountId, resource);
 		metadataManager.create(accountId, user, resource);
+		return resource;
 	}
 
 	public void remove(String accountId, User user, String resourceId)
@@ -68,7 +69,7 @@ public class MediaManager {
 	}
 
 	public Token getResourceToken(User user, String rid, Operation op)
-			throws SmartcampusException {
+			throws SmartcampusException, SecurityException {
 
 		return scAcl.getSessionToken(op, user, rid);
 	}

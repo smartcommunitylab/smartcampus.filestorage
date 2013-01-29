@@ -77,7 +77,7 @@ public class DropboxTest {
 		byte[] content = FileUtils.readFileToByteArray(f);
 		InputStream in = new ByteArrayInputStream(content);
 		sourceClient.putFile("/test.txt", in, content.length, null, null);
-
+		sourceClient.delete("/test.txt");
 		sourceSession.unlink();
 	}
 
@@ -104,23 +104,6 @@ public class DropboxTest {
 		content = FileUtils.readFileToByteArray(f);
 		in = new ByteArrayInputStream(content);
 		sourceClient.putFileOverwrite("/test.txt", in, content.length, null);
-		sourceSession.unlink();
-	}
-
-	@Test
-	public void delete() throws DropboxException {
-		AppKeyPair app = new AppKeyPair(DropboxUtils.appkey,
-				DropboxUtils.appsecret);
-
-		AccessTokenPair token = new AccessTokenPair(DropboxUtils.userkey,
-				DropboxUtils.usersecret);
-
-		WebAuthSession sourceSession = new WebAuthSession(app,
-				Session.AccessType.APP_FOLDER, token);
-		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
-				sourceSession);
-
-		sourceClient.delete("/test.txt");
 		sourceSession.unlink();
 	}
 
