@@ -18,10 +18,28 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.List;
 
+/**
+ * User storage account informations
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class UserAccount {
+	/**
+	 * id of the account
+	 */
 	private String id;
+	/**
+	 * id of the user
+	 */
 	private long userId;
+	/**
+	 * type of the storage
+	 */
 	private StorageType storage;
+	/**
+	 * list of the configurations of the account storage
+	 */
 	private List<Configuration> configurations;
 
 	public long getUserId() {

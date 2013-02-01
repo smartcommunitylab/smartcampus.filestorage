@@ -31,6 +31,12 @@ import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.common.SemanticHelper;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 
+/**
+ * <i>SocialManager</i> manages interaction with social engine.
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class SocialManager {
 	SCWebApiClient socialClient;
@@ -48,6 +54,17 @@ public class SocialManager {
 				socialEngineHost, socialEnginePort);
 	}
 
+	/**
+	 * creates a social entity
+	 * 
+	 * @param resource
+	 *            resource to bind with new social entity
+	 * @param user
+	 *            user owner of the resource
+	 * @return the id of the new entity
+	 * @throws WebApiException
+	 *             exception thrown by social engine
+	 */
 	public Long createEntity(Resource resource, User user)
 			throws WebApiException {
 		Entity entity = SemanticHelper.createEntity(socialClient,
@@ -57,10 +74,30 @@ public class SocialManager {
 		return entity.getId();
 	}
 
+	/**
+	 * deletes a social entity
+	 * 
+	 * @param eid
+	 *            id of the social entity to delete
+	 * @return true if operation gone fine, false otherwise
+	 * @throws WebApiException
+	 *             exception thrown by social engine
+	 */
 	public boolean deleteEntity(long eid) throws WebApiException {
 		return SemanticHelper.deleteEntity(socialClient, eid);
 	}
 
+	/**
+	 * checks if an entity is shared with a user
+	 * 
+	 * @param user
+	 *            the user to check
+	 * @param eid
+	 *            id of the entity
+	 * @return true if entity is shared with the user, false otherwise
+	 * @throws WebApiException
+	 *             exception thrown by social engine
+	 */
 	public boolean checkPermission(User user, String eid)
 			throws WebApiException {
 		return SemanticHelper.isEntitySharedWithUser(socialClient,

@@ -54,7 +54,7 @@ public class MediaController extends RestController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}")
 	public @ResponseBody
-	Resource storeResource(HttpServletRequest request,
+	String storeResource(HttpServletRequest request,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource) throws IOException,
 			AlreadyStoredException, SmartcampusException, NotFoundException {
@@ -64,11 +64,13 @@ public class MediaController extends RestController {
 			throw new SecurityException();
 		}
 
-		return mediaManager.storage(accountId, user, getResource(resource));
+		return mediaManager.storage(accountId, user, getResource(resource))
+				.getId();
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
-	public void replaceResource(HttpServletRequest request,
+	public @ResponseBody
+	void replaceResource(HttpServletRequest request,
 			@PathVariable("rid") String rid,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource)
@@ -79,7 +81,7 @@ public class MediaController extends RestController {
 			throw new SecurityException();
 		}
 
-		mediaManager.replace(accountId, user, getResource(resource));
+		mediaManager.replace(accountId, user, getResource(rid, resource));
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
@@ -105,11 +107,18 @@ public class MediaController extends RestController {
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid);
 	}
 
+	private Resource getResource(String rid, MultipartFile file)
+			throws IOException {
+		Resource res = getResource(file);
+		res.setId(rid);
+		return res;
+	}
+
 	private Resource getResource(MultipartFile file) throws IOException {
 		Resource res = new Resource();
 		res.setContent(file.getBytes());
 		res.setContentType(file.getContentType());
-		res.setName(file.getName());
+		res.setName(file.getOriginalFilename());
 		return res;
 	}
 }

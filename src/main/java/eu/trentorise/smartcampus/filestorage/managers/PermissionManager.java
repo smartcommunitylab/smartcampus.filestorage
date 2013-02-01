@@ -24,6 +24,13 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 
+/**
+ * <i>PermissionManager</i> checks the permissions about resources and storage
+ * accounts
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class PermissionManager {
 	@Autowired
@@ -32,16 +39,49 @@ public class PermissionManager {
 	@Autowired
 	MetadataManager metaManager;
 
+	/**
+	 * checks if a user can access to a storage account
+	 * 
+	 * @param user
+	 *            user who want to access the storage account
+	 * @param account
+	 *            storage account
+	 * @return true if user can access, false otherwise
+	 * @see UserAccount
+	 */
 	public boolean checkAccountPermission(User user, UserAccount account) {
 		return user.getId().equals(account.getUserId());
 	}
 
+	/**
+	 * checks if a user can access to a storage account
+	 * 
+	 * @param user
+	 *            user who want to access the storage account
+	 * @param accountId
+	 *            storage account id
+	 * @return true if user can access, false otherwise
+	 * @see UserAccount
+	 * @throws NotFoundException
+	 *             if account doesn't exist
+	 */
 	public boolean checkAccountPermission(User user, String accountId)
 			throws NotFoundException {
 		UserAccount account = accountManager.findById(accountId);
 		return user.getId().equals(account.getUserId());
 	}
 
+	/**
+	 * checks if a user can access to a resource
+	 * 
+	 * @param user
+	 *            the user who want to access to the resource
+	 * @param rid
+	 *            the resource id
+	 * @return true if user can access, false otherwise
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 */
 	public boolean checkResourcePermission(User user, String rid)
 			throws NotFoundException {
 		Metadata meta = metaManager.findByResource(rid);

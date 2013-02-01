@@ -18,9 +18,15 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import org.springframework.data.annotation.Id;
 
+/**
+ * <i>Metadata</i> represents all the informations about a resource
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class Metadata {
 	/**
-	 * original name
+	 * name of the resource
 	 */
 	private String name;
 
@@ -31,19 +37,28 @@ public class Metadata {
 	private String rid;
 
 	/**
-	 * entity id
+	 * entity id binded to resource
 	 */
 	private String eid;
 
+	/**
+	 * account id in which resource is stored
+	 */
 	private String accountId;
 
 	/**
-	 * mime of the type
+	 * MIME type of resource
 	 */
 	private String contentType;
 
+	/**
+	 * creation time
+	 */
 	private long creationTs;
 
+	/**
+	 * last modification time
+	 */
 	private long lastModifiedTs;
 
 	public String getName() {

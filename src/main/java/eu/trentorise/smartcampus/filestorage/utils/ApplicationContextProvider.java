@@ -14,14 +14,25 @@
  *    limitations under the License.
  */
 
-package eu.trentorise.smartcampus.filestorage.model;
+package eu.trentorise.smartcampus.filestorage.utils;
 
-/**
- * Operation on a resource
- * 
- * @author mirko perillo
- * 
- */
-public enum Operation {
-	STORE, MODIFY, DELETE, DOWNLOAD
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+public class ApplicationContextProvider implements ApplicationContextAware {
+
+	private static ApplicationContext ctx;
+
+	@Override
+	public void setApplicationContext(ApplicationContext ctx)
+			throws BeansException {
+		this.ctx = ctx;
+
+	}
+
+	public ApplicationContext getApplicationContext() {
+		return ctx;
+	}
+
 }

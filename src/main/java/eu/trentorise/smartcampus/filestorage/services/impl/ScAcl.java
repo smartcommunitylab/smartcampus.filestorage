@@ -45,16 +45,25 @@ public class ScAcl implements ACLService {
 	@Autowired
 	StorageUtils storageUtils;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isPermitted(Operation operation, String rid, User user) {
 		throw new IllegalArgumentException("Operation not implemented");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Operation[] getPermissions(String rid, User user) {
 		throw new IllegalArgumentException("Operation not implemented");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Token getSessionToken(Operation operation, User user, String rid)
 			throws SmartcampusException, SecurityException {

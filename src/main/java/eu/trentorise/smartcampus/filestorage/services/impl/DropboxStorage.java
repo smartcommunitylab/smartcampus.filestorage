@@ -48,6 +48,12 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
+/**
+ * Storage on a user Dropbox account
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class DropboxStorage implements StorageService {
 
@@ -69,11 +75,14 @@ public class DropboxStorage implements StorageService {
 	}
 
 	@Autowired
-	UserAccountManager accountManager;
+	private UserAccountManager accountManager;
 
 	@Autowired
-	MetadataService metaService;
+	private MetadataService metaService;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
@@ -115,6 +124,9 @@ public class DropboxStorage implements StorageService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void replace(String accountId, Resource resource)
 			throws NotFoundException, SmartcampusException {
@@ -149,6 +161,9 @@ public class DropboxStorage implements StorageService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void remove(String accountId, String rid) throws NotFoundException,
 			SmartcampusException {
@@ -198,6 +213,9 @@ public class DropboxStorage implements StorageService {
 		return new AccessTokenPair(userKey, userSecret);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Token getToken(String accountId, String rid)
 			throws NotFoundException, SmartcampusException {

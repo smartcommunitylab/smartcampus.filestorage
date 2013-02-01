@@ -22,17 +22,72 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 
+/**
+ * The interface collects operation about storage of a resource
+ * 
+ * @author mirko perillo
+ * 
+ */
 public interface StorageService {
-
+	/**
+	 * stores a resource
+	 * 
+	 * @param accountId
+	 *            the id of user storage account in which store the resource
+	 * @param resource
+	 *            the resource to store
+	 * @return the resource populated with the id given from storage
+	 * @throws AlreadyStoredException
+	 *             if resource already exists
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException;
 
+	/**
+	 * updates of a resource
+	 * 
+	 * @param accountId
+	 *            the id of user storage account in which store the resource
+	 * @param resource
+	 *            the informations of resource to update
+	 * @throws NotFoundException
+	 *             if resource doesn't exists
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public void replace(String accountId, Resource resource)
 			throws NotFoundException, SmartcampusException;
 
+	/**
+	 * deletes a resource
+	 * 
+	 * @param accountId
+	 *            id of the account
+	 * @param rid
+	 *            id of the resource
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public void remove(String accountId, String rid) throws NotFoundException,
 			SmartcampusException;
 
+	/**
+	 * retrieves Token to access to the resource
+	 * 
+	 * @param accountId
+	 *            id of the account
+	 * @param rid
+	 *            id of the resource
+	 * @return the token to access the resource
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public Token getToken(String accountId, String rid)
 			throws NotFoundException, SmartcampusException;
 

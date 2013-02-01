@@ -16,8 +16,21 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+/**
+ * <i>Configuration</i> is the representation of a configuration in a user
+ * storage account
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class Configuration {
+	/**
+	 * name of configuration
+	 */
 	private String name;
+	/**
+	 * value of configuration
+	 */
 	private String value;
 
 	public Configuration() {

@@ -30,6 +30,13 @@ import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
 
+/**
+ * <i>MediaManager</i> manages all other managers and exposes the main core
+ * functionalities about {@link Resource}
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class MediaManager {
 
@@ -42,6 +49,21 @@ public class MediaManager {
 	@Autowired
 	StorageUtils storageUtils;
 
+	/**
+	 * stores a {@link Resource} in the storage.
+	 * 
+	 * @param accountId
+	 *            id of user storage account where store the resource
+	 * @param user
+	 *            the user who stores the resource
+	 * @param resource
+	 *            resource to store
+	 * @return the resource stored with the id assigned from storage
+	 * @throws AlreadyStoredException
+	 *             if resource is already stored.
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public Resource storage(String accountId, User user, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 
@@ -52,6 +74,20 @@ public class MediaManager {
 		return resource;
 	}
 
+	/**
+	 * deletes a {@link Resource}
+	 * 
+	 * @param accountId
+	 *            id of user storage account in which resource is stored
+	 * @param user
+	 *            user that do the operation
+	 * @param resourceId
+	 *            id of the resource to delete
+	 * @throws SmartcampusException
+	 *             general exception
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 */
 	public void remove(String accountId, User user, String resourceId)
 			throws SmartcampusException, NotFoundException {
 		StorageService storageService = storageUtils
@@ -60,6 +96,22 @@ public class MediaManager {
 		metadataManager.delete(resourceId);
 	}
 
+	/**
+	 * updates the content of the {@link Resource} in the storage, then updates
+	 * only lastModifiedTs field of
+	 * {@link eu.trentorise.smartcampus.filestorage.model.Metadata}.
+	 * 
+	 * @param accountId
+	 *            id of user storage account in which resource is stored
+	 * @param user
+	 *            user that do the operation
+	 * @param resource
+	 *            the new resource
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public void replace(String accountId, User user, Resource resource)
 			throws NotFoundException, SmartcampusException {
 		StorageService storageService = storageUtils
@@ -68,6 +120,21 @@ public class MediaManager {
 		metadataManager.update(resource);
 	}
 
+	/**
+	 * retrieves a {@link Token} to access the resource content
+	 * 
+	 * @param user
+	 *            user who want to access the resource
+	 * @param rid
+	 *            id of the resource to download
+	 * @param op
+	 *            {@link Operation} to do on the resource
+	 * @return the {@link Token}
+	 * @throws SmartcampusException
+	 *             general exception
+	 * @throws SecurityException
+	 *             if user haven't privileges to access the resource
+	 */
 	public Token getResourceToken(User user, String rid, Operation op)
 			throws SmartcampusException, SecurityException {
 

@@ -47,14 +47,15 @@ public class UserAccountController extends RestController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.UserAccount")
 	public @ResponseBody
-	void save(HttpServletRequest request, @RequestBody UserAccount account)
-			throws SmartcampusException, AlreadyStoredException {
+	UserAccount save(HttpServletRequest request,
+			@RequestBody UserAccount account) throws SmartcampusException,
+			AlreadyStoredException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkAccountPermission(user, account)) {
 			throw new SecurityException();
 		}
-		accountManager.save(account);
+		return accountManager.save(account);
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/eu.trentorise.smartcampus.filestorage.UserAccount/{aid}")

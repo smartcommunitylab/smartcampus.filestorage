@@ -39,6 +39,9 @@ public class MongoMetadataService implements MetadataService {
 	@Autowired
 	MongoTemplate db;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getResourceByEntity(String eid) throws NotFoundException {
 		Criteria criteria = new Criteria("eid").is(eid);
@@ -51,12 +54,18 @@ public class MongoMetadataService implements MetadataService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getEntityByResource(String rid) throws NotFoundException {
 		Metadata meta = getMetadata(rid);
 		return meta.getEid();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Metadata getMetadata(String rid) throws NotFoundException {
 		Metadata meta = db.findById(rid, Metadata.class);
@@ -68,6 +77,9 @@ public class MongoMetadataService implements MetadataService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void save(Metadata metadata) throws AlreadyStoredException {
 		if (metadata.getRid() != null
@@ -79,6 +91,9 @@ public class MongoMetadataService implements MetadataService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void delete(String rid) {
 		Criteria criteria = new Criteria("rid").is(rid);
@@ -86,6 +101,9 @@ public class MongoMetadataService implements MetadataService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void update(Metadata metadata) throws NotFoundException {
 		if (metadata.getRid() != null) {
@@ -108,6 +126,9 @@ public class MongoMetadataService implements MetadataService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getResourceByFilename(String accountId, String filename)
 			throws NotFoundException {
@@ -128,6 +149,9 @@ public class MongoMetadataService implements MetadataService {
 		return results.get(0).getRid();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Metadata> getAccountMetadata(String accountId)
 			throws NotFoundException {
