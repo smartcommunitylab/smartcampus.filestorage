@@ -56,16 +56,20 @@ public class MediaController extends RestController {
 	public @ResponseBody
 	String storeResource(HttpServletRequest request,
 			@PathVariable("accountId") String accountId,
-			@RequestParam("file") MultipartFile resource) throws IOException,
-			AlreadyStoredException, SmartcampusException, NotFoundException {
+			@RequestParam("file") MultipartFile resource)
+			throws AlreadyStoredException, SmartcampusException,
+			NotFoundException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkAccountPermission(user, accountId)) {
 			throw new SecurityException();
 		}
-
-		return mediaManager.storage(accountId, user, getResource(resource))
-				.getId();
+		try {
+			return mediaManager.storage(accountId, user, getResource(resource))
+					.getId();
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
@@ -74,14 +78,18 @@ public class MediaController extends RestController {
 			@PathVariable("rid") String rid,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource)
-			throws SmartcampusException, NotFoundException, IOException {
+			throws SmartcampusException, NotFoundException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkResourcePermission(user, rid)) {
 			throw new SecurityException();
 		}
 
-		mediaManager.replace(accountId, user, getResource(rid, resource));
+		try {
+			mediaManager.replace(accountId, user, getResource(rid, resource));
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.filestorage.Resource/{accountId}/{rid}")
