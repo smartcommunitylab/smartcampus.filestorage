@@ -20,71 +20,76 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.activemq.util.ByteArrayInputStream;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxLink;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.WebAuthSession;
 
+import eu.trentorise.smartcampus.filestorage.managers.AppAccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.AppAccount;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
+/**
+ * Storage on a user Dropbox account
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class DropboxStorage implements StorageService {
-
-	AppKeyPair app;
-
-	@Value("${dropbox.app.key}")
-	private String appKey;
-
-	@Value("${dropbox.app.secret}")
-	private String appSecret;
 
 	private static final String USER_KEY = "USER_KEY";
 	private static final String USER_SECRET = "USER_SECRET";
 
-	@PostConstruct
-	@SuppressWarnings("unused")
-	private void init() {
-		app = new AppKeyPair(appKey, appSecret);
-	}
+	private static final String APP_KEY = "APP_KEY";
+	private static final String APP_SECRET = "APP_SECRET";
 
 	@Autowired
-	UserAccountManager accountManager;
+	private UserAccountManager accountManager;
 
 	@Autowired
-	MetadataService metaService;
+	AppAccountManager appAccountManager;
 
+	@Autowired
+	private MetadataService metaService;
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Resource store(String accountId, Resource resource)
+	public Resource store(String userAccountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 
 		// check if file already exists int
 		try {
-			metaService.getResourceByFilename(accountId, resource.getName());
+			metaService
+					.getResourceByFilename(userAccountId, resource.getName());
 			throw new AlreadyStoredException();
 		} catch (NotFoundException e1) {
 
-			AccessTokenPair token;
+			AccessTokenPair token = null;
+			AppKeyPair app = null;
 			try {
-				token = getUserToken(accountId);
+				token = getUserToken(userAccountId);
+				app = getAppToken(userAccountId);
 			} catch (NotFoundException e2) {
 				throw new SmartcampusException(e2);
 			}
@@ -113,17 +118,21 @@ public class DropboxStorage implements StorageService {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void replace(String accountId, Resource resource)
+	public void replace(String userAccountId, Resource resource)
 			throws NotFoundException, SmartcampusException {
-		// TODO check if there is a change of content type
 		if (resource.getId() == null) {
 			throw new NotFoundException();
 		}
 
-		AccessTokenPair token;
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
 		try {
-			token = getUserToken(accountId);
+			token = getUserToken(userAccountId);
+			app = getAppToken(userAccountId);
 		} catch (NotFoundException e2) {
 			throw new SmartcampusException(e2);
 		}
@@ -148,13 +157,23 @@ public class DropboxStorage implements StorageService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void remove(String accountId, String rid) throws NotFoundException,
-			SmartcampusException {
+	public void remove(String userAccountId, String rid)
+			throws NotFoundException, SmartcampusException {
 		// get user token
-		UserAccount account = accountManager.findById(accountId);
-		AccessTokenPair token = getUserToken(account.getConfigurations());
 
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(userAccountId);
+			app = getAppToken(userAccountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
 		// find resource name
 		Metadata metadata = metaService.getMetadata(rid);
 
@@ -172,11 +191,39 @@ public class DropboxStorage implements StorageService {
 
 	}
 
-	private AccessTokenPair getUserToken(String accountId)
+	private AccessTokenPair getUserToken(String userAccountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(accountId);
+		UserAccount account = accountManager.findById(userAccountId);
 
 		return getUserToken(account.getConfigurations());
+	}
+
+	private AppKeyPair getAppToken(String userAccountId)
+			throws NotFoundException {
+		UserAccount account = accountManager.findById(userAccountId);
+
+		AppAccount appAccount = appAccountManager.getAppAccountById(account
+				.getAppAccountId());
+
+		return getAppToken(appAccount.getConfigurations());
+	}
+
+	private AppKeyPair getAppToken(List<Configuration> confs) {
+		String appKey = null;
+		String appSecret = null;
+		if (confs == null) {
+			return null;
+		}
+		for (Configuration tmp : confs) {
+			if (tmp.getName().equals(APP_KEY)) {
+				appKey = tmp.getValue();
+			}
+			if (tmp.getName().equals(APP_SECRET)) {
+				appSecret = tmp.getValue();
+			}
+		}
+		return new AppKeyPair(appKey, appSecret);
+
 	}
 
 	private AccessTokenPair getUserToken(List<Configuration> confs) {
@@ -195,5 +242,42 @@ public class DropboxStorage implements StorageService {
 		}
 
 		return new AccessTokenPair(userKey, userSecret);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Token getToken(String userAccountId, String rid)
+			throws NotFoundException, SmartcampusException {
+		// get user token
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(userAccountId);
+			app = getAppToken(userAccountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
+
+		// find resource name
+		Metadata metadata = metaService.getMetadata(rid);
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		DropboxLink link;
+		try {
+			link = sourceClient.media("/" + metadata.getName(), true);
+		} catch (DropboxException e) {
+			throw new SmartcampusException();
+		}
+		Token userSessionToken = new Token();
+		userSessionToken.setUrl(link.url);
+		userSessionToken.setMethodREST("GET");
+		return userSessionToken;
 	}
 }

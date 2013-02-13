@@ -31,8 +31,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.MediaManager;
+import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
@@ -47,45 +49,59 @@ public class MediaController extends RestController {
 	MediaManager mediaManager;
 
 	@Autowired
+	MetadataManager metadataManager;
+
+	@Autowired
 	PermissionManager permissionManager;
 
 	@Autowired
 	ACLService scAcl;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}")
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/{appName}/{accountId}")
 	public @ResponseBody
-	void storeResource(HttpServletRequest request,
+	String storeResource(HttpServletRequest request,
+			@PathVariable String appName,
 			@PathVariable("accountId") String accountId,
-			@RequestParam("file") MultipartFile resource) throws IOException,
-			AlreadyStoredException, SmartcampusException, NotFoundException {
+			@RequestParam("file") MultipartFile resource)
+			throws AlreadyStoredException, SmartcampusException,
+			NotFoundException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkAccountPermission(user, accountId)) {
 			throw new SecurityException();
 		}
-
-		mediaManager.storage(accountId, user, getResource(resource));
+		try {
+			return mediaManager.storage(accountId, user, getResource(resource))
+					.getId();
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		}
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}/{rid}")
-	public boolean replaceResource(HttpServletRequest request,
-			@PathVariable("rid") String rid,
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/{appName}/{accountId}/{rid}")
+	public @ResponseBody
+	void replaceResource(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable("rid") String rid,
 			@PathVariable("accountId") String accountId,
 			@RequestParam("file") MultipartFile resource)
-			throws SmartcampusException, NotFoundException, IOException {
+			throws SmartcampusException, NotFoundException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkResourcePermission(user, rid)) {
 			throw new SecurityException();
 		}
 
-		mediaManager.replace(accountId, user, getResource(resource));
-		return false;
+		try {
+			mediaManager.replace(accountId, user, getResource(rid, resource));
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		}
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{accountId}/{rid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/{appName}{accountId}/{rid}")
 	public @ResponseBody
 	void removeResource(HttpServletRequest request,
+			@PathVariable String appName,
 			@PathVariable("accountId") String accountId,
 			@PathVariable("rid") String rid) throws SmartcampusException,
 			NotFoundException {
@@ -97,20 +113,38 @@ public class MediaController extends RestController {
 		mediaManager.remove(accountId, user, rid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/eu.trentorise.smartcampus.mediastorage.Resource/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/{appName}/{rid}")
 	public @ResponseBody
-	Token getResource(HttpServletRequest request, @PathVariable String rid)
-			throws SmartcampusException, SecurityException {
+	Metadata getResourceMetadata(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable String rid)
+			throws SmartcampusException, SecurityException, NotFoundException {
+		User user = retrieveUser(request);
+
+		return metadataManager.findByResource(rid);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/{appName}/{rid}")
+	public @ResponseBody
+	Token getResource(HttpServletRequest request, @PathVariable String appName,
+			@PathVariable String rid) throws SmartcampusException,
+			SecurityException {
 		User user = retrieveUser(request);
 
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid);
+	}
+
+	private Resource getResource(String rid, MultipartFile file)
+			throws IOException {
+		Resource res = getResource(file);
+		res.setId(rid);
+		return res;
 	}
 
 	private Resource getResource(MultipartFile file) throws IOException {
 		Resource res = new Resource();
 		res.setContent(file.getBytes());
 		res.setContentType(file.getContentType());
-		res.setName(file.getName());
+		res.setName(file.getOriginalFilename());
 		return res;
 	}
 }

@@ -18,6 +18,7 @@ package eu.trentorise.smartcampus.filestorage.managers;
 
 import it.unitn.disi.sweb.webapi.client.WebApiException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,59 +28,128 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 
+/**
+ * <i>MetadataManager</i> manages all aspects about {@link Metadata} of a
+ * resource.
+ * 
+ * @author mirko perillo
+ * 
+ */
 @Service
 public class MetadataManager {
 
+	private static final Logger logger = Logger.getLogger(Metadata.class);
 	@Autowired
 	MetadataService metadataSrv;
 
 	@Autowired
 	SocialManager socialManager;
 
+	@Autowired
+	UserAccountManager userAccountManager;
+
+	/**
+	 * creates and saves metadata info for given {@link Resource}
+	 * 
+	 * @param accountId
+	 *            the id of user storage account in which resource is stored
+	 * @param user
+	 *            user owner of the resource
+	 * @param resource
+	 *            the resource
+	 * @throws AlreadyStoredException
+	 *             if metadata already exists
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public void create(String accountId, User user, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 		metadataSrv.save(createMetadata(accountId, user, resource));
 	}
 
+	/**
+	 * deletes {@link Metadata}
+	 * 
+	 * @param rid
+	 *            the id of the resource binded with metadata
+	 * @throws NotFoundException
+	 *             if metadata for given resource doesn't exist
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
 	public void delete(String rid) throws NotFoundException,
 			SmartcampusException {
-		metadataSrv.delete(rid);
+		String eid = null;
 		try {
-			socialManager.deleteEntity(Long.parseLong(metadataSrv
-					.getEntityByResource(rid)));
+			eid = metadataSrv.getEntityByResource(rid);
+			metadataSrv.delete(rid);
+			socialManager.deleteEntity(Long.parseLong(eid));
 		} catch (NumberFormatException e) {
+			logger.error("Exception parsing entity id: " + eid);
 			throw new NotFoundException();
 		} catch (WebApiException e) {
+			logger.error("Exception invoking social engine", e);
 			throw new SmartcampusException(
 					"Social engine error deleting entity");
 		}
 	}
 
+	/**
+	 * updates a {@link Metadata}. Only field lastModifiedTs is updated
+	 * 
+	 * @param resource
+	 *            resource to update
+	 * @throws NotFoundException
+	 *             if metadata for given resource doesn't exist
+	 */
 	public void update(Resource resource) throws NotFoundException {
 		Metadata metadata = metadataSrv.getMetadata(resource.getId());
 		metadata.setLastModifiedTs(System.currentTimeMillis());
 		metadataSrv.update(metadata);
 	}
 
+	/**
+	 * retrieves a {@link Metadata} given binded resource id
+	 * 
+	 * @param rid
+	 *            the resource id
+	 * @return {@link Metadata} binded to resource
+	 * @throws NotFoundException
+	 *             if metadata doesn't exist
+	 */
 	public Metadata findByResource(String rid) throws NotFoundException {
 		return metadataSrv.getMetadata(rid);
 	}
 
-	private Metadata createMetadata(String accountId, User user,
+	private Metadata createMetadata(String userAccountId, User user,
 			Resource resource) throws SmartcampusException {
 		Metadata metadata = new Metadata();
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());
 		metadata.setName(resource.getName());
 		metadata.setRid(resource.getId());
-		metadata.setAccountId(accountId);
+		metadata.setUserAccountId(userAccountId);
+		metadata.setFileExternalId(resource.getName());
+		// appaccount data
+		UserAccount userAccount;
+		try {
+			userAccount = userAccountManager.findById(userAccountId);
+			metadata.setAppAccountId(userAccount.getAppAccountId());
+			metadata.setAppName(userAccount.getAccountName());
+		} catch (NotFoundException e1) {
+			logger.error(String.format("userAccount not found: %s",
+					userAccountId));
+			throw new SmartcampusException("UserAccount not found");
+		}
 
 		try {
 			metadata.setEid(socialManager.createEntity(resource, user)
 					.toString());
 		} catch (WebApiException e) {
+			logger.error("Exception invoking social engine", e);
 			throw new SmartcampusException(
 					"Social engine error creating entity");
 		}

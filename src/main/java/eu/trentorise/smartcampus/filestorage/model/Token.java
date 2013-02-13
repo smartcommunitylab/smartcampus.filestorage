@@ -20,11 +20,24 @@ import java.util.Map;
 
 public class Token {
 	/* Token data */
+	/**
+	 * the set of security information to access the resource
+	 */
 	private Map<String, Object> metadata;
 
 	/* parameters for REST invocation */
+
+	/**
+	 * HTTP method to access the resource
+	 */
 	private String methodREST;
+	/**
+	 * direct URL to access the resource
+	 */
 	private String url;
+	/**
+	 * optional HTTP headers to access the resource
+	 */
 	private Map<String, String> httpHeaders;
 
 	public Map<String, Object> getMetadata() {

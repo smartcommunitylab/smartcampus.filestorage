@@ -16,10 +16,28 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+/**
+ * <i>Resource</i> represents any type of file stored in the storage
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class Resource {
+	/**
+	 * id of the resource
+	 */
 	private String id;
+	/**
+	 * name of the resource
+	 */
 	private String name;
+	/**
+	 * the content
+	 */
 	private byte[] content;
+	/**
+	 * content type of the resource
+	 */
 	private String contentType;
 
 	public String getName() {

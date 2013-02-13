@@ -21,12 +21,54 @@ import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 
+/**
+ * This interface collects operation about access control list and permission on
+ * resources
+ * 
+ * @author mirko perillo
+ * 
+ */
 public interface ACLService {
 
+	/**
+	 * checks if a user can do a specific operation on a user
+	 * 
+	 * @param operation
+	 *            operation to do
+	 * @param rid
+	 *            id of the resource
+	 * @param user
+	 *            user
+	 * @return true if operation is permitted, false otherwise
+	 */
 	public boolean isPermitted(Operation operation, String rid, User user);
 
+	/**
+	 * retrieves the operations permitted to a user on a resource
+	 * 
+	 * @param rid
+	 *            id of the resource
+	 * @param user
+	 *            user
+	 * @return the array of operation permitted
+	 */
 	public Operation[] getPermissions(String rid, User user);
 
+	/**
+	 * retrieves the Token to performs given operation on the resource
+	 * 
+	 * @param operation
+	 *            operation to perform on the resource
+	 * @param user
+	 *            user who do the operation
+	 * @param rid
+	 *            id of the resource
+	 * @return the token
+	 * @throws SmartcampusException
+	 *             generic exception
+	 * @throws SecurityException
+	 *             if user has no privileges to do the operation on the resource
+	 */
 	public Token getSessionToken(Operation operation, User user, String rid)
 			throws SmartcampusException, SecurityException;
 

@@ -21,9 +21,9 @@ public class DropboxUtils {
 	/**
 	 * Put your dropbox keys
 	 */
-	public static final String appkey = "";
-	public static final String appsecret = "";
-	public static final String userkey = "";
-	public static final String usersecret = "";
+	public static final String appkey = "h6k2ef00f5v224t";
+	public static final String appsecret = "1tex79owvmw04j7";
+	public static final String userkey = "hbw0v1ycmeov3dp";
+	public static final String usersecret = "a30tb8ajp3hdpza";
 
 }

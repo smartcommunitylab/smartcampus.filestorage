@@ -21,6 +21,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 
+@Controller
 public class UserAccountController extends RestController {
 
 	@Autowired
@@ -43,19 +45,20 @@ public class UserAccountController extends RestController {
 	@Autowired
 	PermissionManager permissionManager;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/eu.trentorise.smartcampus.mediastorage.UserAccount")
+	@RequestMapping(method = RequestMethod.POST, value = "/useraccount")
 	public @ResponseBody
-	void save(HttpServletRequest request, @RequestBody UserAccount account)
-			throws SmartcampusException, AlreadyStoredException {
+	UserAccount save(HttpServletRequest request,
+			@RequestBody UserAccount account) throws SmartcampusException,
+			AlreadyStoredException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkAccountPermission(user, account)) {
 			throw new SecurityException();
 		}
-		accountManager.save(account);
+		return accountManager.save(account);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/eu.trentorise.smartcampus.mediastorage.UserAccount/{aid}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/useraccount/{aid}")
 	public @ResponseBody
 	void update(HttpServletRequest request, @RequestBody UserAccount account,
 			@PathVariable("aid") String aid) throws SmartcampusException {
@@ -72,10 +75,11 @@ public class UserAccountController extends RestController {
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/eu.trentorise.smartcampus.mediastorage.UserAccount/{aid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/useraccount/{appName}/{aid}")
 	public @ResponseBody
-	void delete(HttpServletRequest request, @PathVariable("aid") String aid)
-			throws SmartcampusException, NotFoundException {
+	void delete(HttpServletRequest request, @PathVariable String appName,
+			@PathVariable("aid") String aid) throws SmartcampusException,
+			NotFoundException {
 		User user = retrieveUser(request);
 
 		if (!permissionManager.checkAccountPermission(user, aid)) {
@@ -84,7 +88,23 @@ public class UserAccountController extends RestController {
 		accountManager.delete(aid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/eu.trentorise.smartcampus.mediastorage.UserAccount")
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}/{aid}")
+	public @ResponseBody
+	UserAccount getAccountById(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable String aid)
+			throws SmartcampusException, NotFoundException {
+		User user = retrieveUser(request);
+		return accountManager.findById(aid);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}")
+	public @ResponseBody
+	List<UserAccount> getAccounts(HttpServletRequest request,
+			@PathVariable String appName) throws SmartcampusException {
+		return accountManager.findUserAccounts(appName);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "useraccount")
 	public @ResponseBody
 	List<UserAccount> getMyAccounts(HttpServletRequest request)
 			throws SmartcampusException {
@@ -92,7 +112,7 @@ public class UserAccountController extends RestController {
 		return accountManager.findBy(user.getId());
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/eu.trentorise.smartcampus.mediastorage.UserAccount/{aid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{aid}")
 	public @ResponseBody
 	UserAccount getMyAccount(HttpServletRequest request,
 			@PathVariable String aid) throws SmartcampusException,

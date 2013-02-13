@@ -18,9 +18,15 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import org.springframework.data.annotation.Id;
 
+/**
+ * <i>Metadata</i> represents all the informations about a resource
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class Metadata {
 	/**
-	 * original name
+	 * name of the resource
 	 */
 	private String name;
 
@@ -31,19 +37,34 @@ public class Metadata {
 	private String rid;
 
 	/**
-	 * entity id
+	 * entity id binded to resource
 	 */
 	private String eid;
 
-	private String accountId;
+	private String fileExternalId;
 
 	/**
-	 * mime of the type
+	 * account id in which resource is stored
+	 */
+	private String userAccountId;
+
+	private String appAccountId;
+
+	private String appName;
+
+	/**
+	 * MIME type of resource
 	 */
 	private String contentType;
 
+	/**
+	 * creation time
+	 */
 	private long creationTs;
 
+	/**
+	 * last modification time
+	 */
 	private long lastModifiedTs;
 
 	public String getName() {
@@ -94,12 +115,36 @@ public class Metadata {
 		this.lastModifiedTs = lastModifiedTs;
 	}
 
-	public String getAccountId() {
-		return accountId;
+	public String getUserAccountId() {
+		return userAccountId;
 	}
 
-	public void setAccountId(String accountId) {
-		this.accountId = accountId;
+	public void setUserAccountId(String accountId) {
+		this.userAccountId = accountId;
+	}
+
+	public String getFileExternalId() {
+		return fileExternalId;
+	}
+
+	public void setFileExternalId(String fileExternalId) {
+		this.fileExternalId = fileExternalId;
+	}
+
+	public String getAppAccountId() {
+		return appAccountId;
+	}
+
+	public void setAppAccountId(String appAccountId) {
+		this.appAccountId = appAccountId;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 
 }

@@ -18,10 +18,34 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.List;
 
+/**
+ * User storage account informations
+ * 
+ * @author mirko perillo
+ * 
+ */
 public class UserAccount {
+	/**
+	 * id of the account
+	 */
 	private String id;
+	/**
+	 * id of the user
+	 */
 	private long userId;
-	private StorageType storage;
+	/**
+	 * type of the storage
+	 */
+	private String appAccountId;
+
+	private String appName;
+
+	private StorageType storageType;
+
+	private String accountName;
+	/**
+	 * list of the configurations of the account storage
+	 */
 	private List<Configuration> configurations;
 
 	public long getUserId() {
@@ -32,12 +56,12 @@ public class UserAccount {
 		this.userId = userId;
 	}
 
-	public StorageType getStorage() {
-		return storage;
+	public StorageType getStorageType() {
+		return storageType;
 	}
 
-	public void setStorage(StorageType storage) {
-		this.storage = storage;
+	public void setStorageType(StorageType storage) {
+		this.storageType = storage;
 	}
 
 	public List<Configuration> getConfigurations() {
@@ -54,6 +78,30 @@ public class UserAccount {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getAppAccountId() {
+		return appAccountId;
+	}
+
+	public void setAppAccountId(String appAccountId) {
+		this.appAccountId = appAccountId;
+	}
+
+	public String getAccountName() {
+		return accountName;
+	}
+
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 
 }

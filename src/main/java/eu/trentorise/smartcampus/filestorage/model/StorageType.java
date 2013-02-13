@@ -16,6 +16,12 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+/**
+ * Types of storage
+ * 
+ * @author mirko perillo
+ * 
+ */
 public enum StorageType {
 	S3, DROPBOX
 }
