@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.AppAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.AppAccount;
@@ -34,7 +33,6 @@ public class AppAccountController extends RestController {
 	AppAccount create(HttpServletRequest request,
 			@RequestBody AppAccount appAccount) throws SmartcampusException,
 			AlreadyStoredException {
-		User user = retrieveUser(request);
 
 		return appAccountManager.save(appAccount);
 	}
@@ -44,7 +42,6 @@ public class AppAccountController extends RestController {
 	AppAccount update(HttpServletRequest request,
 			@RequestBody AppAccount appAccount, @PathVariable String appName)
 			throws SmartcampusException, NotFoundException {
-		User user = retrieveUser(request);
 		return appAccountManager.update(appAccount);
 	}
 
@@ -52,7 +49,6 @@ public class AppAccountController extends RestController {
 	public @ResponseBody
 	boolean delete(HttpServletRequest request, @PathVariable String appName,
 			@PathVariable String appAccountId) throws SmartcampusException {
-		User user = retrieveUser(request);
 		appAccountManager.delete(appAccountId);
 		return true;
 	}

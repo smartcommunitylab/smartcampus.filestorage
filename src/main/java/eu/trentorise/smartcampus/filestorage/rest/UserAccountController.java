@@ -58,10 +58,11 @@ public class UserAccountController extends RestController {
 		return accountManager.save(account);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/useraccount/{aid}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/useraccount/{appName}/{aid}")
 	public @ResponseBody
 	void update(HttpServletRequest request, @RequestBody UserAccount account,
-			@PathVariable("aid") String aid) throws SmartcampusException {
+			@PathVariable String appName, @PathVariable("aid") String aid)
+			throws SmartcampusException {
 		User user = retrieveUser(request);
 
 		if (account.getId() == null) {
