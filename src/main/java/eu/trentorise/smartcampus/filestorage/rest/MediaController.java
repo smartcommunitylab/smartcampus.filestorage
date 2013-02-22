@@ -98,7 +98,7 @@ public class MediaController extends RestController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/{appName}{accountId}/{rid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/{appName}/{accountId}/{rid}")
 	public @ResponseBody
 	void removeResource(HttpServletRequest request,
 			@PathVariable String appName,
