@@ -40,6 +40,11 @@ public class Token {
 	 */
 	private Map<String, String> httpHeaders;
 
+	/**
+	 * storage which stores the resource
+	 */
+	private StorageType storageType;
+
 	public Map<String, Object> getMetadata() {
 		return metadata;
 
@@ -71,5 +76,13 @@ public class Token {
 
 	public void setHttpHeaders(Map<String, String> httpHeaders) {
 		this.httpHeaders = httpHeaders;
+	}
+
+	public StorageType getStorageType() {
+		return storageType;
+	}
+
+	public void setStorageType(StorageType storageType) {
+		this.storageType = storageType;
 	}
 }

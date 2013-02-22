@@ -263,6 +263,8 @@ public class DropboxStorage implements StorageService {
 
 		// find resource name
 		Metadata metadata = metaService.getMetadata(rid);
+		AppAccount appAccount = appAccountManager.getAppAccountById(metadata
+				.getAppAccountId());
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -278,6 +280,7 @@ public class DropboxStorage implements StorageService {
 		Token userSessionToken = new Token();
 		userSessionToken.setUrl(link.url);
 		userSessionToken.setMethodREST("GET");
+		userSessionToken.setStorageType(appAccount.getStorageType());
 		return userSessionToken;
 	}
 }
