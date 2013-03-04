@@ -45,13 +45,17 @@ public class UserAccountController extends RestController {
 	@Autowired
 	PermissionManager permissionManager;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/useraccount")
+	@RequestMapping(method = RequestMethod.POST, value = "/useraccount/{appName}")
 	public @ResponseBody
 	UserAccount save(HttpServletRequest request,
-			@RequestBody UserAccount account) throws SmartcampusException,
-			AlreadyStoredException {
+			@RequestBody UserAccount account, @PathVariable String appName)
+			throws SmartcampusException, AlreadyStoredException {
 		User user = retrieveUser(request);
 
+		// if userId isn't setted, it will be use the authToken to retrieve it
+		if (account.getUserId() <= 0) {
+			account.setUserId(user.getId());
+		}
 		if (!permissionManager.checkAccountPermission(user, account)) {
 			throw new SecurityException();
 		}
