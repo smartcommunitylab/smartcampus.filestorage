@@ -18,6 +18,9 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Token {
 	/* Token data */
 	/**

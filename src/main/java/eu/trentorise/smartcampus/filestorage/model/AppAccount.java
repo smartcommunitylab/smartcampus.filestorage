@@ -2,6 +2,9 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class AppAccount {
 	private String id;
 	private String appName;

@@ -16,6 +16,8 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * <i>Configuration</i> is the representation of a configuration in a user
  * storage account
@@ -23,6 +25,7 @@ package eu.trentorise.smartcampus.filestorage.model;
  * @author mirko perillo
  * 
  */
+@XmlRootElement
 public class Configuration {
 	/**
 	 * name of configuration

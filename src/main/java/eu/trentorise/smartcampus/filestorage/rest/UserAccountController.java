@@ -109,13 +109,13 @@ public class UserAccountController extends RestController {
 		return accountManager.findUserAccounts(appName);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "useraccount")
-	public @ResponseBody
-	List<UserAccount> getMyAccounts(HttpServletRequest request)
-			throws SmartcampusException {
-		User user = retrieveUser(request);
-		return accountManager.findBy(user.getId());
-	}
+	// @RequestMapping(method = RequestMethod.GET, value = "useraccount")
+	// public @ResponseBody
+	// List<UserAccount> getMyAccounts(HttpServletRequest request)
+	// throws SmartcampusException {
+	// User user = retrieveUser(request);
+	// return accountManager.findBy(user.getId());
+	// }
 
 	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{aid}")
 	public @ResponseBody

@@ -18,12 +18,15 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * User storage account informations
  * 
  * @author mirko perillo
  * 
  */
+@XmlRootElement
 public class UserAccount {
 	/**
 	 * id of the account

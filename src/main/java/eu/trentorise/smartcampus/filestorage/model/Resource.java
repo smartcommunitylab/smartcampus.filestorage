@@ -16,12 +16,15 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * <i>Resource</i> represents any type of file stored in the storage
  * 
  * @author mirko perillo
  * 
  */
+@XmlRootElement
 public class Resource {
 	/**
 	 * id of the resource
