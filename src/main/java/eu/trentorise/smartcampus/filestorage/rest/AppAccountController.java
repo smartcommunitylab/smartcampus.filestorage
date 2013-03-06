@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import eu.trentorise.smartcampus.filestorage.managers.AppAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.ListAppAccount;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 
@@ -53,12 +54,21 @@ public class AppAccountController extends RestController {
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}", produces = "application/json")
 	public @ResponseBody
-	List<AppAccount> getAppAccounts(HttpServletRequest request,
+	List<AppAccount> getAppAccountsJSON(HttpServletRequest request,
 			@PathVariable String appName) throws SmartcampusException {
 
 		return appAccountManager.getAppAccounts(appName);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}", produces = "application/xml")
+	public @ResponseBody
+	ListAppAccount getAppAccountsXML(HttpServletRequest request,
+			@PathVariable String appName) throws SmartcampusException {
+		ListAppAccount result = new ListAppAccount();
+		result.setAppAccounts(appAccountManager.getAppAccounts(appName));
+		return result;
 	}
 
 }

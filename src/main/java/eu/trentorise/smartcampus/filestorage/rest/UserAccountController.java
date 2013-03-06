@@ -32,6 +32,7 @@ import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
 import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.ListUserAccount;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
@@ -102,11 +103,20 @@ public class UserAccountController extends RestController {
 		return accountManager.findById(aid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}", produces = "application/json")
 	public @ResponseBody
-	List<UserAccount> getAccounts(HttpServletRequest request,
+	List<UserAccount> getAccountsJSON(HttpServletRequest request,
 			@PathVariable String appName) throws SmartcampusException {
 		return accountManager.findUserAccounts(appName);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}", produces = "application/xml")
+	public @ResponseBody
+	ListUserAccount getAccountsXML(HttpServletRequest request,
+			@PathVariable String appName) throws SmartcampusException {
+		ListUserAccount result = new ListUserAccount();
+		result.setUserAccounts(accountManager.findUserAccounts(appName));
+		return result;
 	}
 
 	// @RequestMapping(method = RequestMethod.GET, value = "useraccount")
@@ -117,15 +127,15 @@ public class UserAccountController extends RestController {
 	// return accountManager.findBy(user.getId());
 	// }
 
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{aid}")
-	public @ResponseBody
-	UserAccount getMyAccount(HttpServletRequest request,
-			@PathVariable String aid) throws SmartcampusException,
-			NotFoundException {
-		User user = retrieveUser(request);
-		if (!permissionManager.checkAccountPermission(user, aid)) {
-			throw new SecurityException();
-		}
-		return accountManager.findById(aid);
-	}
+	// @RequestMapping(method = RequestMethod.GET, value = "/useraccount/{aid}")
+	// public @ResponseBody
+	// UserAccount getMyAccount(HttpServletRequest request,
+	// @PathVariable String aid) throws SmartcampusException,
+	// NotFoundException {
+	// User user = retrieveUser(request);
+	// if (!permissionManager.checkAccountPermission(user, aid)) {
+	// throw new SecurityException();
+	// }
+	// return accountManager.findById(aid);
+	// }
 }
