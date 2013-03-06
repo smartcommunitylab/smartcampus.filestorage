@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.rest;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,39 +101,12 @@ public class UserAccountController extends RestController {
 		return accountManager.findById(aid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}", produces = "application/json")
+	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}")
 	public @ResponseBody
-	List<UserAccount> getAccountsJSON(HttpServletRequest request,
-			@PathVariable String appName) throws SmartcampusException {
-		return accountManager.findUserAccounts(appName);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}", produces = "application/xml")
-	public @ResponseBody
-	ListUserAccount getAccountsXML(HttpServletRequest request,
+	ListUserAccount getAccounts(HttpServletRequest request,
 			@PathVariable String appName) throws SmartcampusException {
 		ListUserAccount result = new ListUserAccount();
 		result.setUserAccounts(accountManager.findUserAccounts(appName));
 		return result;
 	}
-
-	// @RequestMapping(method = RequestMethod.GET, value = "useraccount")
-	// public @ResponseBody
-	// List<UserAccount> getMyAccounts(HttpServletRequest request)
-	// throws SmartcampusException {
-	// User user = retrieveUser(request);
-	// return accountManager.findBy(user.getId());
-	// }
-
-	// @RequestMapping(method = RequestMethod.GET, value = "/useraccount/{aid}")
-	// public @ResponseBody
-	// UserAccount getMyAccount(HttpServletRequest request,
-	// @PathVariable String aid) throws SmartcampusException,
-	// NotFoundException {
-	// User user = retrieveUser(request);
-	// if (!permissionManager.checkAccountPermission(user, aid)) {
-	// throw new SecurityException();
-	// }
-	// return accountManager.findById(aid);
-	// }
 }

@@ -1,7 +1,5 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -54,17 +52,9 @@ public class AppAccountController extends RestController {
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}", produces = "application/json")
+	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}")
 	public @ResponseBody
-	List<AppAccount> getAppAccountsJSON(HttpServletRequest request,
-			@PathVariable String appName) throws SmartcampusException {
-
-		return appAccountManager.getAppAccounts(appName);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/appaccount/{appName}", produces = "application/xml")
-	public @ResponseBody
-	ListAppAccount getAppAccountsXML(HttpServletRequest request,
+	ListAppAccount getAppAccounts(HttpServletRequest request,
 			@PathVariable String appName) throws SmartcampusException {
 		ListAppAccount result = new ListAppAccount();
 		result.setAppAccounts(appAccountManager.getAppAccounts(appName));
