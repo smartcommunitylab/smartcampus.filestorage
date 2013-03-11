@@ -16,6 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,8 @@ import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
  */
 @Service
 public class MediaManager {
+
+	private static final Logger logger = Logger.getLogger(MediaManager.class);
 
 	@Autowired
 	MetadataManager metadataManager;
@@ -69,8 +72,10 @@ public class MediaManager {
 
 		StorageService storageService = storageUtils
 				.getStorageService(accountId);
+		logger.info("Retrieved storageService");
 		resource = storageService.store(accountId, resource);
 		metadataManager.create(accountId, user, resource);
+		logger.info("Created resource metadata");
 		return resource;
 	}
 

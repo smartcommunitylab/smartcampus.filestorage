@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.activemq.util.ByteArrayInputStream;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,8 @@ import eu.trentorise.smartcampus.filestorage.services.StorageService;
 @Service
 public class DropboxStorage implements StorageService {
 
+	private static final Logger logger = Logger.getLogger(DropboxStorage.class);
+
 	private static final String USER_KEY = "USER_KEY";
 	private static final String USER_SECRET = "USER_SECRET";
 
@@ -90,6 +93,7 @@ public class DropboxStorage implements StorageService {
 			try {
 				token = getUserToken(userAccountId);
 				app = getAppToken(userAccountId);
+				logger.info("Retrived dropbox account informations");
 			} catch (NotFoundException e2) {
 				throw new SmartcampusException(e2);
 			}
@@ -105,6 +109,7 @@ public class DropboxStorage implements StorageService {
 						resource.getContent().length, null, null);
 				sourceSession.unlink();
 				in.close();
+				logger.info("Resource stored on dropbox");
 				if (resource.getId() == null) {
 					resource.setId(new ObjectId().toString());
 				}
