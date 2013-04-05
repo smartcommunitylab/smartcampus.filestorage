@@ -102,13 +102,13 @@ public class UserAccountManager {
 	/**
 	 * retrieves all the {@link UserAccount} of a given user
 	 * 
-	 * @param uid
+	 * @param userId
 	 *            id of the owner of user storage accounts
 	 * @return a list of UserAccount of the given user id
 	 */
-	public List<UserAccount> findBy(long uid) {
+	public List<UserAccount> findBy(long userId) {
 		Criteria criteria = new Criteria();
-		criteria.and("userId").is(uid);
+		criteria.and("userId").is(userId);
 		return db.find(Query.query(criteria), UserAccount.class);
 	}
 
@@ -134,15 +134,15 @@ public class UserAccountManager {
 	 * retrieves a list of {@link UserAccount} of a given user and of a given
 	 * type
 	 * 
-	 * @param uid
+	 * @param userId
 	 *            id of the user
 	 * @param storage
 	 *            type of storage
 	 * @return the list of UserAccount for given user and type
 	 */
-	public List<UserAccount> findBy(long uid, StorageType storage) {
+	public List<UserAccount> findBy(long userId, StorageType storage) {
 		Criteria criteria = new Criteria();
-		criteria.and("userId").is(uid);
+		criteria.and("userId").is(userId);
 		criteria.and("storage").is(storage);
 		return db.find(Query.query(criteria), UserAccount.class);
 	}
