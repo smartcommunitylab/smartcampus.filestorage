@@ -54,7 +54,8 @@ public interface MetadataService {
 	 * @throws NotFoundException
 	 *             if resource dosn't exist
 	 */
-	public String getResourceByEntity(String eid) throws NotFoundException;
+	public String getResourceBySocialId(String sociaId)
+			throws NotFoundException;
 
 	/**
 	 * retrieves social entity id given the id of the resource

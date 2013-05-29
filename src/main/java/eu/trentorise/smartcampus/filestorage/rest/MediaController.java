@@ -57,11 +57,11 @@ public class MediaController extends RestController {
 	@Autowired
 	ACLService scAcl;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/resource/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/{appName}/{accountId}/{createSocialData}")
 	public @ResponseBody
 	String storeResource(HttpServletRequest request,
-			@PathVariable String appName,
-			@PathVariable("accountId") String accountId,
+			@PathVariable String appName, @PathVariable String accountId,
+			@PathVariable boolean createSocialData,
 			@RequestParam("file") MultipartFile resource)
 			throws AlreadyStoredException, SmartcampusException,
 			NotFoundException {
@@ -71,8 +71,8 @@ public class MediaController extends RestController {
 			throw new SecurityException();
 		}
 		try {
-			return mediaManager.storage(accountId, user, getResource(resource))
-					.getId();
+			return mediaManager.storage(accountId, user, getResource(resource),
+					createSocialData).getId();
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}

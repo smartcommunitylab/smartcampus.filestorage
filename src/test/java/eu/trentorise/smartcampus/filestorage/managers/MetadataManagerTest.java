@@ -64,8 +64,8 @@ public class MetadataManagerTest {
 			userAccount = TestUtils.createUserAccount(appAccount, user.getId());
 			userAccount = accountManager.save(userAccount);
 
-			resource = mediaManager
-					.storage(userAccount.getId(), user, resource);
+			resource = mediaManager.storage(userAccount.getId(), user,
+					resource, false);
 		} catch (Exception e) {
 			Assert.fail("Exception in setup env");
 		}

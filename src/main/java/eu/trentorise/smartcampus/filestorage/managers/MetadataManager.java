@@ -60,14 +60,18 @@ public class MetadataManager {
 	 *            user owner of the resource
 	 * @param resource
 	 *            the resource
+	 * @param createSocialData
+	 *            true to create social information to associate to the resource
 	 * @throws AlreadyStoredException
 	 *             if metadata already exists
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void create(String accountId, User user, Resource resource)
-			throws AlreadyStoredException, SmartcampusException {
-		metadataSrv.save(createMetadata(accountId, user, resource));
+	public void create(String accountId, User user, Resource resource,
+			boolean createSocialData) throws AlreadyStoredException,
+			SmartcampusException {
+		metadataSrv.save(createMetadata(accountId, user, resource,
+				createSocialData));
 	}
 
 	/**
@@ -152,7 +156,8 @@ public class MetadataManager {
 	}
 
 	private Metadata createMetadata(String userAccountId, User user,
-			Resource resource) throws SmartcampusException {
+			Resource resource, boolean createSocialData)
+			throws SmartcampusException {
 		Metadata metadata = new Metadata();
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());
@@ -171,16 +176,16 @@ public class MetadataManager {
 					userAccountId));
 			throw new SmartcampusException("UserAccount not found");
 		}
-
-		try {
-			metadata.setSocialId(socialManager.createEntity(resource, user)
-					.toString());
-		} catch (WebApiException e) {
-			logger.error("Exception invoking social engine", e);
-			throw new SmartcampusException(
-					"Social engine error creating entity");
+		if (createSocialData) {
+			try {
+				metadata.setSocialId(socialManager.createEntity(resource, user)
+						.toString());
+			} catch (WebApiException e) {
+				logger.error("Exception invoking social engine", e);
+				throw new SmartcampusException(
+						"Social engine error creating entity");
+			}
 		}
-
 		return metadata;
 	}
 }

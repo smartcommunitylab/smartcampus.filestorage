@@ -86,7 +86,7 @@ public class CompleteScenarioTest {
 
 		User user = testUtils.createUser();
 
-		resource = mediaManager.storage(account.getId(), user, resource);
+		resource = mediaManager.storage(account.getId(), user, resource, true);
 		Token token = mediaManager.getResourceToken(user, resource.getId(),
 				Operation.DOWNLOAD);
 		Assert.assertNotNull(token.getUrl());
@@ -118,7 +118,7 @@ public class CompleteScenarioTest {
 		User user1 = testUtils.createUser();
 		User user2 = testUtils.createUser();
 
-		resource = mediaManager.storage(account.getId(), user1, resource);
+		resource = mediaManager.storage(account.getId(), user1, resource, true);
 
 		try {
 			mediaManager.getResourceToken(user2, resource.getId(),

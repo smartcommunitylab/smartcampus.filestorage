@@ -61,20 +61,23 @@ public class MediaManager {
 	 *            the user who stores the resource
 	 * @param resource
 	 *            resource to store
+	 * @param createSocialData
+	 *            TODO
 	 * @return the resource stored with the id assigned from storage
 	 * @throws AlreadyStoredException
 	 *             if resource is already stored.
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public Resource storage(String accountId, User user, Resource resource)
-			throws AlreadyStoredException, SmartcampusException {
+	public Resource storage(String accountId, User user, Resource resource,
+			boolean createSocialData) throws AlreadyStoredException,
+			SmartcampusException {
 
 		StorageService storageService = storageUtils
 				.getStorageService(accountId);
 		logger.info("Retrieved storageService");
 		resource = storageService.store(accountId, resource);
-		metadataManager.create(accountId, user, resource);
+		metadataManager.create(accountId, user, resource, createSocialData);
 		logger.info("Created resource metadata");
 		return resource;
 	}

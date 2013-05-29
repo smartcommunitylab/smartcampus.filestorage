@@ -43,11 +43,12 @@ public class MongoMetadataService implements MetadataService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getResourceByEntity(String eid) throws NotFoundException {
-		Criteria criteria = new Criteria("eid").is(eid);
+	public String getResourceBySocialId(String socialId)
+			throws NotFoundException {
+		Criteria criteria = new Criteria("socialId").is(socialId);
 		Metadata meta = db.findOne(Query.query(criteria), Metadata.class);
 		if (meta == null) {
-			logger.error("Metadata not found: " + eid);
+			logger.error("Metadata not found: " + socialId);
 			throw new NotFoundException();
 		} else {
 			return meta.getRid();
@@ -137,7 +138,7 @@ public class MongoMetadataService implements MetadataService {
 		criteria.and("name").is(filename);
 		List<Metadata> results = db.find(Query.query(criteria), Metadata.class);
 		if (results.size() < 1) {
-			logger.error(String.format("Metadata not found: %s - %s", filename,
+			logger.warn(String.format("Metadata not found: %s - %s", filename,
 					accountId));
 			throw new NotFoundException();
 		}
