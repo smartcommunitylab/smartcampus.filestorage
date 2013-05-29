@@ -44,7 +44,7 @@
 			<version>1.0</version>
 			<type>jar</type>
 		</dependency>
-		
+
 		<!-- Utilities -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -67,24 +67,24 @@
 			<version>1.2.2</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.owasp.esapi</groupId> -->
-<!-- 			<artifactId>esapi</artifactId> -->
-<!-- 			<version>2.0GA</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.owasp.esapi</groupId> -->
+		<!-- <artifactId>esapi</artifactId> -->
+		<!-- <version>2.0GA</version> -->
+		<!-- </dependency> -->
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.owasp</groupId> -->
-<!-- 			<artifactId>antisamy</artifactId> -->
-<!-- 			<version>1.4</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.owasp</groupId> -->
+		<!-- <artifactId>antisamy</artifactId> -->
+		<!-- <version>1.4</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>dropbox</groupId>
 			<artifactId>dropbox-sdk</artifactId>
 			<version>1.5.1</version>
 		</dependency>
-		
+
 		<!-- User filestorage.client to test the REST layer -->
 		<dependency>
 			<groupId>eu.trentorise.smartcampus</groupId>
@@ -127,6 +127,18 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<version>${project.version}</version>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
