@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.AppAccount;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
+import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.utils.SocialEngineOperation;
@@ -86,6 +87,12 @@ public class MetadataManagerTest {
 		} catch (Exception e) {
 			Assert.fail("Exception occurred " + e.getMessage());
 		}
+	}
+
+	@Test
+	public void resourceSize() throws NotFoundException {
+		Metadata meta = metaManager.findByResource(resource.getId());
+		Assert.assertTrue(meta.getSize() > 0);
 	}
 
 	@After

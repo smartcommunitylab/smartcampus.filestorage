@@ -64,6 +64,11 @@ public class Metadata {
 	private String contentType;
 
 	/**
+	 * file size in bytes
+	 */
+	private long size;
+
+	/**
 	 * creation time
 	 */
 	private long creationTs;
@@ -151,6 +156,14 @@ public class Metadata {
 
 	public void setAppName(String appName) {
 		this.appName = appName;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 }

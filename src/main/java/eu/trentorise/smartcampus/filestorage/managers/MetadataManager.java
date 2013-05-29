@@ -165,6 +165,7 @@ public class MetadataManager {
 		metadata.setRid(resource.getId());
 		metadata.setUserAccountId(userAccountId);
 		metadata.setFileExternalId(resource.getName());
+		metadata.setSize(resource.getContent().length);
 		// appaccount data
 		UserAccount userAccount;
 		try {
