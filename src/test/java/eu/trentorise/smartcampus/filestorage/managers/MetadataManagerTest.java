@@ -81,7 +81,7 @@ public class MetadataManagerTest {
 			Metadata updatedMeta = metaManager.updateSocialData(user,
 					resource.getId(), newEntity.getId().toString());
 			Metadata readed = metaManager.findByResource(resource.getId());
-			Assert.assertEquals(updatedMeta.getEid(), readed.getEid());
+			Assert.assertEquals(updatedMeta.getSocialId(), readed.getSocialId());
 
 		} catch (Exception e) {
 			Assert.fail("Exception occurred " + e.getMessage());

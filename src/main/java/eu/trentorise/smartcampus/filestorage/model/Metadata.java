@@ -45,7 +45,7 @@ public class Metadata {
 	/**
 	 * entity id binded to resource
 	 */
-	private String eid;
+	private String socialId;
 
 	private String fileExternalId;
 
@@ -89,12 +89,12 @@ public class Metadata {
 		this.rid = rid;
 	}
 
-	public String getEid() {
-		return eid;
+	public String getSocialId() {
+		return socialId;
 	}
 
-	public void setEid(String eid) {
-		this.eid = eid;
+	public void setSocialId(String eid) {
+		this.socialId = eid;
 	}
 
 	public String getContentType() {

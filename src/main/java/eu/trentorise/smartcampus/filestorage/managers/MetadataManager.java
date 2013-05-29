@@ -143,7 +143,7 @@ public class MetadataManager {
 
 		// check if entityId is owned by owner of the resource
 		if (socialManager.isOwnedBy(owner, entityId)) {
-			meta.setEid(entityId);
+			meta.setSocialId(entityId);
 			metadataSrv.update(meta);
 		} else {
 			throw new SecurityException("Entity is not owned by the user");
@@ -173,7 +173,7 @@ public class MetadataManager {
 		}
 
 		try {
-			metadata.setEid(socialManager.createEntity(resource, user)
+			metadata.setSocialId(socialManager.createEntity(resource, user)
 					.toString());
 		} catch (WebApiException e) {
 			logger.error("Exception invoking social engine", e);

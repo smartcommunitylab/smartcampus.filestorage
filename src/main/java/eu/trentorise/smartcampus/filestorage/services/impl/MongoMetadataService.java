@@ -60,7 +60,7 @@ public class MongoMetadataService implements MetadataService {
 	@Override
 	public String getEntityByResource(String rid) throws NotFoundException {
 		Metadata meta = getMetadata(rid);
-		return meta.getEid();
+		return meta.getSocialId();
 	}
 
 	/**

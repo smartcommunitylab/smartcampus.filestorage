@@ -129,7 +129,7 @@ public class CompleteScenarioTest {
 		}
 
 		long eid = Long.parseLong(metaManager.findByResource(resource.getId())
-				.getEid());
+				.getSocialId());
 
 		socialEngine.shareEntityWith(eid, user1.getSocialId(),
 				user2.getSocialId());

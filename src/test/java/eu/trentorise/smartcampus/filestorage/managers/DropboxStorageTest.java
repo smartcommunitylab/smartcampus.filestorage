@@ -164,7 +164,7 @@ public class DropboxStorageTest {
 		Metadata meta = new Metadata();
 		meta.setContentType(r.getContentType());
 		meta.setCreationTs(System.currentTimeMillis());
-		meta.setEid("eid");
+		meta.setSocialId("eid");
 		meta.setName(r.getName());
 		meta.setRid(r.getId());
 		meta.setUserAccountId(a.getId());
