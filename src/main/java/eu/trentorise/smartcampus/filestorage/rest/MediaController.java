@@ -133,6 +133,18 @@ public class MediaController extends RestController {
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid);
 	}
 
+	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/{appName}/{rid}/{entityId}")
+	public @ResponseBody
+	Metadata updateSocialData(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable String rid,
+			@PathVariable String entityId) throws SmartcampusException,
+			SecurityException, NotFoundException {
+
+		User user = retrieveUser(request);
+
+		return metadataManager.updateSocialData(user, rid, entityId);
+	}
+
 	private Resource getResource(String rid, MultipartFile file)
 			throws IOException {
 		Resource res = getResource(file);

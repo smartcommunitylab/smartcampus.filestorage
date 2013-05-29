@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.trentorise.smartcampus</groupId>
 	<artifactId>smartcampus.filestorage</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<packaging>war</packaging>
 
 	<parent>
@@ -44,6 +44,7 @@
 			<version>1.0</version>
 			<type>jar</type>
 		</dependency>
+		
 		<!-- Utilities -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -66,32 +67,43 @@
 			<version>1.2.2</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.owasp.esapi</groupId>
-			<artifactId>esapi</artifactId>
-			<version>2.0GA</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.owasp.esapi</groupId> -->
+<!-- 			<artifactId>esapi</artifactId> -->
+<!-- 			<version>2.0GA</version> -->
+<!-- 		</dependency> -->
 
-		<dependency>
-			<groupId>org.owasp</groupId>
-			<artifactId>antisamy</artifactId>
-			<version>1.4</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.owasp</groupId> -->
+<!-- 			<artifactId>antisamy</artifactId> -->
+<!-- 			<version>1.4</version> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>dropbox</groupId>
 			<artifactId>dropbox-sdk</artifactId>
 			<version>1.5.1</version>
 		</dependency>
+		
+		<!-- User filestorage.client to test the REST layer -->
 		<dependency>
 			<groupId>eu.trentorise.smartcampus</groupId>
 			<artifactId>filestorage.client</artifactId>
 			<version>1.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

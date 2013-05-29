@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,10 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
  */
 @Service
 public class SocialManager {
-	SCWebApiClient socialClient;
+
+	private static final Logger logger = Logger.getLogger(SocialManager.class);
+
+	private SCWebApiClient socialClient;
 
 	@Value("${smartcampus.vas.web.socialengine.host}")
 	private String socialEngineHost;
@@ -102,7 +106,35 @@ public class SocialManager {
 			throws WebApiException {
 		return SemanticHelper.isEntitySharedWithUser(socialClient,
 				Long.decode(eid), user.getSocialId());
+	}
 
+	/**
+	 * checks if social entity is owned by the given user
+	 * 
+	 * @param user
+	 *            user owner of entity
+	 * @param entityId
+	 *            social entity id
+	 * @return true if entity is owned by the user, false otherwise
+	 */
+	public boolean isOwnedBy(User user, String entityId) {
+		try {
+			Entity entity = socialClient
+					.readEntity(Long.decode(entityId), null);
+			it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialClient
+					.readUser(user.getSocialId());
+			return entity.getOwnerId().equals(socialUser.getEntityBaseId());
+		} catch (NumberFormatException e) {
+			logger.error(String.format(
+					"Exception converting in long entityId %s", entityId));
+			return false;
+		} catch (WebApiException e) {
+			logger.error("Exception invoking socialEngineClient", e);
+			return false;
+		} catch (Exception e) {
+			logger.error("A general exception is occurred", e);
+			return false;
+		}
 	}
 
 }

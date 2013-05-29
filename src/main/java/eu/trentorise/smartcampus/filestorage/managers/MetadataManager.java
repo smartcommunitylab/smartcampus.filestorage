@@ -124,6 +124,33 @@ public class MetadataManager {
 		return metadataSrv.getMetadata(rid);
 	}
 
+	/**
+	 * updates the social data relative to a resource
+	 * 
+	 * @param rid
+	 *            the resource id
+	 * @param entityId
+	 *            social id to associate to the resource
+	 * @return the information about the resource updated
+	 * @throws NotFoundException
+	 *             social entity not found
+	 * @throws SecurityException
+	 *             social entity is not owned by the user
+	 */
+	public Metadata updateSocialData(User owner, String rid, String entityId)
+			throws NotFoundException, SecurityException {
+		Metadata meta = findByResource(rid);
+
+		// check if entityId is owned by owner of the resource
+		if (socialManager.isOwnedBy(owner, entityId)) {
+			meta.setEid(entityId);
+			metadataSrv.update(meta);
+		} else {
+			throw new SecurityException("Entity is not owned by the user");
+		}
+		return meta;
+	}
+
 	private Metadata createMetadata(String userAccountId, User user,
 			Resource resource) throws SmartcampusException {
 		Metadata metadata = new Metadata();
