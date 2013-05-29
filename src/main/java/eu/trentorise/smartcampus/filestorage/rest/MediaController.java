@@ -123,14 +123,24 @@ public class MediaController extends RestController {
 		return metadataManager.findByResource(rid);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/resource/{appName}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/myresource/{appName}/{rid}")
 	public @ResponseBody
-	Token getResource(HttpServletRequest request, @PathVariable String appName,
-			@PathVariable String rid) throws SmartcampusException,
-			SecurityException {
+	Token getMyResource(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable String rid)
+			throws SmartcampusException, SecurityException {
 		User user = retrieveUser(request);
 
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, true);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/{appName}/{rid}")
+	public @ResponseBody
+	Token getSharedResource(HttpServletRequest request,
+			@PathVariable String appName, @PathVariable String rid)
+			throws SmartcampusException, SecurityException {
+		User user = retrieveUser(request);
+
+		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, false);
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/{appName}/{rid}/{entityId}")

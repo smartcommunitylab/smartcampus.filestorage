@@ -146,7 +146,7 @@ public class MediaManager {
 	public Token getResourceToken(User user, String rid, Operation op)
 			throws SmartcampusException, SecurityException {
 
-		return scAcl.getSessionToken(op, user, rid);
+		return scAcl.getSessionToken(op, user, rid, true);
 	}
 
 }

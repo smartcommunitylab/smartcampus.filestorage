@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
@@ -41,6 +42,7 @@ public class TestUtils {
 	 */
 	public static final long userId = -1L;
 
+	private static Random random = new Random();
 	/**
 	 * Utility methods
 	 */
@@ -103,7 +105,7 @@ public class TestUtils {
 		it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialEngine
 				.createUser();
 		user.setSocialId(socialUser.getId());
-		user.setId(50l);
+		user.setId((long) random.nextInt(1000));
 		user.setAuthToken("token");
 		user.setExpTime(System.currentTimeMillis() + 3600 * 1000);
 		return user;

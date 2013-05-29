@@ -63,13 +63,15 @@ public interface ACLService {
 	 *            user who do the operation
 	 * @param rid
 	 *            id of the resource
+	 * @param owned
+	 *            true to look at a owned resource
 	 * @return the token
 	 * @throws SmartcampusException
 	 *             generic exception
 	 * @throws SecurityException
 	 *             if user has no privileges to do the operation on the resource
 	 */
-	public Token getSessionToken(Operation operation, User user, String rid)
-			throws SmartcampusException, SecurityException;
+	public Token getSessionToken(Operation operation, User user, String rid,
+			boolean owned) throws SmartcampusException, SecurityException;
 
 }

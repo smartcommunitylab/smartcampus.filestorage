@@ -22,11 +22,13 @@ import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.SocialManager;
+import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
+import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -38,6 +40,9 @@ public class ScAcl implements ACLService {
 	private static final Logger logger = Logger.getLogger(ScAcl.class);
 	@Autowired
 	MetadataService metaService;
+
+	@Autowired
+	UserAccountManager userAccountManager;
 
 	@Autowired
 	SocialManager socialManager;
@@ -65,14 +70,15 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getSessionToken(Operation operation, User user, String rid)
-			throws SmartcampusException, SecurityException {
+	public Token getSessionToken(Operation operation, User user, String rid,
+			boolean owned) throws SmartcampusException, SecurityException {
 		Token token = null;
 		switch (operation) {
 		case DOWNLOAD:
 			try {
-				if (socialManager.checkPermission(user,
-						metaService.getEntityByResource(rid))) {
+				if ((owned && isMyResource(user, rid))
+						|| (!owned && socialManager.checkPermission(user,
+								metaService.getEntityByResource(rid)))) {
 					logger.info(String.format(
 							"Download permission ok, user: %s, resource: %s",
 							user.getId(), rid));
@@ -85,15 +91,31 @@ public class ScAcl implements ACLService {
 					throw new SecurityException(
 							"User has not permission on this resource");
 				}
+			} catch (SecurityException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new SmartcampusException(e);
 			}
 			break;
 
 		default:
-			break;
+			throw new IllegalArgumentException("Operation not supported");
 		}
 		return token;
+	}
+
+	private boolean isMyResource(User user, String rid) {
+		Metadata resourceInfo;
+		try {
+			resourceInfo = metaService.getMetadata(rid);
+			UserAccount account = userAccountManager.findById(resourceInfo
+					.getUserAccountId());
+			return account.getUserId() == user.getId();
+		} catch (NotFoundException e) {
+			logger.error(String.format("%s resource not found", rid));
+			return false;
+		}
+
 	}
 
 	private Token generateToken(String rid) throws NotFoundException,

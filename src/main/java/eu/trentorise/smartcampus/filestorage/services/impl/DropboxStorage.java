@@ -93,7 +93,7 @@ public class DropboxStorage implements StorageService {
 			try {
 				token = getUserToken(userAccountId);
 				app = getAppToken(userAccountId);
-				logger.info("Retrived dropbox account informations");
+				logger.info("Retrieved dropbox account informations");
 			} catch (NotFoundException e2) {
 				throw new SmartcampusException(e2);
 			}
