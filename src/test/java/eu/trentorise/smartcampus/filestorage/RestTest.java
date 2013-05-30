@@ -34,8 +34,9 @@ public class RestTest {
 		List<HttpHeader> headers = Arrays.asList(new HttpHeader("AUTH_TOKEN",
 				TestUtils.AUTH_TOKEN));
 
+		String appName = "smartcampus";
 		// creation of appAccount
-		AppAccount appAccount = TestUtils.createAppAccount("smartcampus");
+		AppAccount appAccount = TestUtils.createAppAccount(appName);
 		appAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
 				+ "/appaccount", headers, appAccount, AppAccount.class);
 
@@ -43,26 +44,31 @@ public class RestTest {
 		UserAccount userAccount = TestUtils.createUserAccount(appAccount,
 				TestUtils.userId);
 		userAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
-				+ "/useraccount", headers, userAccount, UserAccount.class);
+				+ "/useraccount/" + appName, headers, userAccount,
+				UserAccount.class);
 
 		// storeResource
 
 		File resource = new File(this.getClass().getResource("image.png")
 				.toURI());
-		String rid = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
-				+ "/resource/smartcampus/" + userAccount.getId(), headers,
-				resource, "file", String.class);
-		Assert.assertNotNull(rid);
+		Metadata info = caller.callOneResult(
+				RequestType.POST,
+				TestUtils.BASE_URL + "/resource/" + appName + "/"
+						+ userAccount.getId() + "?createSocialData=false",
+				headers, resource, "file", Metadata.class);
+		Assert.assertNotNull(info.getRid());
 
 		// sessionToken
-		Token sessionToken = caller.callOneResult(RequestType.GET,
-				TestUtils.BASE_URL + "/resource/smartcampus/" + rid, headers,
-				Token.class);
+		Token sessionToken = caller.callOneResult(
+				RequestType.GET,
+				TestUtils.BASE_URL + "/myresource/" + appName + "/"
+						+ info.getRid(), headers, Token.class);
 		Assert.assertNotNull(sessionToken);
 
-		Metadata metadata = caller.callOneResult(RequestType.GET,
-				TestUtils.BASE_URL + "/metadata/smartcampus/" + rid, headers,
-				Metadata.class);
+		Metadata metadata = caller.callOneResult(
+				RequestType.GET,
+				TestUtils.BASE_URL + "/metadata/" + appName + "/"
+						+ info.getRid(), headers, Metadata.class);
 		Assert.assertNotNull(metadata);
 	}
 

@@ -62,7 +62,7 @@ public class MediaManager {
 	 * @param resource
 	 *            resource to store
 	 * @param createSocialData
-	 *            TODO
+	 *            true to create a social entity associated to the resource
 	 * @return the resource stored with the id assigned from storage
 	 * @throws AlreadyStoredException
 	 *             if resource is already stored.
