@@ -29,18 +29,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
-import eu.trentorise.smartcampus.filestorage.managers.AppAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
 import eu.trentorise.smartcampus.filestorage.managers.MediaManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.utils.SocialEngineOperation;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 
@@ -49,10 +49,10 @@ import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 public class CompleteScenarioTest {
 
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
 
 	@Autowired
-	AppAccountManager appAccountManager;
+	StorageManager appAccountManager;
 
 	@Autowired
 	MediaManager mediaManager;
@@ -77,10 +77,10 @@ public class CompleteScenarioTest {
 	public void scenarioA() throws AlreadyStoredException,
 			SmartcampusException, Exception {
 		Resource resource = testUtils.createResource();
-		AppAccount appAccount = TestUtils.createAppAccount("smartcampus");
+		Storage appAccount = TestUtils.createAppAccount("smartcampus");
 		appAccountManager.save(appAccount);
 
-		UserAccount account = TestUtils.createUserAccount(appAccount,
+		Account account = TestUtils.createUserAccount(appAccount,
 				TestUtils.userId);
 		accountManager.save(account);
 
@@ -110,9 +110,9 @@ public class CompleteScenarioTest {
 			WebApiException, AlreadyStoredException, SmartcampusException,
 			NumberFormatException, NotFoundException {
 		Resource resource = testUtils.createResource();
-		AppAccount appAccount = TestUtils.createAppAccount("smartcampus");
+		Storage appAccount = TestUtils.createAppAccount("smartcampus");
 		appAccountManager.save(appAccount);
-		UserAccount account = TestUtils.createUserAccount(appAccount,
+		Account account = TestUtils.createUserAccount(appAccount,
 				TestUtils.userId);
 		accountManager.save(account);
 		User user1 = testUtils.createUser();

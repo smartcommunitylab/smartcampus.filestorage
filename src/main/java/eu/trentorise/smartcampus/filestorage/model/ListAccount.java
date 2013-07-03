@@ -7,19 +7,18 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "appAccounts")
+@XmlRootElement(name = "accounts")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ListAppAccount {
+public class ListAccount {
+	@XmlElement(name = "account")
+	private List<Account> accounts;
 
-	@XmlElement(name = "appAccount")
-	private List<AppAccount> appAccounts;
-
-	public List<AppAccount> getAppAccounts() {
-		return appAccounts;
+	public List<Account> getAccounts() {
+		return accounts;
 	}
 
-	public void setAppAccounts(List<AppAccount> appAccounts) {
-		this.appAccounts = appAccounts;
+	public void setAccounts(List<Account> accounts) {
+		this.accounts = accounts;
 	}
 
 }

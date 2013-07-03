@@ -51,4 +51,15 @@
 
 	<bean id="applicationContextProvider"
 		class="eu.trentorise.smartcampus.filestorage.utils.ApplicationContextProvider" />
+	
+	
+	<!-- AC permission provider conf -->
+	<bean id="dataSource" destroy-method="close"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/acprovider" />
+		<property name="username" value="ac" />
+		<property name="password" value="ac" />
+	</bean>
+	
 </beans>

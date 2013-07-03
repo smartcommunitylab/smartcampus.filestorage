@@ -51,7 +51,7 @@ public class MongoMetadataService implements MetadataService {
 			logger.error("Metadata not found: " + socialId);
 			throw new NotFoundException();
 		} else {
-			return meta.getRid();
+			return meta.getResourceId();
 		}
 	}
 
@@ -83,9 +83,9 @@ public class MongoMetadataService implements MetadataService {
 	 */
 	@Override
 	public void save(Metadata metadata) throws AlreadyStoredException {
-		if (metadata.getRid() != null
-				&& db.findById(metadata.getRid(), Metadata.class) != null) {
-			logger.error("Metadata already stored: " + metadata.getRid());
+		if (metadata.getResourceId() != null
+				&& db.findById(metadata.getResourceId(), Metadata.class) != null) {
+			logger.error("Metadata already stored: " + metadata.getResourceId());
 			throw new AlreadyStoredException();
 		}
 		db.save(metadata);
@@ -107,17 +107,17 @@ public class MongoMetadataService implements MetadataService {
 	 */
 	@Override
 	public void update(Metadata metadata) throws NotFoundException {
-		if (metadata.getRid() != null) {
+		if (metadata.getResourceId() != null) {
 			int results = db.find(
-					Query.query(new Criteria("rid").is(metadata.getRid())),
+					Query.query(new Criteria("rid").is(metadata.getResourceId())),
 					Metadata.class).size();
 			if (results < 1) {
-				logger.error("Metadata not found: " + metadata.getRid());
+				logger.error("Metadata not found: " + metadata.getResourceId());
 				throw new NotFoundException();
 			}
 			if (results > 1) {
 				logger.error("Found more than one metadata: "
-						+ metadata.getRid());
+						+ metadata.getResourceId());
 				throw new IllegalArgumentException("Found more than one result");
 			}
 			db.save(metadata);
@@ -147,7 +147,7 @@ public class MongoMetadataService implements MetadataService {
 					filename, accountId));
 			throw new IllegalArgumentException("Found more than one result");
 		}
-		return results.get(0).getRid();
+		return results.get(0).getResourceId();
 	}
 
 	/**

@@ -7,18 +7,19 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "userAccounts")
+@XmlRootElement(name = "storages")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ListUserAccount {
-	@XmlElement(name = "userAccount")
-	private List<UserAccount> userAccounts;
+public class ListStorage {
 
-	public List<UserAccount> getUserAccounts() {
-		return userAccounts;
+	@XmlElement(name = "storage")
+	private List<Storage> storages;
+
+	public List<Storage> getStorages() {
+		return storages;
 	}
 
-	public void setUserAccounts(List<UserAccount> userAccounts) {
-		this.userAccounts = userAccounts;
+	public void setStorages(List<Storage> storages) {
+		this.storages = storages;
 	}
 
 }

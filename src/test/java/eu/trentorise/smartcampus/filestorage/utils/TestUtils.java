@@ -16,11 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 
 @Service
 public class TestUtils {
@@ -32,15 +32,15 @@ public class TestUtils {
 	/**
 	 * base URL of application web
 	 */
-	public static final String BASE_URL = "http://localhost:8280/filestorage";
+	public static final String BASE_URL = "http://localhost:8080/smartcampus.filestorage";
 	/**
 	 * authorization token of user to validate REST calls
 	 */
-	public static final String AUTH_TOKEN = "";
+	public static final String AUTH_TOKEN = "c9a4fe5d-46e9-4851-85f7-25163a945e05";
 	/**
 	 * system user id
 	 */
-	public static final long userId = -1L;
+	public static final long userId = 220l;
 
 	private static Random random = new Random();
 	/**
@@ -50,10 +50,10 @@ public class TestUtils {
 	@Autowired
 	SocialEngineOperation socialEngine;
 
-	public static AppAccount createAppAccount(String appName) {
-		AppAccount account = new AppAccount();
-		account.setAppName(appName);
-		account.setAppAccountName("smartcampus test");
+	public static Storage createAppAccount(String appName) {
+		Storage account = new Storage();
+		account.setAppId(appName);
+		account.setName("smartcampus test");
 		account.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
 		confs.add(new Configuration("APP_KEY", DropboxUtils.appkey));
@@ -62,14 +62,14 @@ public class TestUtils {
 		return account;
 	}
 
-	public static UserAccount createUserAccount(AppAccount appAccount,
+	public static Account createUserAccount(Storage appAccount,
 			long userId) {
-		UserAccount account = new UserAccount();
+		Account account = new Account();
 		account.setId(new ObjectId().toString());
 		account.setUserId(userId);
-		account.setAccountName("smartcampus test");
-		account.setAppAccountId(appAccount.getId());
-		account.setAppName(appAccount.getAppName());
+		account.setName("smartcampus test");
+		account.setStorageId(appAccount.getId());
+		account.setAppId(appAccount.getAppId());
 		account.setStorageType(appAccount.getStorageType());
 
 		List<Configuration> confs = new ArrayList<Configuration>();

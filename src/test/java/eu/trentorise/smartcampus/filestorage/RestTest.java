@@ -17,11 +17,11 @@ import org.junit.Test;
 import eu.trentorise.smartcampus.filestorage.client.HttpHeader;
 import eu.trentorise.smartcampus.filestorage.client.RestCaller;
 import eu.trentorise.smartcampus.filestorage.client.RestCaller.RequestType;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 
 public class RestTest {
@@ -36,16 +36,16 @@ public class RestTest {
 
 		String appName = "smartcampus";
 		// creation of appAccount
-		AppAccount appAccount = TestUtils.createAppAccount(appName);
+		Storage appAccount = TestUtils.createAppAccount(appName);
 		appAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
-				+ "/appaccount", headers, appAccount, AppAccount.class);
+				+ "/appaccount", headers, appAccount, Storage.class);
 
 		// creation userAccount
-		UserAccount userAccount = TestUtils.createUserAccount(appAccount,
+		Account userAccount = TestUtils.createUserAccount(appAccount,
 				TestUtils.userId);
 		userAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
 				+ "/useraccount/" + appName, headers, userAccount,
-				UserAccount.class);
+				Account.class);
 
 		// storeResource
 
@@ -56,19 +56,19 @@ public class RestTest {
 				TestUtils.BASE_URL + "/resource/" + appName + "/"
 						+ userAccount.getId() + "?createSocialData=false",
 				headers, resource, "file", Metadata.class);
-		Assert.assertNotNull(info.getRid());
+		Assert.assertNotNull(info.getResourceId());
 
 		// sessionToken
 		Token sessionToken = caller.callOneResult(
 				RequestType.GET,
 				TestUtils.BASE_URL + "/myresource/" + appName + "/"
-						+ info.getRid(), headers, Token.class);
+						+ info.getResourceId(), headers, Token.class);
 		Assert.assertNotNull(sessionToken);
 
 		Metadata metadata = caller.callOneResult(
 				RequestType.GET,
 				TestUtils.BASE_URL + "/metadata/" + appName + "/"
-						+ info.getRid(), headers, Metadata.class);
+						+ info.getResourceId(), headers, Metadata.class);
 		Assert.assertNotNull(metadata);
 	}
 
@@ -76,21 +76,21 @@ public class RestTest {
 	public void crudAppAccount() throws JsonGenerationException,
 			JsonMappingException, UnsupportedEncodingException, IOException {
 		// creation
-		AppAccount appAccount = TestUtils.createAppAccount("smartcampus");
+		Storage appAccount = TestUtils.createAppAccount("smartcampus");
 
 		RestCaller caller = new RestCaller();
 
 		List<HttpHeader> headers = Arrays.asList(new HttpHeader("AUTH_TOKEN",
 				TestUtils.AUTH_TOKEN));
 
-		List<AppAccount> results = caller.callListResult(RequestType.GET,
+		List<Storage> results = caller.callListResult(RequestType.GET,
 				TestUtils.BASE_URL + "/appaccount/smartcampus", headers,
-				AppAccount.class);
+				Storage.class);
 
 		Assert.assertEquals(0, results.size());
 
 		appAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
-				+ "/appaccount", headers, appAccount, AppAccount.class);
+				+ "/appaccount", headers, appAccount, Storage.class);
 		Assert.assertNotNull(appAccount.getId());
 
 		// update
@@ -99,7 +99,7 @@ public class RestTest {
 
 		appAccount = caller.callOneResult(RequestType.PUT, TestUtils.BASE_URL
 				+ "/appaccount/smartcampus", headers, appAccount,
-				AppAccount.class);
+				Storage.class);
 		Assert.assertEquals(0, appAccount.getConfigurations().size());
 
 		// delete
@@ -111,7 +111,7 @@ public class RestTest {
 		Assert.assertTrue(deleted);
 
 		results = caller.callListResult(RequestType.GET, TestUtils.BASE_URL
-				+ "/appaccount/smartcampus", headers, AppAccount.class);
+				+ "/appaccount/smartcampus", headers, Storage.class);
 
 		Assert.assertEquals(0, results.size());
 

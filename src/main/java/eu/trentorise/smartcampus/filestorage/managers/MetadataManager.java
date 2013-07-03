@@ -28,7 +28,7 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 
 /**
@@ -49,7 +49,7 @@ public class MetadataManager {
 	SocialManager socialManager;
 
 	@Autowired
-	UserAccountManager userAccountManager;
+	AccountManager userAccountManager;
 
 	/**
 	 * creates and saves metadata info for given {@link Resource}
@@ -162,20 +162,20 @@ public class MetadataManager {
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());
 		metadata.setName(resource.getName());
-		metadata.setRid(resource.getId());
-		metadata.setUserAccountId(userAccountId);
+		metadata.setResourceId(resource.getId());
+		metadata.setAccountId(userAccountId);
 		metadata.setFileExternalId(resource.getName());
 		metadata.setSize(resource.getContent().length);
 		// appaccount data
-		UserAccount userAccount;
+		Account userAccount;
 		try {
 			userAccount = userAccountManager.findById(userAccountId);
-			metadata.setAppAccountId(userAccount.getAppAccountId());
-			metadata.setAppName(userAccount.getAppName());
+			metadata.setStorageId(userAccount.getStorageId());
+			metadata.setAppId(userAccount.getAppId());
 		} catch (NotFoundException e1) {
 			logger.error(String.format("userAccount not found: %s",
 					userAccountId));
-			throw new SmartcampusException("UserAccount not found");
+			throw new SmartcampusException("Account not found");
 		}
 		if (createSocialData) {
 			try {

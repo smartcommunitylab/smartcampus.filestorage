@@ -27,29 +27,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.ListUserAccount;
+import eu.trentorise.smartcampus.filestorage.model.ListAccount;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 
 @Controller
-public class UserAccountController extends RestController {
+public class UserAccountController extends SCController {
 
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
 
 	@Autowired
 	PermissionManager permissionManager;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/useraccount/{appName}")
+	@RequestMapping(method = RequestMethod.POST, value = "/account")
 	public @ResponseBody
-	UserAccount save(HttpServletRequest request,
-			@RequestBody UserAccount account, @PathVariable String appName)
+	Account save(HttpServletRequest request, @RequestBody Account account)
 			throws SmartcampusException, AlreadyStoredException {
 		User user = retrieveUser(request);
+		String appId = retrieveAppId(request);
 
 		// if userId isn't setted, it will be use the authToken to retrieve it
 		if (account.getUserId() <= 0) {
@@ -61,15 +62,15 @@ public class UserAccountController extends RestController {
 		return accountManager.save(account);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/useraccount/{appName}/{aid}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/{accountId}")
 	public @ResponseBody
-	void update(HttpServletRequest request, @RequestBody UserAccount account,
-			@PathVariable String appName, @PathVariable("aid") String aid)
-			throws SmartcampusException {
+	void update(HttpServletRequest request, @RequestBody Account account,
+			@PathVariable String accountId) throws SmartcampusException {
 		User user = retrieveUser(request);
+		String appId = retrieveAppId(request);
 
 		if (account.getId() == null) {
-			account.setId(aid);
+			account.setId(accountId);
 		}
 
 		if (!permissionManager.checkAccountPermission(user, account)) {
@@ -79,34 +80,37 @@ public class UserAccountController extends RestController {
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/useraccount/{appName}/{aid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/{accountId}")
 	public @ResponseBody
-	void delete(HttpServletRequest request, @PathVariable String appName,
-			@PathVariable("aid") String aid) throws SmartcampusException,
-			NotFoundException {
-		User user = retrieveUser(request);
-
-		if (!permissionManager.checkAccountPermission(user, aid)) {
-			throw new SecurityException();
-		}
-		accountManager.delete(aid);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}/{aid}")
-	public @ResponseBody
-	UserAccount getAccountById(HttpServletRequest request,
-			@PathVariable String appName, @PathVariable String aid)
+	void delete(HttpServletRequest request, @PathVariable String accountId)
 			throws SmartcampusException, NotFoundException {
 		User user = retrieveUser(request);
-		return accountManager.findById(aid);
+		String appId = retrieveAppId(request);
+
+		if (!permissionManager.checkAccountPermission(user, accountId)) {
+			throw new SecurityException();
+		}
+		accountManager.delete(accountId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/useraccount/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/{accountId}")
 	public @ResponseBody
-	ListUserAccount getAccounts(HttpServletRequest request,
-			@PathVariable String appName) throws SmartcampusException {
-		ListUserAccount result = new ListUserAccount();
-		result.setUserAccounts(accountManager.findUserAccounts(appName));
+	Account getAccountById(HttpServletRequest request,
+			@PathVariable String accountId) throws SmartcampusException,
+			NotFoundException {
+		User user = retrieveUser(request);
+		String appId = retrieveAppId(request);
+
+		return accountManager.findById(accountId);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/account")
+	public @ResponseBody
+	ListAccount getAccounts(HttpServletRequest request)
+			throws SmartcampusException {
+		String appId = retrieveAppId(request);
+		ListAccount result = new ListAccount();
+		result.setAccounts(accountManager.findUserAccounts(appId));
 		return result;
 	}
 }

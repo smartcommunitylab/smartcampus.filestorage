@@ -21,10 +21,10 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.services.impl.DropboxStorage;
 
@@ -40,7 +40,7 @@ public class StorageUtils {
 	private static final Logger logger = Logger.getLogger(StorageUtils.class);
 
 	@Autowired
-	private UserAccountManager accountManager;
+	private AccountManager accountManager;
 
 	@Autowired
 	private ApplicationContextProvider ctxProvider;
@@ -58,7 +58,7 @@ public class StorageUtils {
 	public StorageService getStorageService(String accountId)
 			throws SmartcampusException {
 		BeanFactory beanFactory = ctxProvider.getApplicationContext();
-		UserAccount account;
+		Account account;
 		try {
 			account = accountManager.findById(accountId);
 		} catch (NotFoundException e) {

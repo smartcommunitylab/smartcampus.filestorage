@@ -34,7 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
@@ -42,7 +42,7 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.utils.DropboxUtils;
@@ -56,20 +56,20 @@ public class DropboxStorageTest {
 	StorageService storageService;
 
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
 
 	@Autowired
-	AppAccountManager appAccountManager;
+	StorageManager appAccountManager;
 
 	@Autowired
 	MetadataService metaService;
 
 	@Before
 	public void initEnv() throws AlreadyStoredException {
-		// AppAccount creation
-		AppAccount appAccount = new AppAccount();
-		appAccount.setAppName("smartcampus");
-		appAccount.setAppAccountName("smartcampustTest");
+		// Storage creation
+		Storage appAccount = new Storage();
+		appAccount.setAppId("smartcampus");
+		appAccount.setName("smartcampustTest");
 		appAccount.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
 		confs.add(new Configuration("APP_KEY", DropboxUtils.appkey));
@@ -79,12 +79,12 @@ public class DropboxStorageTest {
 		appAccount = appAccountManager.save(appAccount);
 
 		// userAccount creation
-		UserAccount account = new UserAccount();
-		account.setAccountName("dropbox personal");
+		Account account = new Account();
+		account.setName("dropbox personal");
 		account.setUserId(TEST_USER_ID);
 		account.setStorageType(StorageType.DROPBOX);
-		account.setAppAccountId(appAccount.getId());
-		account.setAppName(appAccount.getAppName());
+		account.setStorageId(appAccount.getId());
+		account.setAppId(appAccount.getAppId());
 		List<Configuration> configurations = new ArrayList<Configuration>();
 		configurations.add(new Configuration("USER_KEY", DropboxUtils.userkey));
 		configurations.add(new Configuration("USER_SECRET",
@@ -98,11 +98,11 @@ public class DropboxStorageTest {
 		String accountId = accountManager.findBy(TEST_USER_ID).get(0).getId();
 
 		for (Metadata m : metaService.getAccountMetadata(accountId)) {
-			storageService.remove(accountId, m.getRid());
-			metaService.delete(m.getRid());
+			storageService.remove(accountId, m.getResourceId());
+			metaService.delete(m.getResourceId());
 		}
 
-		for (UserAccount a : accountManager.findAll()) {
+		for (Account a : accountManager.findAll()) {
 			accountManager.delete(a);
 		}
 	}
@@ -112,7 +112,7 @@ public class DropboxStorageTest {
 			SmartcampusException, IOException, NotFoundException {
 
 		// load user account
-		List<UserAccount> accounts = accountManager.findBy(TEST_USER_ID);
+		List<Account> accounts = accountManager.findBy(TEST_USER_ID);
 		Assert.assertEquals(1, accounts.size());
 
 		Resource res = storageService.store(accounts.get(0).getId(),
@@ -124,7 +124,7 @@ public class DropboxStorageTest {
 	public void uploadFailedResource() throws AlreadyStoredException,
 			SmartcampusException, IOException {
 		// load user account
-		List<UserAccount> accounts = accountManager.findBy(TEST_USER_ID);
+		List<Account> accounts = accountManager.findBy(TEST_USER_ID);
 		Assert.assertEquals(1, accounts.size());
 		Resource sample = getSampleResource();
 		sample = storageService.store(accounts.get(0).getId(), sample);
@@ -137,7 +137,7 @@ public class DropboxStorageTest {
 	public void getSessionToken() throws IOException, AlreadyStoredException,
 			SmartcampusException, NotFoundException {
 		// load user account
-		List<UserAccount> accounts = accountManager.findBy(TEST_USER_ID);
+		List<Account> accounts = accountManager.findBy(TEST_USER_ID);
 		Assert.assertEquals(1, accounts.size());
 		Resource sample = getSampleResource();
 		sample = storageService.store(accounts.get(0).getId(), sample);
@@ -160,14 +160,14 @@ public class DropboxStorageTest {
 		return res;
 	}
 
-	private Metadata getMetadata(UserAccount a, Resource r) {
+	private Metadata getMetadata(Account a, Resource r) {
 		Metadata meta = new Metadata();
 		meta.setContentType(r.getContentType());
 		meta.setCreationTs(System.currentTimeMillis());
 		meta.setSocialId("eid");
 		meta.setName(r.getName());
-		meta.setRid(r.getId());
-		meta.setUserAccountId(a.getId());
+		meta.setResourceId(r.getId());
+		meta.setAccountId(a.getId());
 		return meta;
 	}
 }

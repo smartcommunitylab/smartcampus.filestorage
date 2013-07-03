@@ -23,5 +23,5 @@ package eu.trentorise.smartcampus.filestorage.model;
  * 
  */
 public enum StorageType {
-	S3, DROPBOX
+	DROPBOX
 }

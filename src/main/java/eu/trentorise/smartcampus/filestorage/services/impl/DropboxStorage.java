@@ -16,11 +16,11 @@
 
 package eu.trentorise.smartcampus.filestorage.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.activemq.util.ByteArrayInputStream;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,17 +34,17 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.WebAuthSession;
 
-import eu.trentorise.smartcampus.filestorage.managers.AppAccountManager;
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
@@ -66,10 +66,10 @@ public class DropboxStorage implements StorageService {
 	private static final String APP_SECRET = "APP_SECRET";
 
 	@Autowired
-	private UserAccountManager accountManager;
+	private AccountManager accountManager;
 
 	@Autowired
-	AppAccountManager appAccountManager;
+	StorageManager appAccountManager;
 
 	@Autowired
 	private MetadataService metaService;
@@ -198,17 +198,17 @@ public class DropboxStorage implements StorageService {
 
 	private AccessTokenPair getUserToken(String userAccountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(userAccountId);
+		Account account = accountManager.findById(userAccountId);
 
 		return getUserToken(account.getConfigurations());
 	}
 
 	private AppKeyPair getAppToken(String userAccountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(userAccountId);
+		Account account = accountManager.findById(userAccountId);
 
-		AppAccount appAccount = appAccountManager.getAppAccountById(account
-				.getAppAccountId());
+		Storage appAccount = appAccountManager
+				.getStorageById(account.getStorageId());
 
 		return getAppToken(appAccount.getConfigurations());
 	}
@@ -268,8 +268,8 @@ public class DropboxStorage implements StorageService {
 
 		// find resource name
 		Metadata metadata = metaService.getMetadata(rid);
-		AppAccount appAccount = appAccountManager.getAppAccountById(metadata
-				.getAppAccountId());
+		Storage appAccount = appAccountManager
+				.getStorageById(metadata.getStorageId());
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);

@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AppAccount {
+public class Storage {
 	private String id;
-	private String appName;
-	private String appAccountName;
+	private String appId;
+	private String name;
 	private StorageType storageType;
 
 	@XmlElementWrapper
@@ -28,20 +28,20 @@ public class AppAccount {
 		this.id = id;
 	}
 
-	public String getAppName() {
-		return appName;
+	public String getAppId() {
+		return appId;
 	}
 
-	public void setAppName(String appName) {
-		this.appName = appName;
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 
-	public String getAppAccountName() {
-		return appAccountName;
+	public String getName() {
+		return name;
 	}
 
-	public void setAppAccountName(String appAccountName) {
-		this.appAccountName = appAccountName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public StorageType getStorageType() {

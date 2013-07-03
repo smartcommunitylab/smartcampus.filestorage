@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class UserAccount {
+public class Account {
 	/**
 	 * id of the account
 	 */
@@ -41,16 +41,26 @@ public class UserAccount {
 	 * id of the user
 	 */
 	private long userId;
+
+	/**
+	 * storage account reference
+	 */
+	private String storageId;
+
+	/**
+	 * appId reference
+	 */
+	private String appId;
+
 	/**
 	 * type of the storage
 	 */
-	private String appAccountId;
-
-	private String appName;
-
 	private StorageType storageType;
 
-	private String accountName;
+	/**
+	 * name for the user storage account
+	 */
+	private String name;
 	/**
 	 * list of the configurations of the account storage
 	 */
@@ -90,28 +100,28 @@ public class UserAccount {
 		this.id = id;
 	}
 
-	public String getAppAccountId() {
-		return appAccountId;
+	public String getStorageId() {
+		return storageId;
 	}
 
-	public void setAppAccountId(String appAccountId) {
-		this.appAccountId = appAccountId;
+	public void setStorageId(String storageId) {
+		this.storageId = storageId;
 	}
 
-	public String getAccountName() {
-		return accountName;
+	public String getName() {
+		return name;
 	}
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getAppName() {
-		return appName;
+	public String getAppId() {
+		return appId;
 	}
 
-	public void setAppName(String appName) {
-		this.appName = appName;
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 
 }

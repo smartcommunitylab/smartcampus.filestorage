@@ -16,12 +16,12 @@
 
 package eu.trentorise.smartcampus.filestorage;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import org.apache.activemq.util.ByteArrayInputStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class DropboxTest {
 
 		File f = TestUtils.getSampleTextFile("sample file");
 		byte[] content = FileUtils.readFileToByteArray(f);
-		InputStream in = new ByteArrayInputStream(content);
+		InputStream in = new java.io.ByteArrayInputStream(content);
 		sourceClient.putFile("/test.txt", in, content.length, null, null);
 		sourceClient.delete("/test.txt");
 		sourceSession.unlink();

@@ -26,145 +26,142 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 
 /**
- * <i>UserAccountManager</i> manages functionalities about the user storage
- * accounts
+ * <i>AccountManager</i> manages functionalities about the user storage accounts
  * 
  * @author mirko perillo
  * 
  */
 @Service
-public class UserAccountManager {
+public class AccountManager {
 
-	private static final Logger logger = Logger
-			.getLogger(UserAccountManager.class);
+	private static final Logger logger = Logger.getLogger(AccountManager.class);
 	@Autowired
 	MongoTemplate db;
 
 	/**
 	 * saves a new account
 	 * 
-	 * @param ua
+	 * @param account
 	 *            the user storage account to save
 	 * @return the account saved with id field populated
 	 * @throws AlreadyStoredException
 	 *             if account is already stored
 	 */
-	public UserAccount save(UserAccount ua) throws AlreadyStoredException {
-		if (ua.getId() != null
-				&& db.findById(ua.getId(), UserAccount.class) != null) {
-			logger.error("UserAccount already stored, " + ua.getId());
+	public Account save(Account account) throws AlreadyStoredException {
+		if (account.getId() != null
+				&& db.findById(account.getId(), Account.class) != null) {
+			logger.error("Account already stored, " + account.getId());
 			throw new AlreadyStoredException();
 		}
-		if (ua.getId() == null || ua.getId().trim().length() == 0) {
-			ua.setId(new ObjectId().toString());
+		if (account.getId() == null || account.getId().trim().length() == 0) {
+			account.setId(new ObjectId().toString());
 		}
-		db.save(ua);
-		return ua;
+		db.save(account);
+		return account;
 	}
 
 	/**
-	 * updates {@link UserAccount} informations
+	 * updates {@link Account} informations
 	 * 
-	 * @param ua
+	 * @param account
 	 *            new informations to update
 	 */
-	public void update(UserAccount ua) {
-		db.save(ua);
+	public void update(Account account) {
+		db.save(account);
 	}
 
-	public UserAccount update(String appName, String userAccountId,
+	public Account update(String appId, String accountId,
 			List<Configuration> confs) {
 		return null;
 	}
 
 	/**
-	 * retrieves all the {@link UserAccount} in the system
+	 * retrieves all the {@link Account} in the system
 	 * 
-	 * @return the list of all UserAccount
+	 * @return the list of all Account
 	 */
-	public List<UserAccount> findAll() {
-		return db.findAll(UserAccount.class);
+	public List<Account> findAll() {
+		return db.findAll(Account.class);
 	}
 
-	public List<UserAccount> findUserAccounts(String appName) {
+	public List<Account> findUserAccounts(String appId) {
 		Criteria criteria = new Criteria();
-		criteria.and("appName").is(appName);
-		return db.find(Query.query(criteria), UserAccount.class);
+		criteria.and("appId").is(appId);
+		return db.find(Query.query(criteria), Account.class);
 	}
 
 	/**
-	 * retrieves all the {@link UserAccount} of a given user
+	 * retrieves all the {@link Account} of a given user
 	 * 
 	 * @param userId
 	 *            id of the owner of user storage accounts
-	 * @return a list of UserAccount of the given user id
+	 * @return a list of Account of the given user id
 	 */
-	public List<UserAccount> findBy(long userId) {
+	public List<Account> findBy(long userId) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
-		return db.find(Query.query(criteria), UserAccount.class);
+		return db.find(Query.query(criteria), Account.class);
 	}
 
 	/**
-	 * retrieves the {@link UserAccount} of given id
+	 * retrieves the {@link Account} of given id
 	 * 
 	 * @param accountId
 	 *            the user storage account id
-	 * @return the UserAccount
+	 * @return the Account
 	 * @throws NotFoundException
-	 *             if UserAccount doesn't exist
+	 *             if Account doesn't exist
 	 */
-	public UserAccount findById(String accountId) throws NotFoundException {
-		UserAccount account = db.findById(accountId, UserAccount.class);
+	public Account findById(String accountId) throws NotFoundException {
+		Account account = db.findById(accountId, Account.class);
 		if (account == null) {
-			logger.error("UserAccount not found: " + accountId);
+			logger.error("Account not found: " + accountId);
 			throw new NotFoundException();
 		}
 		return account;
 	}
 
 	/**
-	 * retrieves a list of {@link UserAccount} of a given user and of a given
-	 * type
+	 * retrieves a list of {@link Account} of a given user and of a given type
 	 * 
 	 * @param userId
 	 *            id of the user
 	 * @param storage
 	 *            type of storage
-	 * @return the list of UserAccount for given user and type
+	 * @return the list of Account for given user and type
 	 */
-	public List<UserAccount> findBy(long userId, StorageType storage) {
+	public List<Account> findBy(long userId, StorageType storage) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
-		criteria.and("storage").is(storage);
-		return db.find(Query.query(criteria), UserAccount.class);
+		criteria.and("storageType").is(storage);
+		return db.find(Query.query(criteria), Account.class);
 	}
 
 	/**
-	 * deletes a {@link UserAccount}
+	 * deletes a {@link Account}
 	 * 
 	 * @param id
 	 *            id of the user storage account to delete
 	 */
 	public void delete(String id) {
-		db.remove(Query.query(new Criteria("id").is(id)), UserAccount.class);
+		db.remove(Query.query(new Criteria("id").is(id)), Account.class);
 	}
 
 	/**
-	 * deletes a {@link UserAccount}
+	 * deletes a {@link Account}
 	 * 
-	 * @param ua
+	 * @param account
 	 *            the user storage account to delete
 	 */
-	public void delete(UserAccount ua) {
-		db.remove(ua);
+	public void delete(Account account) {
+		db.remove(account);
 	}
 
 }

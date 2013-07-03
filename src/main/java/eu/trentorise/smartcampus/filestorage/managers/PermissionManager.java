@@ -20,9 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 
 /**
  * <i>PermissionManager</i> checks the permissions about resources and storage
@@ -34,7 +35,10 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 @Service
 public class PermissionManager {
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
+
+	@Autowired
+	StorageManager storageManager;
 
 	@Autowired
 	MetadataManager metaManager;
@@ -47,9 +51,9 @@ public class PermissionManager {
 	 * @param account
 	 *            storage account
 	 * @return true if user can access, false otherwise
-	 * @see UserAccount
+	 * @see Account
 	 */
-	public boolean checkAccountPermission(User user, UserAccount account) {
+	public boolean checkAccountPermission(User user, Account account) {
 		return user.getId().equals(account.getUserId());
 	}
 
@@ -61,13 +65,13 @@ public class PermissionManager {
 	 * @param accountId
 	 *            storage account id
 	 * @return true if user can access, false otherwise
-	 * @see UserAccount
+	 * @see Account
 	 * @throws NotFoundException
 	 *             if account doesn't exist
 	 */
 	public boolean checkAccountPermission(User user, String accountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(accountId);
+		Account account = accountManager.findById(accountId);
 		return user.getId().equals(account.getUserId());
 	}
 
@@ -86,7 +90,23 @@ public class PermissionManager {
 			throws NotFoundException {
 		Metadata meta = metaManager.findByResource(rid);
 		return user.getId().equals(
-				accountManager.findById(meta.getUserAccountId()).getUserId());
+				accountManager.findById(meta.getAccountId()).getUserId());
 	}
 
+	/**
+	 * checks if application can access to the storage configurations
+	 * 
+	 * @param appId
+	 * @param storageId
+	 * @return
+	 */
+	public boolean checkStoragePermission(String appId, String storageId) {
+		Storage retrieved;
+		try {
+			retrieved = storageManager.getStorageById(storageId);
+			return retrieved.getAppId().equals(appId);
+		} catch (NotFoundException e) {
+			return false;
+		}
+	}
 }

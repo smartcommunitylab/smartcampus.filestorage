@@ -16,11 +16,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
-import eu.trentorise.smartcampus.filestorage.model.AppAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.impl.ScAcl;
 import eu.trentorise.smartcampus.filestorage.utils.SocialEngineOperation;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
@@ -30,10 +30,10 @@ import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 public class ScAclTest {
 
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
 
 	@Autowired
-	AppAccountManager appAccountManager;
+	StorageManager appAccountManager;
 
 	@Autowired
 	MediaManager mediaManager;
@@ -51,9 +51,9 @@ public class ScAclTest {
 	ScAcl aclManager;
 
 	private Resource resource;
-	private UserAccount userAccount;
+	private Account userAccount;
 	private User user;
-	private AppAccount appAccount;
+	private Storage appAccount;
 
 	@Before
 	public void setup() throws URISyntaxException, IOException, WebApiException {

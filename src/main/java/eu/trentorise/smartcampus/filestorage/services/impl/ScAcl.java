@@ -22,13 +22,13 @@ import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.SocialManager;
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -42,7 +42,7 @@ public class ScAcl implements ACLService {
 	MetadataService metaService;
 
 	@Autowired
-	UserAccountManager userAccountManager;
+	AccountManager userAccountManager;
 
 	@Autowired
 	SocialManager socialManager;
@@ -108,8 +108,8 @@ public class ScAcl implements ACLService {
 		Metadata resourceInfo;
 		try {
 			resourceInfo = metaService.getMetadata(rid);
-			UserAccount account = userAccountManager.findById(resourceInfo
-					.getUserAccountId());
+			Account account = userAccountManager.findById(resourceInfo
+					.getAccountId());
 			return account.getUserId() == user.getId();
 		} catch (NotFoundException e) {
 			logger.error(String.format("%s resource not found", rid));
@@ -122,7 +122,7 @@ public class ScAcl implements ACLService {
 			SmartcampusException {
 		Metadata meta = metaService.getMetadata(rid);
 		StorageService storageService = storageUtils.getStorageService(meta
-				.getUserAccountId());
-		return storageService.getToken(meta.getUserAccountId(), rid);
+				.getAccountId());
+		return storageService.getToken(meta.getAccountId(), rid);
 	}
 }

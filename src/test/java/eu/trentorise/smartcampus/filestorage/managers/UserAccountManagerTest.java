@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
@@ -40,25 +40,24 @@ public class UserAccountManagerTest {
 	private static final int USER_ID = 50;
 
 	@Autowired
-	UserAccountManager manager;
+	AccountManager manager;
 
 	@After
 	public void cleanup() {
-		for (UserAccount a : manager.findAll()) {
+		for (Account a : manager.findAll()) {
 			manager.delete(a);
 		}
 	}
 
 	@Test
 	public void crud() throws AlreadyStoredException {
-		UserAccount account = create();
+		Account account = create();
 
 		Assert.assertEquals(0, manager.findAll().size());
 		manager.save(account);
 		Assert.assertEquals(1, manager.findAll().size());
 		account = manager.findAll().get(0);
 		Assert.assertEquals(StorageType.DROPBOX, account.getStorageType());
-		account.setStorageType(StorageType.S3);
 		manager.update(account);
 		account = manager.findAll().get(0);
 		Assert.assertNotSame(StorageType.DROPBOX, account.getStorageType());
@@ -69,15 +68,15 @@ public class UserAccountManagerTest {
 
 	@Test(expected = AlreadyStoredException.class)
 	public void alreadyStored() throws AlreadyStoredException {
-		UserAccount account = create();
+		Account account = create();
 		manager.save(account);
 
 		account = manager.findAll().get(0);
 		manager.save(account);
 	}
 
-	private UserAccount create() {
-		UserAccount account = new UserAccount();
+	private Account create() {
+		Account account = new Account();
 		account.setUserId(USER_ID);
 		account.setStorageType(StorageType.DROPBOX);
 		List<Configuration> configurations = new ArrayList<Configuration>();
