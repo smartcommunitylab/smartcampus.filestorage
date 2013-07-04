@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
+import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 
 /**
@@ -33,6 +34,8 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
  */
 @Service
 public class PermissionManager {
+
+	private static final long PUBLIC_ACCOUNT = -1000;
 	@Autowired
 	UserAccountManager accountManager;
 
@@ -46,11 +49,15 @@ public class PermissionManager {
 	 *            user who want to access the storage account
 	 * @param account
 	 *            storage account
+	 * @param operation
+	 *            type of operation
 	 * @return true if user can access, false otherwise
 	 * @see UserAccount
 	 */
-	public boolean checkAccountPermission(User user, UserAccount account) {
-		return user.getId().equals(account.getUserId());
+	public boolean checkAccountPermission(User user, UserAccount account,
+			Operation operation) {
+		return (operation == Operation.STORE && account.getUserId() == PUBLIC_ACCOUNT)
+				|| user.getId().equals(account.getUserId());
 	}
 
 	/**
@@ -65,10 +72,36 @@ public class PermissionManager {
 	 * @throws NotFoundException
 	 *             if account doesn't exist
 	 */
-	public boolean checkAccountPermission(User user, String accountId)
+	public boolean checkAccountPermission(User user, String accountId,
+			Operation operation) throws NotFoundException {
+		UserAccount account = accountManager.findById(accountId);
+		return checkAccountPermission(user, account, operation);
+	}
+
+	/**
+	 * checks if a user can store a resource in a specific account
+	 * 
+	 * @param user
+	 * @param account
+	 * @return true if user can store resource, false otherwise
+	 */
+	public boolean checkStoragePermission(User user, UserAccount account) {
+		return account.getUserId() == PUBLIC_ACCOUNT
+				|| user.getId().equals(account.getUserId());
+	}
+
+	/**
+	 * checks if a user can store a resource in a specific account
+	 * 
+	 * @param user
+	 * @param account
+	 * @return true if user can store resource, false otherwise
+	 * @throws NotFoundException
+	 */
+	public boolean checkStoragePermission(User user, String accountId)
 			throws NotFoundException {
 		UserAccount account = accountManager.findById(accountId);
-		return user.getId().equals(account.getUserId());
+		return checkStoragePermission(user, account);
 	}
 
 	/**

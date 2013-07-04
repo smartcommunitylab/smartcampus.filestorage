@@ -23,5 +23,5 @@ package eu.trentorise.smartcampus.filestorage.model;
  * 
  */
 public enum Operation {
-	STORE, MODIFY, DELETE, DOWNLOAD
+	STORE, READ, MODIFY, DELETE, DOWNLOAD
 }

@@ -32,6 +32,7 @@ import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.ListUserAccount;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
+import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 
@@ -52,10 +53,11 @@ public class UserAccountController extends RestController {
 		User user = retrieveUser(request);
 
 		// if userId isn't setted, it will be use the authToken to retrieve it
-		if (account.getUserId() <= 0) {
+		if (account.getUserId() == 0) {
 			account.setUserId(user.getId());
 		}
-		if (!permissionManager.checkAccountPermission(user, account)) {
+		if (!permissionManager.checkAccountPermission(user, account,
+				Operation.STORE)) {
 			throw new SecurityException();
 		}
 		return accountManager.save(account);
@@ -72,7 +74,8 @@ public class UserAccountController extends RestController {
 			account.setId(aid);
 		}
 
-		if (!permissionManager.checkAccountPermission(user, account)) {
+		if (!permissionManager.checkAccountPermission(user, account,
+				Operation.MODIFY)) {
 			throw new SecurityException();
 		}
 
@@ -86,7 +89,8 @@ public class UserAccountController extends RestController {
 			NotFoundException {
 		User user = retrieveUser(request);
 
-		if (!permissionManager.checkAccountPermission(user, aid)) {
+		if (!permissionManager.checkAccountPermission(user, aid,
+				Operation.DELETE)) {
 			throw new SecurityException();
 		}
 		accountManager.delete(aid);

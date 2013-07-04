@@ -67,7 +67,7 @@ public class MediaController extends RestController {
 			NotFoundException {
 		User user = retrieveUser(request);
 
-		if (!permissionManager.checkAccountPermission(user, accountId)) {
+		if (!permissionManager.checkStoragePermission(user, accountId)) {
 			throw new SecurityException();
 		}
 		try {
