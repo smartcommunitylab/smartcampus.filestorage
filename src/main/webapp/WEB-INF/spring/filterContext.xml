@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-       Copyright 2012-2013 Trento RISE
-
-       Licensed under the Apache License, Version 2.0 (the "License");
-       you may not use this file except in compliance with the License.
-       You may obtain a copy of the License at
-
-           http://www.apache.org/licenses/LICENSE-2.0
-
-       Unless required by applicable law or agreed to in writing, software
-       distributed under the License is distributed on an "AS IS" BASIS,
-       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-       See the License for the specific language governing permissions and
-       limitations under the License.
-
--->
+<!-- Copyright 2012-2013 Trento RISE Licensed under the Apache License, Version 
+	2.0 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
@@ -35,37 +25,54 @@
     http://www.springframework.org/schema/security 
   	http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
-	<bean class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer" />
+	<bean
+		class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer" />
 
 	<!-- AC SERVICE PROVIDER FILTER INTEGRATION -->
-	
+
 	<bean id="acClient" class="eu.trentorise.smartcampus.ac.provider.filters.AcClient">
-        <property name="endpointUrl" value="${ac.endpoint.url}" />
-    </bean>	
-	
-	
-	<sec:http entry-point-ref="forbEntryPoint" use-expressions="true" create-session="stateless">
-		<sec:custom-filter position="PRE_AUTH_FILTER" ref="authTokenFilter" />
-		 <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
+		<property name="endpointUrl" value="${ac.endpoint.url}" />
+	</bean>
+
+
+	<!-- BASIC SECURITY -->
+	<sec:http pattern="/publicresource/**" authentication-manager-ref="basic-auth">
+		<sec:http-basic />
+		<sec:intercept-url pattern="/publicresource/**"
+			access="ROLE_USER" />
+
 	</sec:http>
-	
-	<!-- 
-		<sec:http entry-point-ref="forbEntryPoint" use-expressions="true" create-session="stateless">
+
+
+	<sec:authentication-manager id="basic-auth">
+		<sec:authentication-provider>
+			<sec:user-service>
+				<sec:user name="altaccess" password="4sToraging" authorities="ROLE_USER" />
+			</sec:user-service>
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+
+	<sec:http entry-point-ref="forbEntryPoint" use-expressions="true"
+		create-session="stateless">
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="authTokenFilter" />
-		<sec:intercept-url pattern="/login**" access="permitAll()" />
-        <sec:intercept-url pattern="/js/**" access="permitAll()" />
-        <sec:intercept-url pattern="/css/**" access="permitAll()" />
-        <sec:intercept-url pattern="/lib/**" access="permitAll()" />
-        <sec:intercept-url pattern="/search/**" access="permitAll()" />
-		<sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
-		<sec:anonymous enabled="true" />
+		<sec:intercept-url pattern="/resource/**" access="isFullyAuthenticated()" />
+		<sec:intercept-url pattern="/useraccount/**" access="isFullyAuthenticated()" />
+		<sec:intercept-url pattern="/appaccount/**" access="isFullyAuthenticated()" />
 	</sec:http>
-	
-	 -->
+
+
+	<!-- <sec:http entry-point-ref="forbEntryPoint" use-expressions="true" create-session="stateless"> 
+		<sec:custom-filter position="PRE_AUTH_FILTER" ref="authTokenFilter" /> <sec:intercept-url 
+		pattern="/login**" access="permitAll()" /> <sec:intercept-url pattern="/js/**" 
+		access="permitAll()" /> <sec:intercept-url pattern="/css/**" access="permitAll()" 
+		/> <sec:intercept-url pattern="/lib/**" access="permitAll()" /> <sec:intercept-url 
+		pattern="/search/**" access="permitAll()" /> <sec:intercept-url pattern="/**" 
+		access="isFullyAuthenticated()" /> <sec:anonymous enabled="true" /> </sec:http> -->
 
 	<bean id="forbEntryPoint"
-	class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint">
-</bean>
+		class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint">
+	</bean>
 
 	<bean id="authTokenFilter"
 		class="eu.trentorise.smartcampus.ac.provider.filters.AcProviderFilter">
@@ -80,5 +87,5 @@
 		class="eu.trentorise.smartcampus.ac.provider.filters.SpringAcProvider">
 		<constructor-arg value="${ac.endpoint.url}" />
 	</bean>
-		
+
 </beans>

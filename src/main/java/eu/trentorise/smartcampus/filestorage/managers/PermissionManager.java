@@ -35,7 +35,6 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 @Service
 public class PermissionManager {
 
-	private static final long PUBLIC_ACCOUNT = -1000;
 	@Autowired
 	UserAccountManager accountManager;
 
@@ -56,7 +55,7 @@ public class PermissionManager {
 	 */
 	public boolean checkAccountPermission(User user, UserAccount account,
 			Operation operation) {
-		return (operation == Operation.STORE && account.getUserId() == PUBLIC_ACCOUNT)
+		return (operation == Operation.STORE && account.isPublic())
 				|| user.getId().equals(account.getUserId());
 	}
 
@@ -86,8 +85,7 @@ public class PermissionManager {
 	 * @return true if user can store resource, false otherwise
 	 */
 	public boolean checkStoragePermission(User user, UserAccount account) {
-		return account.getUserId() == PUBLIC_ACCOUNT
-				|| user.getId().equals(account.getUserId());
+		return account.isPublic() || user.getId().equals(account.getUserId());
 	}
 
 	/**

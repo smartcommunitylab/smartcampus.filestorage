@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.springframework.data.annotation.Transient;
+
 /**
  * User storage account informations
  * 
@@ -33,6 +35,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserAccount {
+
+	@Transient
+	private static final long PUBLIC_ACCOUNT = -1000;
+
 	/**
 	 * id of the account
 	 */
@@ -112,6 +118,10 @@ public class UserAccount {
 
 	public void setAppName(String appName) {
 		this.appName = appName;
+	}
+
+	public boolean isPublic() {
+		return userId == PUBLIC_ACCOUNT;
 	}
 
 }

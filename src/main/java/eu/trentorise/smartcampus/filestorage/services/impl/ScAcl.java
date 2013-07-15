@@ -76,12 +76,17 @@ public class ScAcl implements ACLService {
 		switch (operation) {
 		case DOWNLOAD:
 			try {
-				if ((owned && isMyResource(user, rid))
-						|| (!owned && socialManager.checkPermission(user,
-								metaService.getEntityByResource(rid)))) {
-					logger.info(String.format(
-							"Download permission ok, user: %s, resource: %s",
-							user.getId(), rid));
+				if ((!owned && (isPublic(rid) || socialManager.checkPermission(
+						user, metaService.getEntityByResource(rid))))
+						|| (owned && isMyResource(user, rid))) {
+					if (user != null) {
+						logger.info(String
+								.format("Download permission ok, user: %s, resource: %s",
+										user.getId(), rid));
+					} else {
+						logger.info(String.format(
+								"Download permission ok, resource: %s", rid));
+					}
 					token = generateToken(rid);
 					logger.info("Session token for download operation created successfully");
 				} else {
@@ -115,7 +120,19 @@ public class ScAcl implements ACLService {
 			logger.error(String.format("%s resource not found", rid));
 			return false;
 		}
+	}
 
+	private boolean isPublic(String rid) {
+		Metadata resourceInfo;
+		try {
+			resourceInfo = metaService.getMetadata(rid);
+			UserAccount account = userAccountManager.findById(resourceInfo
+					.getUserAccountId());
+			return account.isPublic();
+		} catch (NotFoundException e) {
+			logger.error(String.format("%s resource not found", rid));
+			return false;
+		}
 	}
 
 	private Token generateToken(String rid) throws NotFoundException,
