@@ -40,6 +40,8 @@
 		<sec:http-basic />
 		<sec:intercept-url pattern="/publicresource/**"
 			access="ROLE_USER" />
+		<sec:intercept-url pattern="/mobile/**"
+			access="ROLE_USER" />
 
 	</sec:http>
 

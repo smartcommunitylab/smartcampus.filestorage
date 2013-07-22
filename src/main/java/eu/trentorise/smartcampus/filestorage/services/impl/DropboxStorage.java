@@ -18,6 +18,7 @@ package eu.trentorise.smartcampus.filestorage.services.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.activemq.util.ByteArrayInputStream;
@@ -288,4 +289,78 @@ public class DropboxStorage implements StorageService {
 		userSessionToken.setStorageType(appAccount.getStorageType());
 		return userSessionToken;
 	}
+
+	public String getResourceUrlById(String rid) throws SmartcampusException,
+			NotFoundException {
+		// find resource name
+		Metadata metadata = metaService.getMetadata(rid);
+		String name = metadata.getName();
+		return getResourceUrlByName(metadata.getUserAccountId(), name);
+	}
+
+	public String getResourceUrlByName(String userAccountId, String name)
+			throws SmartcampusException, NotFoundException {
+		// get user token
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(userAccountId);
+			app = getAppToken(userAccountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		DropboxLink link;
+		try {
+			link = sourceClient.media("/" + name, true);
+			sourceSession.unlink();
+			return link.url;
+		} catch (DropboxException e) {
+			logger.warn(String.format("%s doesn't exist in userAccount %s",
+					name, userAccountId));
+			return null;
+		}
+	}
+
+	public void getResourceById(String rid, OutputStream outStream)
+			throws NotFoundException, SmartcampusException {
+		Metadata metadata = metaService.getMetadata(rid);
+		getResourceByName(metadata.getUserAccountId(), metadata.getName(),
+				outStream);
+	}
+
+	public void getResourceByName(String userAccountId, String name,
+			OutputStream outStream) throws SmartcampusException {
+		// get user token
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(userAccountId);
+			app = getAppToken(userAccountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		try {
+			sourceClient.getFile("/" + name, null, outStream, null);
+			sourceSession.unlink();
+		} catch (DropboxException e) {
+			throw new SmartcampusException(String.format(
+					"Exception retrieving %s from userAccount %s", name,
+					userAccountId));
+		}
+	}
+
 }

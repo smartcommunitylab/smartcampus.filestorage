@@ -16,7 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.utils;
 
-public class DropboxUtils {
+public class DropboxTestUtils {
 
 	/**
 	 * Put your dropbox keys

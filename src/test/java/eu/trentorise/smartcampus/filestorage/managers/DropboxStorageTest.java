@@ -45,7 +45,7 @@ import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
-import eu.trentorise.smartcampus.filestorage.utils.DropboxUtils;
+import eu.trentorise.smartcampus.filestorage.utils.DropboxTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
@@ -72,8 +72,8 @@ public class DropboxStorageTest {
 		appAccount.setAppAccountName("smartcampustTest");
 		appAccount.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
-		confs.add(new Configuration("APP_KEY", DropboxUtils.appkey));
-		confs.add(new Configuration("APP_SECRET", DropboxUtils.appsecret));
+		confs.add(new Configuration("APP_KEY", DropboxTestUtils.appkey));
+		confs.add(new Configuration("APP_SECRET", DropboxTestUtils.appsecret));
 
 		appAccount.setConfigurations(confs);
 		appAccount = appAccountManager.save(appAccount);
@@ -86,9 +86,10 @@ public class DropboxStorageTest {
 		account.setAppAccountId(appAccount.getId());
 		account.setAppName(appAccount.getAppName());
 		List<Configuration> configurations = new ArrayList<Configuration>();
-		configurations.add(new Configuration("USER_KEY", DropboxUtils.userkey));
+		configurations.add(new Configuration("USER_KEY",
+				DropboxTestUtils.userkey));
 		configurations.add(new Configuration("USER_SECRET",
-				DropboxUtils.usersecret));
+				DropboxTestUtils.usersecret));
 		account.setConfigurations(configurations);
 		accountManager.save(account);
 	}

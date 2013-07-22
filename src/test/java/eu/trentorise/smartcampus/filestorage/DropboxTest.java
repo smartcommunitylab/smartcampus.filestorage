@@ -33,7 +33,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.WebAuthSession;
 
-import eu.trentorise.smartcampus.filestorage.utils.DropboxUtils;
+import eu.trentorise.smartcampus.filestorage.utils.DropboxTestUtils;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 
 public class DropboxTest {
@@ -41,11 +41,11 @@ public class DropboxTest {
 	@Test
 	public void listFiles() throws DropboxException {
 
-		AppKeyPair app = new AppKeyPair(DropboxUtils.appkey,
-				DropboxUtils.appsecret);
+		AppKeyPair app = new AppKeyPair(DropboxTestUtils.appkey,
+				DropboxTestUtils.appsecret);
 
-		AccessTokenPair token = new AccessTokenPair(DropboxUtils.userkey,
-				DropboxUtils.usersecret);
+		AccessTokenPair token = new AccessTokenPair(DropboxTestUtils.userkey,
+				DropboxTestUtils.usersecret);
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -62,11 +62,11 @@ public class DropboxTest {
 
 	@Test
 	public void upload() throws DropboxException, IOException {
-		AppKeyPair app = new AppKeyPair(DropboxUtils.appkey,
-				DropboxUtils.appsecret);
+		AppKeyPair app = new AppKeyPair(DropboxTestUtils.appkey,
+				DropboxTestUtils.appsecret);
 
-		AccessTokenPair token = new AccessTokenPair(DropboxUtils.userkey,
-				DropboxUtils.usersecret);
+		AccessTokenPair token = new AccessTokenPair(DropboxTestUtils.userkey,
+				DropboxTestUtils.usersecret);
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -84,11 +84,11 @@ public class DropboxTest {
 	@Test
 	public void update() throws IOException, DropboxException,
 			URISyntaxException {
-		AppKeyPair app = new AppKeyPair(DropboxUtils.appkey,
-				DropboxUtils.appsecret);
+		AppKeyPair app = new AppKeyPair(DropboxTestUtils.appkey,
+				DropboxTestUtils.appsecret);
 
-		AccessTokenPair token = new AccessTokenPair(DropboxUtils.userkey,
-				DropboxUtils.usersecret);
+		AccessTokenPair token = new AccessTokenPair(DropboxTestUtils.userkey,
+				DropboxTestUtils.usersecret);
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);

@@ -37,10 +37,10 @@ import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
-import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
+import eu.trentorise.smartcampus.filestorage.utils.ResourceUtils;
 
 @Controller
 public class MediaController extends RestController {
@@ -57,6 +57,9 @@ public class MediaController extends RestController {
 	@Autowired
 	ACLService scAcl;
 
+	@Autowired
+	ResourceUtils resourceUtils;
+
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/{appName}/{accountId}")
 	public @ResponseBody
 	Metadata storeResource(HttpServletRequest request,
@@ -72,7 +75,8 @@ public class MediaController extends RestController {
 		}
 		try {
 			String rid = mediaManager.storage(accountId, user,
-					getResource(resource), createSocialData).getId();
+					resourceUtils.getResource(resource), createSocialData)
+					.getId();
 			return metadataManager.findByResource(rid);
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
@@ -93,7 +97,8 @@ public class MediaController extends RestController {
 		}
 
 		try {
-			mediaManager.replace(accountId, user, getResource(rid, resource));
+			mediaManager.replace(accountId, user,
+					resourceUtils.getResource(rid, resource));
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}
@@ -156,18 +161,4 @@ public class MediaController extends RestController {
 		return metadataManager.updateSocialData(user, rid, entityId);
 	}
 
-	private Resource getResource(String rid, MultipartFile file)
-			throws IOException {
-		Resource res = getResource(file);
-		res.setId(rid);
-		return res;
-	}
-
-	private Resource getResource(MultipartFile file) throws IOException {
-		Resource res = new Resource();
-		res.setContent(file.getBytes());
-		res.setContentType(file.getContentType());
-		res.setName(file.getOriginalFilename());
-		return res;
-	}
 }

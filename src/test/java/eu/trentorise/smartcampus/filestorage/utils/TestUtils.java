@@ -32,11 +32,12 @@ public class TestUtils {
 	/**
 	 * base URL of application web
 	 */
-	public static final String BASE_URL = "http://localhost:8280/filestorage";
+	public static final String BASE_URL = "http://localhost:8080/smartcampus.filestorage";
 	/**
 	 * authorization token of user to validate REST calls
 	 */
 	public static final String AUTH_TOKEN = "";
+
 	/**
 	 * system user id
 	 */
@@ -56,8 +57,8 @@ public class TestUtils {
 		account.setAppAccountName("smartcampus test");
 		account.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
-		confs.add(new Configuration("APP_KEY", DropboxUtils.appkey));
-		confs.add(new Configuration("APP_SECRET", DropboxUtils.appsecret));
+		confs.add(new Configuration("APP_KEY", DropboxTestUtils.appkey));
+		confs.add(new Configuration("APP_SECRET", DropboxTestUtils.appsecret));
 		account.setConfigurations(confs);
 		return account;
 	}
@@ -73,8 +74,8 @@ public class TestUtils {
 		account.setStorageType(appAccount.getStorageType());
 
 		List<Configuration> confs = new ArrayList<Configuration>();
-		confs.add(new Configuration("USER_KEY", DropboxUtils.userkey));
-		confs.add(new Configuration("USER_SECRET", DropboxUtils.usersecret));
+		confs.add(new Configuration("USER_KEY", DropboxTestUtils.userkey));
+		confs.add(new Configuration("USER_SECRET", DropboxTestUtils.usersecret));
 
 		account.setConfigurations(confs);
 		return account;
