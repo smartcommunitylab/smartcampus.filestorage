@@ -13,8 +13,6 @@ import javax.imageio.stream.FileImageOutputStream;
 
 import org.apache.activemq.util.ByteArrayInputStream;
 import org.apache.commons.io.FileUtils;
-import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Rotation;
 
 public class ImageUtils {
 
@@ -23,7 +21,7 @@ public class ImageUtils {
 
 		immagine = ImageIO.read(new ByteArrayInputStream(src));
 		// fix for Dropbox
-		immagine = Scalr.rotate(immagine, Rotation.CW_90, null);
+		// immagine = Scalr.rotate(immagine, Rotation.CW_90, null);
 		Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName("jpg");
 		ImageWriter jpgWriter = it.next();
 		ImageWriteParam parametri = jpgWriter.getDefaultWriteParam();
