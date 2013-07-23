@@ -32,14 +32,14 @@ public class StorageManager {
 			throw new AlreadyStoredException();
 		}
 
-		if (StringUtils.isNullOrEmpty(storage.getAppId(), true)) {
+		if (StringUtils.isNullOrEmpty(storage.getAppName(), true)) {
 			throw new IllegalArgumentException("appId should have a value");
 
 		}
 
 		if (StringUtils.isNullOrEmpty(storage.getName(), true)) {
 			storage.setName(DEFAULT_ACCOUNT_NAME + " "
-					+ getStoragesCount(storage.getAppId()));
+					+ getStoragesCount(storage.getAppName()));
 		}
 
 		if (StringUtils.isNullOrEmpty(storage.getId(), true)) {
@@ -73,9 +73,9 @@ public class StorageManager {
 		return getStorages(appId).size();
 	}
 
-	public List<Storage> getStorages(String appId) {
+	public List<Storage> getStorages(String appName) {
 		Criteria crit = new Criteria();
-		crit.and("appId").is(appId);
+		crit.and("appName").is(appName);
 		Query query = Query.query(crit);
 		return db.find(query, Storage.class);
 	}

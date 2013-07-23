@@ -16,11 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.ac.provider.model.User;
-import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.filestorage.model.Account;
 
 @Service
 public class TestUtils {
@@ -36,11 +36,11 @@ public class TestUtils {
 	/**
 	 * authorization token of user to validate REST calls
 	 */
-	public static final String AUTH_TOKEN = "c9a4fe5d-46e9-4851-85f7-25163a945e05";
+	public static final String AUTH_TOKEN = "";
 	/**
 	 * system user id
 	 */
-	public static final long userId = 220l;
+	public static final long userId = -1l;
 
 	private static Random random = new Random();
 	/**
@@ -52,7 +52,7 @@ public class TestUtils {
 
 	public static Storage createAppAccount(String appName) {
 		Storage account = new Storage();
-		account.setAppId(appName);
+		account.setAppName(appName);
 		account.setName("smartcampus test");
 		account.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
@@ -62,14 +62,13 @@ public class TestUtils {
 		return account;
 	}
 
-	public static Account createUserAccount(Storage appAccount,
-			long userId) {
+	public static Account createUserAccount(Storage appAccount, long userId) {
 		Account account = new Account();
 		account.setId(new ObjectId().toString());
 		account.setUserId(userId);
 		account.setName("smartcampus test");
 		account.setStorageId(appAccount.getId());
-		account.setAppId(appAccount.getAppId());
+		account.setAppName(appAccount.getAppName());
 		account.setStorageType(appAccount.getStorageType());
 
 		List<Configuration> confs = new ArrayList<Configuration>();

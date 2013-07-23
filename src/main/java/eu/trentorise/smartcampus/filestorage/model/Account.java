@@ -48,9 +48,9 @@ public class Account {
 	private String storageId;
 
 	/**
-	 * appId reference
+	 * appName reference
 	 */
-	private String appId;
+	private String appName;
 
 	/**
 	 * type of the storage
@@ -116,12 +116,12 @@ public class Account {
 		this.name = name;
 	}
 
-	public String getAppId() {
-		return appId;
+	public String getAppName() {
+		return appName;
 	}
 
-	public void setAppId(String appId) {
-		this.appId = appId;
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 
 }

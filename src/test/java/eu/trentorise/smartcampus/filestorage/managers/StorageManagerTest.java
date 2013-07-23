@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,25 +25,25 @@ public class StorageManagerTest {
 	@Autowired
 	StorageManager manager;
 
-	private static final String APP_ID = "smartcampus";
+	private static final String APP_NAME = "smartcampus";
 
-	@After
+	@Before
 	public void cleanup() {
-		for (Storage temp : manager.getStorages(APP_ID)) {
+		for (Storage temp : manager.getStorages(APP_NAME)) {
 			manager.delete(temp.getId());
 		}
 	}
 
 	@Test
 	public void crud() throws AlreadyStoredException, NotFoundException {
-		Storage storage = createStorage(APP_ID);
+		Storage storage = createStorage(APP_NAME);
 
 		// create
-		Assert.assertEquals(0, manager.getStorages(APP_ID).size());
+		Assert.assertEquals(0, manager.getStorages(APP_NAME).size());
 		manager.save(storage);
 
-		Assert.assertEquals(1, manager.getStorages(APP_ID).size());
-		storage = manager.getStorages(APP_ID).get(0);
+		Assert.assertEquals(1, manager.getStorages(APP_NAME).size());
+		storage = manager.getStorages(APP_NAME).get(0);
 		Assert.assertEquals(2, storage.getConfigurations().size());
 		Assert.assertEquals("sampleAccount", storage.getName());
 
@@ -51,18 +51,18 @@ public class StorageManagerTest {
 		storage.setConfigurations(new ArrayList<Configuration>());
 		manager.update(storage);
 
-		storage = manager.getStorages(APP_ID).get(0);
+		storage = manager.getStorages(APP_NAME).get(0);
 		Assert.assertEquals(0, storage.getConfigurations().size());
 
 		// delete
 		manager.delete(storage.getId());
-		Assert.assertEquals(0, manager.getStorages(APP_ID).size());
+		Assert.assertEquals(0, manager.getStorages(APP_NAME).size());
 
 	}
 
 	private Storage createStorage(String appName) {
 		Storage storage = new Storage();
-		storage.setAppId(appName);
+		storage.setAppName(appName);
 		storage.setName("sampleAccount");
 		storage.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();

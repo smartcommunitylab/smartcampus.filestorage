@@ -171,7 +171,7 @@ public class MetadataManager {
 		try {
 			userAccount = userAccountManager.findById(userAccountId);
 			metadata.setStorageId(userAccount.getStorageId());
-			metadata.setAppId(userAccount.getAppId());
+			metadata.setAppId(userAccount.getAppName());
 		} catch (NotFoundException e1) {
 			logger.error(String.format("userAccount not found: %s",
 					userAccountId));

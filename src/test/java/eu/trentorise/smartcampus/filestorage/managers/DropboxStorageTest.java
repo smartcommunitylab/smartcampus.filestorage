@@ -68,7 +68,7 @@ public class DropboxStorageTest {
 	public void initEnv() throws AlreadyStoredException {
 		// Storage creation
 		Storage appAccount = new Storage();
-		appAccount.setAppId("smartcampus");
+		appAccount.setAppName("smartcampus");
 		appAccount.setName("smartcampustTest");
 		appAccount.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
@@ -84,7 +84,7 @@ public class DropboxStorageTest {
 		account.setUserId(TEST_USER_ID);
 		account.setStorageType(StorageType.DROPBOX);
 		account.setStorageId(appAccount.getId());
-		account.setAppId(appAccount.getAppId());
+		account.setAppName(appAccount.getAppName());
 		List<Configuration> configurations = new ArrayList<Configuration>();
 		configurations.add(new Configuration("USER_KEY", DropboxUtils.userkey));
 		configurations.add(new Configuration("USER_SECRET",

@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Storage {
 	private String id;
-	private String appId;
+	private String appName;
 	private String name;
 	private StorageType storageType;
 
@@ -28,12 +28,12 @@ public class Storage {
 		this.id = id;
 	}
 
-	public String getAppId() {
-		return appId;
+	public String getAppName() {
+		return appName;
 	}
 
-	public void setAppId(String appId) {
-		this.appId = appId;
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 
 	public String getName() {

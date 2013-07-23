@@ -37,7 +37,7 @@ public class StorageController extends SCController {
 	Storage create(HttpServletRequest request, @RequestBody Storage storage)
 			throws SmartcampusException, AlreadyStoredException {
 		String appId = retrieveAppId(request);
-		storage.setAppId(appId);
+		storage.setAppName(appId);
 		return storageManager.save(storage);
 	}
 

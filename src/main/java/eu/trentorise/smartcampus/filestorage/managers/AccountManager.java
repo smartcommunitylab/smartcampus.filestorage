@@ -91,9 +91,9 @@ public class AccountManager {
 		return db.findAll(Account.class);
 	}
 
-	public List<Account> findUserAccounts(String appId) {
+	public List<Account> findUserAccounts(String appName) {
 		Criteria criteria = new Criteria();
-		criteria.and("appId").is(appId);
+		criteria.and("appName").is(appName);
 		return db.find(Query.query(criteria), Account.class);
 	}
 

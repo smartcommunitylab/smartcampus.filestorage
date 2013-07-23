@@ -21,28 +21,28 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.filestorage.model.Account;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
-public class UserAccountManagerTest {
+public class AccountManagerTest {
 
 	private static final int USER_ID = 50;
 
 	@Autowired
 	AccountManager manager;
 
-	@After
+	@Before
 	public void cleanup() {
 		for (Account a : manager.findAll()) {
 			manager.delete(a);
@@ -58,9 +58,6 @@ public class UserAccountManagerTest {
 		Assert.assertEquals(1, manager.findAll().size());
 		account = manager.findAll().get(0);
 		Assert.assertEquals(StorageType.DROPBOX, account.getStorageType());
-		manager.update(account);
-		account = manager.findAll().get(0);
-		Assert.assertNotSame(StorageType.DROPBOX, account.getStorageType());
 
 		manager.delete(account);
 		Assert.assertEquals(0, manager.findAll().size());

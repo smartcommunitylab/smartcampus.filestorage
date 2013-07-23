@@ -104,7 +104,7 @@ public class PermissionManager {
 		Storage retrieved;
 		try {
 			retrieved = storageManager.getStorageById(storageId);
-			return retrieved.getAppId().equals(appId);
+			return retrieved.getAppName().equals(appId);
 		} catch (NotFoundException e) {
 			return false;
 		}
