@@ -12,33 +12,39 @@
 
 	<description>Service manage file resource storage</description>
 
-	<resource name="appName" id="appname"></resource>
-	<resource name="appAccountId" id="appaccountid"></resource>
-	<resource name="userAccountId" id="useraccountid"></resource>
+	<resourceDeclaration id="appName"></resourceDeclaration>
+	<resourceDeclaration id="storageId"></resourceDeclaration>
+	<resourceDeclaration id="accountId"></resourceDeclaration>
 
-	<resourceMapping id="filestorage.appaccount.save" uri="filestorage.appaccount"
-		pathPatterns="/smartcampus.filestorage/appaccount" method="POST" authority="CLIENT">
+	
+	
+	<!-- ************** STORAGE ************** -->
+	
+	<resourceMapping uri="filestorage.storage.{appName}"
+		pathPattern="/storage/{appName}" method="POST">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.storage.{appName}"
+		pathPattern="/storage/{appName}/{storageId}" method="PUT">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.storage.{appName}"
+		pathPattern="/storage/{appName}/{storageId}" method="DELETE">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.storage.{appName}"
+		pathPattern="/storage/{appName}/{storageId}" method="GET">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.storage.{appName}"
+		pathPattern="/storage/{appName}" method="GET">
 	</resourceMapping>
 
-	<resourceMapping id="filestorage.appaccount.read" uri="filestorage.appaccount"
-		pathPatterns="/smartcampus.filestorage/appaccount/{appname}" method="GET"
-		authority="CLIENT">
-	</resourceMapping>
-
-	<resourceMapping id="filestorage.appaccount.edit" uri="filestorage.appaccount"
-		pathPatterns="/smartcampus.filestorage/appaccount/{appname}" method="PUT"
-		authority="CLIENT">
-	</resourceMapping>
-
-
-	<resourceMapping id="filestorage.appaccount.delete"
-		uri="filestorage.appaccount" pathPatterns="/smartcampus.filestorage/appaccount/{appname}/{appaccountid}" method="DELETE"
-		authority="CLIENT">
-	</resourceMapping>
+	
 
 	<!-- ************** USERACCOUNT ************** -->
 
-	<resourceMapping id="filestorage.useraccount.save" uri="filestorage.useraccount"
+	<!-- <resourceMapping id="filestorage.useraccount.save" uri="filestorage.useraccount"
 		pathPatterns="/smartcampus.filestorage/useraccount/{appname}" method="POST"
 		authority="CLIENT">
 	</resourceMapping>
@@ -62,19 +68,9 @@
 	<resourceMapping id="filestorage.useraccount.read.all"
 		uri="filestorage.useraccount" pathPatterns="/smartcampus.filestorage/useraccount/{appname}" method="GET"
 		authority="CLIENT">
-	</resourceMapping>
+	</resourceMapping> -->
 
 	<!-- ************** RESOURCE ************** -->
-
-	<resourceMapping id="filestorage.resource.save" uri="filestorage.useraccount"
-		pathPatterns="/smartcampus.filestorage/resource/{appname}/{useraccountid}" method="POST"
-		authority="USER">
-	</resourceMapping>
-
-	<resourceMapping id="filestorage.resource.edit" uri="filestorage.useraccount"
-		pathPatterns="/smartcampus.filestorage/resource/{appname}/{useraccountid}" method="POST"
-		authority="USER">
-	</resourceMapping>
 
 </service>
 
