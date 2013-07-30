@@ -42,33 +42,25 @@
 
 	
 
-	<!-- ************** USERACCOUNT ************** -->
+	<!-- ************** ACCOUNT ************** -->
 
-	<!-- <resourceMapping id="filestorage.useraccount.save" uri="filestorage.useraccount"
-		pathPatterns="/smartcampus.filestorage/useraccount/{appname}" method="POST"
-		authority="CLIENT">
+	<resourceMapping uri="filestorage.account.{appName}"
+		pathPattern="/account/app/{appName}" method="GET,POST">
 	</resourceMapping>
-
-	<resourceMapping id="filestorage.useraccount.edit" uri="filestorage.useraccount"
-		pathPatterns="/smartcampus.filestorage/useraccount/{appname}/{useraccountid}" method="PUT"
-		authority="CLIENT">
+	
+	<resourceMapping uri="filestorage.account.{appName}"
+		pathPattern="/account/app/{appName}/{accountId}" method="GET,DELETE,PUT">
 	</resourceMapping>
-
-
-	<resourceMapping id="filestorage.useraccount.delete"
-		uri="filestorage.useraccount" pathPatterns="/smartcampus.filestorage/useraccount/{appname}/{useraccountid}" method="DELETE"
-		authority="CLIENT">
+	
+	<resourceMapping uri="filestorage.account.me.{appName}"
+		pathPattern="/account/me/{appName}" method="GET,POST">
 	</resourceMapping>
-
-	<resourceMapping id="filestorage.useraccount.read" uri="filestorage.useraccount"
-		pathPatterns="/smartcampus.filestorage/useraccount/{appname}/{useraccountid}" method="GET"
-		authority="CLIENT">
+	
+	<resourceMapping uri="filestorage.account.me.{appName}"
+		pathPattern="/account/me/{appName}/{accountId}" method="GET,PUT,DELETE">
 	</resourceMapping>
-
-	<resourceMapping id="filestorage.useraccount.read.all"
-		uri="filestorage.useraccount" pathPatterns="/smartcampus.filestorage/useraccount/{appname}" method="GET"
-		authority="CLIENT">
-	</resourceMapping> -->
+	
+	
 
 	<!-- ************** RESOURCE ************** -->
 

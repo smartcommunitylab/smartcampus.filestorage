@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
 import eu.trentorise.smartcampus.filestorage.model.Account;
@@ -35,9 +34,11 @@ import eu.trentorise.smartcampus.filestorage.model.ListAccount;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
+import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
+import eu.trentorise.smartcampus.social.model.User;
 
 @Controller
-public class UserAccountController extends SCController {
+public class AccountController extends SCController {
 
 	@Autowired
 	AccountManager accountManager;
@@ -45,72 +46,168 @@ public class UserAccountController extends SCController {
 	@Autowired
 	PermissionManager permissionManager;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/account")
-	public @ResponseBody
-	Account save(HttpServletRequest request, @RequestBody Account account)
-			throws SmartcampusException, AlreadyStoredException {
-		User user = retrieveUser(request);
-		String appId = retrieveAppId(request);
+	@Autowired
+	AuthServices authServices;
 
-		// if userId isn't setted, it will be use the authToken to retrieve it
-		if (account.getUserId() <= 0) {
-			account.setUserId(user.getId());
+	// METHODS USED BY SERVER SIDE
+
+	@RequestMapping(method = RequestMethod.POST, value = "/account/app/{appName}")
+	public @ResponseBody
+	Account save(@RequestBody Account account, @PathVariable String appName)
+			throws SmartcampusException, AlreadyStoredException,
+			NotFoundException {
+
+		if (!account.isValid()) {
+			throw new IllegalArgumentException("Account is not valid");
 		}
-		if (!permissionManager.checkAccountPermission(user, account)) {
+
+		try {
+			getUserObject("" + account.getUserId());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("userId MUST be valid");
+		}
+
+		account.setAppName(appName);
+		if (!permissionManager.checkAccountPermission(appName, account)) {
 			throw new SecurityException();
 		}
 		return accountManager.save(account);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/account/{accountId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/app/{appName}/{accountId}")
 	public @ResponseBody
-	void update(HttpServletRequest request, @RequestBody Account account,
-			@PathVariable String accountId) throws SmartcampusException {
-		User user = retrieveUser(request);
-		String appId = retrieveAppId(request);
+	void update(@RequestBody Account account, @PathVariable String appName,
+			@PathVariable String accountId) throws SmartcampusException,
+			NotFoundException {
+
+		Account old = accountManager.findById(accountId);
 
 		if (account.getId() == null) {
 			account.setId(accountId);
 		}
 
-		if (!permissionManager.checkAccountPermission(user, account)) {
-			throw new SecurityException();
+		if (!account.isValid()) {
+			throw new IllegalArgumentException(
+					"Account is not valid, some fields are empty");
+		}
+
+		if (!account.isSame(old)) {
+			throw new IllegalArgumentException(String.format(
+					"Not the same account of %s", accountId));
 		}
 
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/account/{accountId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/app/{appName}/{accountId}")
 	public @ResponseBody
-	void delete(HttpServletRequest request, @PathVariable String accountId)
+	void delete(@PathVariable String accountId, @PathVariable String appName)
 			throws SmartcampusException, NotFoundException {
-		User user = retrieveUser(request);
-		String appId = retrieveAppId(request);
 
-		if (!permissionManager.checkAccountPermission(user, accountId)) {
+		Account todel = accountManager.findById(accountId);
+
+		if (!permissionManager.checkAccountPermission(appName, todel)) {
 			throw new SecurityException();
 		}
+
 		accountManager.delete(accountId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/{accountId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appName}/{accountId}")
 	public @ResponseBody
-	Account getAccountById(HttpServletRequest request,
-			@PathVariable String accountId) throws SmartcampusException,
+	Account getAccountById(@PathVariable String accountId,
+			@PathVariable String appName) throws SmartcampusException,
 			NotFoundException {
-		User user = retrieveUser(request);
-		String appId = retrieveAppId(request);
 
-		return accountManager.findById(accountId);
+		Account account = accountManager.findById(accountId);
+		if (!permissionManager.checkAccountPermission(appName, account)) {
+			throw new SecurityException();
+		}
+		return account;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appName}")
 	public @ResponseBody
-	ListAccount getAccounts(HttpServletRequest request)
+	ListAccount getAccounts(@PathVariable String appName)
 			throws SmartcampusException {
-		String appId = retrieveAppId(request);
 		ListAccount result = new ListAccount();
-		result.setAccounts(accountManager.findUserAccounts(appId));
+		result.setAccounts(accountManager.findAccounts(appName));
 		return result;
+	}
+
+	// METHODS USED BY USER
+
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/me/{appName}/{accountId}")
+	public @ResponseBody
+	void updateMyAccount(@RequestBody Account account,
+			@PathVariable String appName, @PathVariable String accountId)
+			throws SmartcampusException, NotFoundException {
+
+		Account old = accountManager.findById(accountId);
+		User user = getUserObject(getUserId());
+		if (account.getId() == null) {
+			account.setId(accountId);
+		}
+
+		if (!account.isValid()) {
+			throw new IllegalArgumentException(
+					"Account is not valid, some fields are empty");
+		}
+
+		if (!account.isSame(old)) {
+			throw new IllegalArgumentException(String.format(
+					"Not the same account of %s", accountId));
+		}
+
+		if (!permissionManager.checkAccountPermission(user, account)) {
+			throw new SecurityException();
+		}
+		accountManager.update(account);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/account/me/{appName}")
+	public @ResponseBody
+	ListAccount getMyAccounts(HttpServletRequest request,
+			@PathVariable String appName) throws SmartcampusException {
+		User user = getUserObject(getUserId());
+		ListAccount result = new ListAccount();
+		result.setAccounts(accountManager.findAccounts(appName,
+				Long.valueOf(user.getId())));
+		return result;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/account/me/{appName}/{accountId}")
+	public @ResponseBody
+	Account getMyAccountById(@PathVariable String accountId,
+			@PathVariable String appName) throws SmartcampusException,
+			NotFoundException {
+		User user = getUserObject(getUserId());
+		Account account = accountManager.findById(accountId);
+		if (!permissionManager.checkAccountPermission(user, account)) {
+			throw new SecurityException();
+		}
+		return account;
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/me/{appName}/{accountId}")
+	public @ResponseBody
+	void deleteMyAccount(@PathVariable String accountId,
+			@PathVariable String appName) throws SmartcampusException,
+			NotFoundException {
+
+		User user = getUserObject(getUserId());
+
+		Account todel = accountManager.findById(accountId);
+
+		if (!permissionManager.checkAccountPermission(user, todel)) {
+			throw new SecurityException();
+		}
+
+		accountManager.delete(accountId);
+	}
+
+	@Override
+	protected AuthServices getAuthServices() {
+		return authServices;
 	}
 }

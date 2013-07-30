@@ -91,9 +91,16 @@ public class AccountManager {
 		return db.findAll(Account.class);
 	}
 
-	public List<Account> findUserAccounts(String appName) {
+	public List<Account> findAccounts(String appName) {
 		Criteria criteria = new Criteria();
 		criteria.and("appName").is(appName);
+		return db.find(Query.query(criteria), Account.class);
+	}
+
+	public List<Account> findAccounts(String appName, long userId) {
+		Criteria criteria = new Criteria();
+		criteria.and("appName").is(appName);
+		criteria.and("userId").is(userId);
 		return db.find(Query.query(criteria), Account.class);
 	}
 
@@ -107,6 +114,15 @@ public class AccountManager {
 	public List<Account> findBy(long userId) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
+		return db.find(Query.query(criteria), Account.class);
+	}
+
+	public List<Account> findBy(long userId, String appName) {
+		Criteria criteria = new Criteria();
+		criteria.and("userId").is(userId);
+		if (appName != null) {
+			criteria.and("appName").is(appName);
+		}
 		return db.find(Query.query(criteria), Account.class);
 	}
 

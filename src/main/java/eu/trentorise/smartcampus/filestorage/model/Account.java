@@ -124,4 +124,17 @@ public class Account {
 		this.appName = appName;
 	}
 
+	public boolean isValid() {
+		return appName != null && userId > 0 && storageType != null
+				&& storageId != null;
+	}
+
+	public boolean isSame(Account account) {
+		return id.equals(account.getId())
+				&& appName.equals(account.getAppName())
+				&& userId == account.getUserId()
+				&& storageType == account.getStorageType()
+				&& storageId.equals(account.getStorageId());
+	}
+
 }

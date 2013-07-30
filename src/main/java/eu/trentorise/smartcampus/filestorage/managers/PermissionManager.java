@@ -19,11 +19,11 @@ package eu.trentorise.smartcampus.filestorage.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>PermissionManager</i> checks the permissions about resources and storage
@@ -55,6 +55,28 @@ public class PermissionManager {
 	 */
 	public boolean checkAccountPermission(User user, Account account) {
 		return user.getId().equals(account.getUserId());
+	}
+
+	/**
+	 * checks if account belongs to a specific appName
+	 * 
+	 * @param appName
+	 * @param account
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkAccountPermission(String appName, Account account)
+			throws NotFoundException {
+		if (account.getStorageId() != null) {
+			Storage storage = storageManager.getStorageById(account
+					.getStorageId());
+
+			return storage.getAppName().equals(appName)
+					&& account.getAppName() != null
+					&& account.getAppName().equals(appName);
+		} else {
+			return false;
+		}
 	}
 
 	/**
