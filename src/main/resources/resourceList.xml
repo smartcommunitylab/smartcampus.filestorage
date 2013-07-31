@@ -15,6 +15,7 @@
 	<resourceDeclaration id="appName"></resourceDeclaration>
 	<resourceDeclaration id="storageId"></resourceDeclaration>
 	<resourceDeclaration id="accountId"></resourceDeclaration>
+	<resourceDeclaration id="resourceId"></resourceDeclaration>
 
 	
 	
@@ -52,17 +53,26 @@
 		pathPattern="/account/app/{appName}/{accountId}" method="GET,DELETE,PUT">
 	</resourceMapping>
 	
-	<resourceMapping uri="filestorage.account.me.{appName}"
-		pathPattern="/account/me/{appName}" method="GET,POST">
+	<resourceMapping uri="filestorage.account.user.{appName}"
+		pathPattern="/account/user/{appName}" method="GET,POST">
 	</resourceMapping>
 	
-	<resourceMapping uri="filestorage.account.me.{appName}"
-		pathPattern="/account/me/{appName}/{accountId}" method="GET,PUT,DELETE">
+	<resourceMapping uri="filestorage.account.user.{appName}"
+		pathPattern="/account/user/{appName}/{accountId}" method="GET,PUT,DELETE">
 	</resourceMapping>
 	
 	
 
 	<!-- ************** RESOURCE ************** -->
+	
+	<resourceMapping uri="filestorage.metadata.{appName}"
+		pathPattern="/metadata/{appName}/{resourceId}" method="GET">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.resource.read"
+		pathPattern="/metadata/{appName}/{resourceId}" method="GET">
+	</resourceMapping>
+	
 
 </service>
 

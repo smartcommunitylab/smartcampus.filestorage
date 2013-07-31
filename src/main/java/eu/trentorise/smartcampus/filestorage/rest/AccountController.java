@@ -137,7 +137,7 @@ public class AccountController extends SCController {
 
 	// METHODS USED BY USER
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/account/me/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/user/{appName}/{accountId}")
 	public @ResponseBody
 	void updateMyAccount(@RequestBody Account account,
 			@PathVariable String appName, @PathVariable String accountId)
@@ -165,7 +165,7 @@ public class AccountController extends SCController {
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/me/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appName}")
 	public @ResponseBody
 	ListAccount getMyAccounts(HttpServletRequest request,
 			@PathVariable String appName) throws SmartcampusException {
@@ -176,7 +176,7 @@ public class AccountController extends SCController {
 		return result;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/me/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appName}/{accountId}")
 	public @ResponseBody
 	Account getMyAccountById(@PathVariable String accountId,
 			@PathVariable String appName) throws SmartcampusException,
@@ -189,7 +189,7 @@ public class AccountController extends SCController {
 		return account;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/account/me/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appName}/{accountId}")
 	public @ResponseBody
 	void deleteMyAccount(@PathVariable String accountId,
 			@PathVariable String appName) throws SmartcampusException,
