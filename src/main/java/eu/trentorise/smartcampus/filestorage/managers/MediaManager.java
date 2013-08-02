@@ -20,8 +20,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
@@ -30,6 +30,7 @@ import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>MediaManager</i> manages all other managers and exposes the main core
@@ -85,10 +86,6 @@ public class MediaManager {
 	/**
 	 * deletes a {@link Resource}
 	 * 
-	 * @param accountId
-	 *            id of user storage account in which resource is stored
-	 * @param user
-	 *            user that do the operation
 	 * @param resourceId
 	 *            id of the resource to delete
 	 * @throws SmartcampusException
@@ -96,11 +93,13 @@ public class MediaManager {
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public void remove(String accountId, User user, String resourceId)
-			throws SmartcampusException, NotFoundException {
-		StorageService storageService = storageUtils
-				.getStorageService(accountId);
-		storageService.remove(accountId, resourceId);
+	public void remove(String resourceId) throws SmartcampusException,
+			NotFoundException {
+
+		Metadata meta = metadataManager.findByResource(resourceId);
+		StorageService storageService = storageUtils.getStorageService(meta
+				.getAccountId());
+		storageService.remove(resourceId);
 		metadataManager.delete(resourceId);
 	}
 
@@ -109,10 +108,6 @@ public class MediaManager {
 	 * only lastModifiedTs field of
 	 * {@link eu.trentorise.smartcampus.filestorage.model.Metadata}.
 	 * 
-	 * @param accountId
-	 *            id of user storage account in which resource is stored
-	 * @param user
-	 *            user that do the operation
 	 * @param resource
 	 *            the new resource
 	 * @throws NotFoundException
@@ -120,11 +115,17 @@ public class MediaManager {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void replace(String accountId, User user, Resource resource)
-			throws NotFoundException, SmartcampusException {
-		StorageService storageService = storageUtils
-				.getStorageService(accountId);
-		storageService.replace(accountId, resource);
+	public void replace(Resource resource) throws NotFoundException,
+			SmartcampusException {
+		if (resource.getId() == null) {
+			throw new IllegalArgumentException("Resource SHOULD have a id");
+		}
+
+		Metadata meta = metadataManager.findByResource(resource.getId());
+
+		StorageService storageService = storageUtils.getStorageService(meta
+				.getAccountId());
+		storageService.replace(resource);
 		metadataManager.update(resource);
 	}
 

@@ -98,6 +98,23 @@ public class PermissionManager {
 	}
 
 	/**
+	 * checks if an account belongs to an application and is accessible by a
+	 * user
+	 * 
+	 * @param user
+	 * @param appName
+	 * @param accountId
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkAccountPermission(User user, String appName,
+			String accountId) throws NotFoundException {
+		Account account = accountManager.findById(accountId);
+		return user.getId().equals(account.getUserId())
+				&& account.getAppName().equals(appName);
+	}
+
+	/**
 	 * checks if a user can access to a resource
 	 * 
 	 * @param user
@@ -113,6 +130,40 @@ public class PermissionManager {
 		Metadata meta = metaManager.findByResource(rid);
 		return user.getId().equals(
 				accountManager.findById(meta.getAccountId()).getUserId());
+	}
+
+	/**
+	 * checks if a resource is owned by an application
+	 * 
+	 * @param appName
+	 *            application id
+	 * @param rid
+	 *            resource id
+	 * @return true if application owns the resource, false otherwise
+	 * @throws NotFoundException
+	 */
+	public boolean checkResourcePermission(String appName, String rid)
+			throws NotFoundException {
+		Metadata meta = metaManager.findByResource(rid);
+		Account account = accountManager.findById(meta.getAccountId());
+		return account.getAppName().equals(appName);
+	}
+
+	/**
+	 * checks if a resource is owned by an application and a user
+	 * 
+	 * @param user
+	 * @param appName
+	 * @param rid
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkResourcePermission(User user, String appName, String rid)
+			throws NotFoundException {
+		Metadata meta = metaManager.findByResource(rid);
+		Account account = accountManager.findById(meta.getAccountId());
+		return account.getUserId() == Long.valueOf(user.getId())
+				&& account.getAppName().equals(appName);
 	}
 
 	/**

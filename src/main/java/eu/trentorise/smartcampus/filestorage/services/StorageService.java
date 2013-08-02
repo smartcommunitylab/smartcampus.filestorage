@@ -48,8 +48,6 @@ public interface StorageService {
 	/**
 	 * updates of a resource
 	 * 
-	 * @param accountId
-	 *            the id of user storage account in which store the resource
 	 * @param resource
 	 *            the informations of resource to update
 	 * @throws NotFoundException
@@ -57,14 +55,12 @@ public interface StorageService {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void replace(String accountId, Resource resource)
-			throws NotFoundException, SmartcampusException;
+	public void replace(Resource resource) throws NotFoundException,
+			SmartcampusException;
 
 	/**
 	 * deletes a resource
 	 * 
-	 * @param accountId
-	 *            id of the account
 	 * @param rid
 	 *            id of the resource
 	 * @throws NotFoundException
@@ -72,7 +68,7 @@ public interface StorageService {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void remove(String accountId, String rid) throws NotFoundException,
+	public void remove(String rid) throws NotFoundException,
 			SmartcampusException;
 
 	/**

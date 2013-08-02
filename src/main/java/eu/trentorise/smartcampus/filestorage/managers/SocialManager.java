@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.common.SemanticHelper;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>SocialManager</i> manages interaction with social engine.
@@ -72,8 +72,8 @@ public class SocialManager {
 	public Long createEntity(Resource resource, User user)
 			throws WebApiException {
 		Entity entity = SemanticHelper.createEntity(socialClient,
-				user.getSocialId(), "computer file", resource.getName(),
-				resource.getId(), null, null);
+				Long.valueOf(user.getSocialId()), "computer file",
+				resource.getName(), resource.getId(), null, null);
 
 		return entity.getId();
 	}
@@ -105,7 +105,7 @@ public class SocialManager {
 	public boolean checkPermission(User user, String eid)
 			throws WebApiException {
 		return SemanticHelper.isEntitySharedWithUser(socialClient,
-				Long.decode(eid), user.getSocialId());
+				Long.decode(eid), Long.valueOf(user.getSocialId()));
 	}
 
 	/**
