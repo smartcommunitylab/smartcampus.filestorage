@@ -60,9 +60,9 @@ public class StorageManagerTest {
 
 	}
 
-	private Storage createStorage(String appName) {
+	private Storage createStorage(String appId) {
 		Storage storage = new Storage();
-		storage.setAppName(appName);
+		storage.setAppId(appId);
 		storage.setName("sampleAccount");
 		storage.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();

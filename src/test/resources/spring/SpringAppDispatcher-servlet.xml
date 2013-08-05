@@ -62,4 +62,9 @@
 		<property name="password" value="ac" />
 	</bean>
 	
+	<bean id="authServices"
+		class="eu.trentorise.smartcampus.resourceprovider.jdbc.JdbcServices">
+		<constructor-arg ref="dataSource" />
+	</bean>
+	
 </beans>

@@ -17,11 +17,11 @@ import org.junit.Test;
 import eu.trentorise.smartcampus.filestorage.client.HttpHeader;
 import eu.trentorise.smartcampus.filestorage.client.RestCaller;
 import eu.trentorise.smartcampus.filestorage.client.RestCaller.RequestType;
-import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 
 public class RestTest {
@@ -34,9 +34,9 @@ public class RestTest {
 		List<HttpHeader> headers = Arrays.asList(new HttpHeader("AUTH_TOKEN",
 				TestUtils.AUTH_TOKEN));
 
-		String appName = "smartcampus";
+		String appId = "smartcampus";
 		// creation of appAccount
-		Storage appAccount = TestUtils.createAppAccount(appName);
+		Storage appAccount = TestUtils.createAppAccount(appId);
 		appAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
 				+ "/appaccount", headers, appAccount, Storage.class);
 
@@ -44,8 +44,7 @@ public class RestTest {
 		Account userAccount = TestUtils.createUserAccount(appAccount,
 				TestUtils.userId);
 		userAccount = caller.callOneResult(RequestType.POST, TestUtils.BASE_URL
-				+ "/useraccount/" + appName, headers, userAccount,
-				Account.class);
+				+ "/useraccount/" + appId, headers, userAccount, Account.class);
 
 		// storeResource
 
@@ -53,7 +52,7 @@ public class RestTest {
 				.toURI());
 		Metadata info = caller.callOneResult(
 				RequestType.POST,
-				TestUtils.BASE_URL + "/resource/" + appName + "/"
+				TestUtils.BASE_URL + "/resource/" + appId + "/"
 						+ userAccount.getId() + "?createSocialData=false",
 				headers, resource, "file", Metadata.class);
 		Assert.assertNotNull(info.getResourceId());
@@ -61,13 +60,13 @@ public class RestTest {
 		// sessionToken
 		Token sessionToken = caller.callOneResult(
 				RequestType.GET,
-				TestUtils.BASE_URL + "/myresource/" + appName + "/"
+				TestUtils.BASE_URL + "/myresource/" + appId + "/"
 						+ info.getResourceId(), headers, Token.class);
 		Assert.assertNotNull(sessionToken);
 
 		Metadata metadata = caller.callOneResult(
 				RequestType.GET,
-				TestUtils.BASE_URL + "/metadata/" + appName + "/"
+				TestUtils.BASE_URL + "/metadata/" + appId + "/"
 						+ info.getResourceId(), headers, Metadata.class);
 		Assert.assertNotNull(metadata);
 	}
@@ -97,9 +96,10 @@ public class RestTest {
 		Assert.assertEquals(2, appAccount.getConfigurations().size());
 		appAccount.setConfigurations(new ArrayList<Configuration>());
 
-		appAccount = caller.callOneResult(RequestType.PUT, TestUtils.BASE_URL
-				+ "/appaccount/smartcampus", headers, appAccount,
-				Storage.class);
+		appAccount = caller
+				.callOneResult(RequestType.PUT, TestUtils.BASE_URL
+						+ "/appaccount/smartcampus", headers, appAccount,
+						Storage.class);
 		Assert.assertEquals(0, appAccount.getConfigurations().size());
 
 		// delete

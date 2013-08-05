@@ -48,9 +48,9 @@ public class Account {
 	private String storageId;
 
 	/**
-	 * appName reference
+	 * appId reference
 	 */
-	private String appName;
+	private String appId;
 
 	/**
 	 * type of the storage
@@ -116,22 +116,21 @@ public class Account {
 		this.name = name;
 	}
 
-	public String getAppName() {
-		return appName;
+	public String getAppId() {
+		return appId;
 	}
 
-	public void setAppName(String appName) {
-		this.appName = appName;
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 
 	public boolean isValid() {
-		return appName != null && userId > 0 && storageType != null
+		return appId != null && userId > 0 && storageType != null
 				&& storageId != null;
 	}
 
 	public boolean isSame(Account account) {
-		return id.equals(account.getId())
-				&& appName.equals(account.getAppName())
+		return id.equals(account.getId()) && appId.equals(account.getAppId())
 				&& userId == account.getUserId()
 				&& storageType == account.getStorageType()
 				&& storageId.equals(account.getStorageId());

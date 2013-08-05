@@ -36,58 +36,58 @@ public class StorageController extends SCController {
 	@Autowired
 	AuthServices authServices;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/storage/{appName}")
+	@RequestMapping(method = RequestMethod.POST, value = "/storage/{appId}")
 	public @ResponseBody
 	Storage create(HttpServletRequest request, @RequestBody Storage storage,
-			@PathVariable String appName) throws SmartcampusException,
+			@PathVariable String appId) throws SmartcampusException,
 			AlreadyStoredException {
-		storage.setAppName(appName);
+		storage.setAppId(appId);
 		return storageManager.save(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/storage/{appName}/{storageId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/storage/{appId}/{storageId}")
 	public @ResponseBody
 	Storage update(HttpServletRequest request, @RequestBody Storage storage,
-			@PathVariable String storageId, @PathVariable String appName)
+			@PathVariable String storageId, @PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
 		storage.setId(storageId);
 
-		if (!permissionManager.checkStoragePermission(appName, storageId)) {
+		if (!permissionManager.checkStoragePermission(appId, storageId)) {
 			throw new SecurityException();
 		}
 		return storageManager.update(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/{appName}/{storageId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/{appId}/{storageId}")
 	public @ResponseBody
 	boolean delete(HttpServletRequest request, @PathVariable String storageId,
-			@PathVariable String appName) throws SmartcampusException {
+			@PathVariable String appId) throws SmartcampusException {
 
-		if (!permissionManager.checkStoragePermission(appName, storageId)) {
+		if (!permissionManager.checkStoragePermission(appId, storageId)) {
 			throw new SecurityException();
 		}
 		storageManager.delete(storageId);
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appId}")
 	public @ResponseBody
 	ListStorage getStorages(HttpServletRequest request,
-			@PathVariable String appName) throws SmartcampusException {
+			@PathVariable String appId) throws SmartcampusException {
 
 		ListStorage result = new ListStorage();
-		result.setStorages(storageManager.getStorages(appName));
+		result.setStorages(storageManager.getStorages(appId));
 		return result;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appName}/{storageId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appId}/{storageId}")
 	public @ResponseBody
 	Storage getStorage(HttpServletRequest request,
-			@PathVariable String storageId, @PathVariable String appName)
+			@PathVariable String storageId, @PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
-		if (!permissionManager.checkStoragePermission(appName, storageId)) {
+		if (!permissionManager.checkStoragePermission(appId, storageId)) {
 			throw new SecurityException();
 		}
 

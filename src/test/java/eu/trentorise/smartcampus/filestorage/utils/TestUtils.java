@@ -50,9 +50,9 @@ public class TestUtils {
 	@Autowired
 	SocialEngineOperation socialEngine;
 
-	public static Storage createAppAccount(String appName) {
+	public static Storage createAppAccount(String appId) {
 		Storage account = new Storage();
-		account.setAppName(appName);
+		account.setAppId(appId);
 		account.setName("smartcampus test");
 		account.setStorageType(StorageType.DROPBOX);
 		List<Configuration> confs = new ArrayList<Configuration>();
@@ -68,7 +68,7 @@ public class TestUtils {
 		account.setUserId(userId);
 		account.setName("smartcampus test");
 		account.setStorageId(appAccount.getId());
-		account.setAppName(appAccount.getAppName());
+		account.setAppId(appAccount.getAppId());
 		account.setStorageType(appAccount.getStorageType());
 
 		List<Configuration> confs = new ArrayList<Configuration>();

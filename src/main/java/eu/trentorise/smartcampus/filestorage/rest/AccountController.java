@@ -51,9 +51,9 @@ public class AccountController extends SCController {
 
 	// METHODS USED BY SERVER SIDE
 
-	@RequestMapping(method = RequestMethod.POST, value = "/account/app/{appName}")
+	@RequestMapping(method = RequestMethod.POST, value = "/account/app/{appId}")
 	public @ResponseBody
-	Account save(@RequestBody Account account, @PathVariable String appName)
+	Account save(@RequestBody Account account, @PathVariable String appId)
 			throws SmartcampusException, AlreadyStoredException,
 			NotFoundException {
 
@@ -67,16 +67,16 @@ public class AccountController extends SCController {
 			throw new IllegalArgumentException("userId MUST be valid");
 		}
 
-		account.setAppName(appName);
-		if (!permissionManager.checkAccountPermission(appName, account)) {
+		account.setAppId(appId);
+		if (!permissionManager.checkAccountPermission(appId, account)) {
 			throw new SecurityException();
 		}
 		return accountManager.save(account);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/account/app/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/app/{appId}/{accountId}")
 	public @ResponseBody
-	void update(@RequestBody Account account, @PathVariable String appName,
+	void update(@RequestBody Account account, @PathVariable String appId,
 			@PathVariable String accountId) throws SmartcampusException,
 			NotFoundException {
 
@@ -99,48 +99,48 @@ public class AccountController extends SCController {
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/account/app/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/app/{appId}/{accountId}")
 	public @ResponseBody
-	void delete(@PathVariable String accountId, @PathVariable String appName)
+	void delete(@PathVariable String accountId, @PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
 		Account todel = accountManager.findById(accountId);
 
-		if (!permissionManager.checkAccountPermission(appName, todel)) {
+		if (!permissionManager.checkAccountPermission(appId, todel)) {
 			throw new SecurityException();
 		}
 
 		accountManager.delete(accountId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appId}/{accountId}")
 	public @ResponseBody
 	Account getAccountById(@PathVariable String accountId,
-			@PathVariable String appName) throws SmartcampusException,
+			@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 
 		Account account = accountManager.findById(accountId);
-		if (!permissionManager.checkAccountPermission(appName, account)) {
+		if (!permissionManager.checkAccountPermission(appId, account)) {
 			throw new SecurityException();
 		}
 		return account;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/app/{appId}")
 	public @ResponseBody
-	ListAccount getAccounts(@PathVariable String appName)
+	ListAccount getAccounts(@PathVariable String appId)
 			throws SmartcampusException {
 		ListAccount result = new ListAccount();
-		result.setAccounts(accountManager.findAccounts(appName));
+		result.setAccounts(accountManager.findAccounts(appId));
 		return result;
 	}
 
 	// METHODS USED BY USER
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/account/user/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/user/{appId}/{accountId}")
 	public @ResponseBody
 	void updateMyAccount(@RequestBody Account account,
-			@PathVariable String appName, @PathVariable String accountId)
+			@PathVariable String appId, @PathVariable String accountId)
 			throws SmartcampusException, NotFoundException {
 
 		Account old = accountManager.findById(accountId);
@@ -165,21 +165,21 @@ public class AccountController extends SCController {
 		accountManager.update(account);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appName}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appId}")
 	public @ResponseBody
 	ListAccount getMyAccounts(HttpServletRequest request,
-			@PathVariable String appName) throws SmartcampusException {
+			@PathVariable String appId) throws SmartcampusException {
 		User user = getUserObject(getUserId());
 		ListAccount result = new ListAccount();
-		result.setAccounts(accountManager.findAccounts(appName,
+		result.setAccounts(accountManager.findAccounts(appId,
 				Long.valueOf(user.getId())));
 		return result;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appId}/{accountId}")
 	public @ResponseBody
 	Account getMyAccountById(@PathVariable String accountId,
-			@PathVariable String appName) throws SmartcampusException,
+			@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 		User user = getUserObject(getUserId());
 		Account account = accountManager.findById(accountId);
@@ -189,10 +189,10 @@ public class AccountController extends SCController {
 		return account;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appName}/{accountId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appId}/{accountId}")
 	public @ResponseBody
 	void deleteMyAccount(@PathVariable String accountId,
-			@PathVariable String appName) throws SmartcampusException,
+			@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 
 		User user = getUserObject(getUserId());

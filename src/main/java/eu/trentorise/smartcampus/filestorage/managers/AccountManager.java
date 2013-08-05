@@ -91,15 +91,15 @@ public class AccountManager {
 		return db.findAll(Account.class);
 	}
 
-	public List<Account> findAccounts(String appName) {
+	public List<Account> findAccounts(String appId) {
 		Criteria criteria = new Criteria();
-		criteria.and("appName").is(appName);
+		criteria.and("appId").is(appId);
 		return db.find(Query.query(criteria), Account.class);
 	}
 
-	public List<Account> findAccounts(String appName, long userId) {
+	public List<Account> findAccounts(String appId, long userId) {
 		Criteria criteria = new Criteria();
-		criteria.and("appName").is(appName);
+		criteria.and("appId").is(appId);
 		criteria.and("userId").is(userId);
 		return db.find(Query.query(criteria), Account.class);
 	}
@@ -117,11 +117,11 @@ public class AccountManager {
 		return db.find(Query.query(criteria), Account.class);
 	}
 
-	public List<Account> findBy(long userId, String appName) {
+	public List<Account> findBy(long userId, String appId) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
-		if (appName != null) {
-			criteria.and("appName").is(appName);
+		if (appId != null) {
+			criteria.and("appId").is(appId);
 		}
 		return db.find(Query.query(criteria), Account.class);
 	}
