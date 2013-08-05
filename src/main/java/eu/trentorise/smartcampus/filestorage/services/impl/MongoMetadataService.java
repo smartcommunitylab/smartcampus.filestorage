@@ -59,8 +59,9 @@ public class MongoMetadataService implements MetadataService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getEntityByResource(String rid) throws NotFoundException {
-		Metadata meta = getMetadata(rid);
+	public String getEntityByResource(String resourceId)
+			throws NotFoundException {
+		Metadata meta = getMetadata(resourceId);
 		return meta.getSocialId();
 	}
 
@@ -68,10 +69,10 @@ public class MongoMetadataService implements MetadataService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Metadata getMetadata(String rid) throws NotFoundException {
-		Metadata meta = db.findById(rid, Metadata.class);
+	public Metadata getMetadata(String resourceId) throws NotFoundException {
+		Metadata meta = db.findById(resourceId, Metadata.class);
 		if (meta == null) {
-			logger.error("Metadata not found: " + rid);
+			logger.error("Metadata not found: " + resourceId);
 			throw new NotFoundException();
 		} else {
 			return meta;
@@ -96,8 +97,8 @@ public class MongoMetadataService implements MetadataService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void delete(String rid) {
-		Criteria criteria = new Criteria("rid").is(rid);
+	public void delete(String resourceId) {
+		Criteria criteria = new Criteria("resourceId").is(resourceId);
 		db.remove(Query.query(criteria), Metadata.class);
 
 	}
@@ -109,8 +110,8 @@ public class MongoMetadataService implements MetadataService {
 	public void update(Metadata metadata) throws NotFoundException {
 		if (metadata.getResourceId() != null) {
 			int results = db.find(
-					Query.query(new Criteria("rid").is(metadata.getResourceId())),
-					Metadata.class).size();
+					Query.query(new Criteria("resourceId").is(metadata
+							.getResourceId())), Metadata.class).size();
 			if (results < 1) {
 				logger.error("Metadata not found: " + metadata.getResourceId());
 				throw new NotFoundException();

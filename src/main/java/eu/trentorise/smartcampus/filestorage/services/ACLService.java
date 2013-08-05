@@ -35,24 +35,24 @@ public interface ACLService {
 	 * 
 	 * @param operation
 	 *            operation to do
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @param user
 	 *            user
 	 * @return true if operation is permitted, false otherwise
 	 */
-	public boolean isPermitted(Operation operation, String rid, User user);
+	public boolean isPermitted(Operation operation, String resourceId, User user);
 
 	/**
 	 * retrieves the operations permitted to a user on a resource
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @param user
 	 *            user
 	 * @return the array of operation permitted
 	 */
-	public Operation[] getPermissions(String rid, User user);
+	public Operation[] getPermissions(String resourceId, User user);
 
 	/**
 	 * retrieves the Token to performs given operation on the resource
@@ -61,7 +61,7 @@ public interface ACLService {
 	 *            operation to perform on the resource
 	 * @param user
 	 *            user who do the operation
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @param owned
 	 *            true to look at a owned resource
@@ -71,7 +71,8 @@ public interface ACLService {
 	 * @throws SecurityException
 	 *             if user has no privileges to do the operation on the resource
 	 */
-	public Token getSessionToken(Operation operation, User user, String rid,
-			boolean owned) throws SmartcampusException, SecurityException;
+	public Token getSessionToken(Operation operation, User user,
+			String resourceId, boolean owned) throws SmartcampusException,
+			SecurityException;
 
 }

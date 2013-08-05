@@ -60,24 +60,25 @@ public interface MetadataService {
 	/**
 	 * retrieves social entity id given the id of the resource
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @return social entity id
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public String getEntityByResource(String rid) throws NotFoundException;
+	public String getEntityByResource(String resourceId)
+			throws NotFoundException;
 
 	/**
 	 * retrieves {@link Metadata} given its resource id
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @return the metadata binded to the resource
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public Metadata getMetadata(String rid) throws NotFoundException;
+	public Metadata getMetadata(String resourceId) throws NotFoundException;
 
 	/**
 	 * retrieves all of {@link Metadata} binded to a given account id
@@ -104,10 +105,10 @@ public interface MetadataService {
 	/**
 	 * deletes a {@link Metadata}
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            the id of the resource binded to the metadata to delete
 	 */
-	public void delete(String rid);
+	public void delete(String resourceId);
 
 	/**
 	 * updates a {@link Metadata}. In particular updates the last modification
@@ -116,7 +117,7 @@ public interface MetadataService {
 	 * @param metadata
 	 *            metadata to update
 	 * @throws NotFoundException
-	 *             if rid field in metadata doesn't exist
+	 *             if resourceId field in metadata doesn't exist
 	 */
 	public void update(Metadata metadata) throws NotFoundException;
 }

@@ -54,7 +54,7 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isPermitted(Operation operation, String rid, User user) {
+	public boolean isPermitted(Operation operation, String resourceId, User user) {
 		throw new IllegalArgumentException("Operation not implemented");
 	}
 
@@ -62,7 +62,7 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Operation[] getPermissions(String rid, User user) {
+	public Operation[] getPermissions(String resourceId, User user) {
 		throw new IllegalArgumentException("Operation not implemented");
 	}
 
@@ -70,24 +70,25 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getSessionToken(Operation operation, User user, String rid,
-			boolean owned) throws SmartcampusException, SecurityException {
+	public Token getSessionToken(Operation operation, User user,
+			String resourceId, boolean owned) throws SmartcampusException,
+			SecurityException {
 		Token token = null;
 		switch (operation) {
 		case DOWNLOAD:
 			try {
-				if ((owned && isMyResource(user, rid))
+				if ((owned && isMyResource(user, resourceId))
 						|| (!owned && socialManager.checkPermission(user,
-								metaService.getEntityByResource(rid)))) {
+								metaService.getEntityByResource(resourceId)))) {
 					logger.info(String.format(
 							"Download permission ok, user: %s, resource: %s",
-							user.getId(), rid));
-					token = generateToken(rid);
+							user.getId(), resourceId));
+					token = generateToken(resourceId);
 					logger.info("Session token for download operation created successfully");
 				} else {
 					logger.error(String
 							.format("User %s not have download permission to resource %s",
-									user.getId(), rid));
+									user.getId(), resourceId));
 					throw new SecurityException(
 							"User has not permission on this resource");
 				}
@@ -104,25 +105,25 @@ public class ScAcl implements ACLService {
 		return token;
 	}
 
-	private boolean isMyResource(User user, String rid) {
+	private boolean isMyResource(User user, String resourceId) {
 		Metadata resourceInfo;
 		try {
-			resourceInfo = metaService.getMetadata(rid);
+			resourceInfo = metaService.getMetadata(resourceId);
 			Account account = userAccountManager.findById(resourceInfo
 					.getAccountId());
 			return account.getUserId() == Long.valueOf(user.getId());
 		} catch (NotFoundException e) {
-			logger.error(String.format("%s resource not found", rid));
+			logger.error(String.format("%s resource not found", resourceId));
 			return false;
 		}
 
 	}
 
-	private Token generateToken(String rid) throws NotFoundException,
+	private Token generateToken(String resourceId) throws NotFoundException,
 			SmartcampusException {
-		Metadata meta = metaService.getMetadata(rid);
+		Metadata meta = metaService.getMetadata(resourceId);
 		StorageService storageService = storageUtils.getStorageService(meta
 				.getAccountId());
-		return storageService.getToken(meta.getAccountId(), rid);
+		return storageService.getToken(meta.getAccountId(), resourceId);
 	}
 }

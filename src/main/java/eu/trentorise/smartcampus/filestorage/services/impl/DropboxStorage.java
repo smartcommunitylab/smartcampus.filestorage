@@ -166,10 +166,10 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void remove(String rid) throws NotFoundException,
+	public void remove(String resourceId) throws NotFoundException,
 			SmartcampusException {
 
-		Metadata metadata = metaService.getMetadata(rid);
+		Metadata metadata = metaService.getMetadata(resourceId);
 		// get user token
 
 		AccessTokenPair token = null;
@@ -254,7 +254,7 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getToken(String userAccountId, String rid)
+	public Token getToken(String userAccountId, String resourceId)
 			throws NotFoundException, SmartcampusException {
 		// get user token
 		AccessTokenPair token = null;
@@ -268,7 +268,7 @@ public class DropboxStorage implements StorageService {
 		}
 
 		// find resource name
-		Metadata metadata = metaService.getMetadata(rid);
+		Metadata metadata = metaService.getMetadata(resourceId);
 		Storage appAccount = appAccountManager.getStorageById(metadata
 				.getStorageId());
 

@@ -106,169 +106,176 @@ public class MediaController extends SCController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/resource/app/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/app/{appId}/{resourceId}")
 	public @ResponseBody
 	void replaceResource(@PathVariable String appId,
-			@PathVariable("rid") String rid,
+			@PathVariable("resourceId") String resourceId,
 			@RequestParam("file") MultipartFile resource)
 			throws SmartcampusException, NotFoundException {
 
-		if (!permissionManager.checkResourcePermission(appId, rid)) {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
 
 		try {
-			mediaManager.replace(getResource(rid, resource));
+			mediaManager.replace(getResource(resourceId, resource));
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/resource/user/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
 	void replaceMyResource(@PathVariable String appId,
-			@PathVariable("rid") String rid,
+			@PathVariable("resourceId") String resourceId,
 			@RequestParam("file") MultipartFile resource)
 			throws SmartcampusException, NotFoundException {
 		User user = getUserObject(getUserId());
 
-		if (!permissionManager.checkResourcePermission(user, appId, rid)) {
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
 			throw new SecurityException();
 		}
 
 		try {
-			mediaManager.replace(getResource(rid, resource));
+			mediaManager.replace(getResource(resourceId, resource));
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/app/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/app/{appId}/{resourceId}")
 	public @ResponseBody
-	void removeResource(@PathVariable String appId, @PathVariable String rid)
-			throws SmartcampusException, NotFoundException {
+	void removeResource(@PathVariable String appId,
+			@PathVariable String resourceId) throws SmartcampusException,
+			NotFoundException {
 
-		if (!permissionManager.checkResourcePermission(appId, rid)) {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		mediaManager.remove(rid);
+		mediaManager.remove(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/user/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
-	void removeMyResource(@PathVariable String appId, @PathVariable String rid)
-			throws SmartcampusException, NotFoundException {
+	void removeMyResource(@PathVariable String appId,
+			@PathVariable String resourceId) throws SmartcampusException,
+			NotFoundException {
 		User user = getUserObject(getUserId());
 
-		if (!permissionManager.checkResourcePermission(user, appId, rid)) {
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
 			throw new SecurityException();
 		}
-		mediaManager.remove(rid);
+		mediaManager.remove(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/metadata/app/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/app/{appId}/{resourceId}")
 	public @ResponseBody
 	Metadata getResourceMetadata(@PathVariable String appId,
-			@PathVariable String rid) throws SmartcampusException,
+			@PathVariable String resourceId) throws SmartcampusException,
 			SecurityException, NotFoundException {
 
-		if (!permissionManager.checkResourcePermission(appId, rid)) {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			new SecurityException();
 		}
-		return metadataManager.findByResource(rid);
+		return metadataManager.findByResource(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/metadata/any/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/any/{resourceId}")
 	public @ResponseBody
-	Metadata getAnyResourceMetadata(@PathVariable String rid)
+	Metadata getAnyResourceMetadata(@PathVariable String resourceId)
 			throws SmartcampusException, SecurityException, NotFoundException {
 
-		return metadataManager.findByResource(rid);
+		return metadataManager.findByResource(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Metadata getMyResourceMetadata(@PathVariable String appId,
-			@PathVariable String rid) throws SmartcampusException,
+			@PathVariable String resourceId) throws SmartcampusException,
 			SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
 
-		if (!permissionManager.checkResourcePermission(user, appId, rid)) {
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
 			throw new SecurityException();
 		}
-		return metadataManager.findByResource(rid);
+		return metadataManager.findByResource(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/myresource/user/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/myresource/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Token getMyResourceUser(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String rid)
+			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
-		if (!permissionManager.checkResourcePermission(appId, rid)) {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, true);
+		return scAcl
+				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/myresource/app/{appId}/{userId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/myresource/app/{appId}/{userId}/{resourceId}")
 	public @ResponseBody
 	Token getMyResourceApp(@PathVariable String userId,
-			@PathVariable String appId, @PathVariable String rid)
+			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException, NotFoundException {
 		User user = getUserObject(userId);
-		if (!permissionManager.checkResourcePermission(appId, rid)) {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, true);
+		return scAcl
+				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/resource/user/{appId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Token getMySharedResource(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String rid)
+			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException {
 		User user = getUserObject(getUserId());
 
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, false);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
+				false);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/resource/app/{appId}/{userId}/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/app/{appId}/{userId}/{resourceId}")
 	public @ResponseBody
 	Token getSharedResource(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String rid)
+			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException {
 		User user = getUserObject(getUserId());
 
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, false);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
+				false);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/resource/any/{rid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/any/{resourceId}")
 	public @ResponseBody
 	Token getAnySharedResource(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String rid)
+			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException {
 		User user = getUserObject(getUserId());
 
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, rid, false);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
+				false);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/{appId}/{rid}/{entityId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/{appId}/{resourceId}/{entityId}")
 	public @ResponseBody
 	Metadata updateSocialData(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String rid,
+			@PathVariable String appId, @PathVariable String resourceId,
 			@PathVariable String entityId) throws SmartcampusException,
 			SecurityException, NotFoundException {
 
 		User user = getUserObject(getUserId());
 
-		return metadataManager.updateSocialData(user, rid, entityId);
+		return metadataManager.updateSocialData(user, resourceId, entityId);
 	}
 
-	private Resource getResource(String rid, MultipartFile file)
+	private Resource getResource(String resourceId, MultipartFile file)
 			throws IOException {
 		Resource res = getResource(file);
-		res.setId(rid);
+		res.setId(resourceId);
 		return res;
 	}
 
