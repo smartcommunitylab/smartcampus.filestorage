@@ -40,7 +40,7 @@ public class TestUtils {
 	/**
 	 * system user id
 	 */
-	public static final long userId = -1l;
+	public static final String userId = null;
 
 	private static Random random = new Random();
 	/**
@@ -62,7 +62,7 @@ public class TestUtils {
 		return account;
 	}
 
-	public static Account createUserAccount(Storage appAccount, long userId) {
+	public static Account createUserAccount(Storage appAccount, String userId) {
 		Account account = new Account();
 		account.setId(new ObjectId().toString());
 		account.setUserId(userId);

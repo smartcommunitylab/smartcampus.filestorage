@@ -171,8 +171,7 @@ public class AccountController extends SCController {
 			@PathVariable String appId) throws SmartcampusException {
 		User user = getUserObject(getUserId());
 		ListAccount result = new ListAccount();
-		result.setAccounts(accountManager.findAccounts(appId,
-				Long.valueOf(user.getId())));
+		result.setAccounts(accountManager.findAccounts(appId, user.getId()));
 		return result;
 	}
 

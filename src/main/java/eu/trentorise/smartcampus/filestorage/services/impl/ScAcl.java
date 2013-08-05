@@ -111,7 +111,7 @@ public class ScAcl implements ACLService {
 			resourceInfo = metaService.getMetadata(resourceId);
 			Account account = userAccountManager.findById(resourceInfo
 					.getAccountId());
-			return account.getUserId() == Long.valueOf(user.getId());
+			return account.getUserId().equals(user.getId());
 		} catch (NotFoundException e) {
 			logger.error(String.format("%s resource not found", resourceId));
 			return false;

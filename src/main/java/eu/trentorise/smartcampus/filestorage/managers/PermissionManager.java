@@ -94,7 +94,7 @@ public class PermissionManager {
 	public boolean checkAccountPermission(User user, String accountId)
 			throws NotFoundException {
 		Account account = accountManager.findById(accountId);
-		return user.getId().equals(account.getUserId());
+		return user.getId().equals("" + account.getUserId());
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class PermissionManager {
 			throws NotFoundException {
 		Metadata meta = metaManager.findByResource(rid);
 		Account account = accountManager.findById(meta.getAccountId());
-		return account.getUserId() == Long.valueOf(user.getId())
+		return account.getUserId().equals(user.getId())
 				&& account.getAppId().equals(appId);
 	}
 

@@ -64,8 +64,7 @@ public class ScAclTest {
 
 			user = testUtils.createUser();
 
-			userAccount = TestUtils.createUserAccount(appAccount,
-					new Long(user.getId()));
+			userAccount = TestUtils.createUserAccount(appAccount, user.getId());
 			userAccount = accountManager.save(userAccount);
 
 			resource = mediaManager.storage(userAccount.getId(), user,

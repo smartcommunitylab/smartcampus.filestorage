@@ -40,7 +40,7 @@ public class Account {
 	/**
 	 * id of the user
 	 */
-	private long userId;
+	private String userId;
 
 	/**
 	 * storage account reference
@@ -68,11 +68,11 @@ public class Account {
 	@XmlElement(name = "configuration")
 	private List<Configuration> configurations;
 
-	public long getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(long userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 
@@ -125,7 +125,7 @@ public class Account {
 	}
 
 	public boolean isValid() {
-		return appId != null && userId > 0 && storageType != null
+		return appId != null && userId != null && storageType != null
 				&& storageId != null;
 	}
 

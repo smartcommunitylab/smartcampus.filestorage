@@ -97,7 +97,7 @@ public class AccountManager {
 		return db.find(Query.query(criteria), Account.class);
 	}
 
-	public List<Account> findAccounts(String appId, long userId) {
+	public List<Account> findAccounts(String appId, String userId) {
 		Criteria criteria = new Criteria();
 		criteria.and("appId").is(appId);
 		criteria.and("userId").is(userId);
@@ -111,13 +111,13 @@ public class AccountManager {
 	 *            id of the owner of user storage accounts
 	 * @return a list of Account of the given user id
 	 */
-	public List<Account> findBy(long userId) {
+	public List<Account> findBy(String userId) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
 		return db.find(Query.query(criteria), Account.class);
 	}
 
-	public List<Account> findBy(long userId, String appId) {
+	public List<Account> findBy(String userId, String appId) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
 		if (appId != null) {
@@ -153,7 +153,7 @@ public class AccountManager {
 	 *            type of storage
 	 * @return the list of Account for given user and type
 	 */
-	public List<Account> findBy(long userId, StorageType storage) {
+	public List<Account> findBy(String userId, StorageType storage) {
 		Criteria criteria = new Criteria();
 		criteria.and("userId").is(userId);
 		criteria.and("storageType").is(storage);

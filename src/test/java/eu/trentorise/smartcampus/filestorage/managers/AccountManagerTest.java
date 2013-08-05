@@ -37,7 +37,7 @@ import eu.trentorise.smartcampus.filestorage.model.StorageType;
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
 public class AccountManagerTest {
 
-	private static final int USER_ID = 50;
+	private static final String USER_ID = "50";
 
 	@Autowired
 	AccountManager manager;
