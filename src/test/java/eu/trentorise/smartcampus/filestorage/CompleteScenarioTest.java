@@ -28,21 +28,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
-import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.MediaManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
-import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.utils.SocialEngineOperation;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
+import eu.trentorise.smartcampus.social.model.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
@@ -131,8 +131,8 @@ public class CompleteScenarioTest {
 		long eid = Long.parseLong(metaManager.findByResource(resource.getId())
 				.getSocialId());
 
-		socialEngine.shareEntityWith(eid, user1.getSocialId(),
-				user2.getSocialId());
+		socialEngine.shareEntityWith(eid, new Long(user1.getSocialId()),
+				new Long(user2.getSocialId()));
 
 		Token token = mediaManager.getResourceToken(user2, resource.getId(),
 				Operation.DOWNLOAD);

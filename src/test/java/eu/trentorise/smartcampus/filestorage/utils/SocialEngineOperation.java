@@ -105,8 +105,8 @@ public class SocialEngineOperation {
 	}
 
 	public Entity createEntity(
-			eu.trentorise.smartcampus.ac.provider.model.User owner,
-			EntityTypes type) throws WebApiException {
+			eu.trentorise.smartcampus.social.model.User owner, EntityTypes type)
+			throws WebApiException {
 		User socialUser = client.readUser(owner.getSocialId());
 		return createEntity(socialUser.getEntityBaseId(), type);
 	}

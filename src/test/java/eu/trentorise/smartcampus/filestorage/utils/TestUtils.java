@@ -15,12 +15,12 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
+import eu.trentorise.smartcampus.social.model.User;
 
 @Service
 public class TestUtils {
@@ -103,10 +103,8 @@ public class TestUtils {
 		User user = new User();
 		it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialEngine
 				.createUser();
-		user.setSocialId(socialUser.getId());
-		user.setId((long) random.nextInt(1000));
-		user.setAuthToken("token");
-		user.setExpTime(System.currentTimeMillis() + 3600 * 1000);
+		user.setSocialId("" + socialUser.getId());
+		user.setId("" + random.nextInt(1000));
 		return user;
 	}
 
