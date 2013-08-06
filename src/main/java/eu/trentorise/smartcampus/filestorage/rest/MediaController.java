@@ -76,9 +76,9 @@ public class MediaController extends SCController {
 			throw new SecurityException();
 		}
 		try {
-			String rid = mediaManager.storage(accountId, user,
+			String resourceId = mediaManager.storage(accountId, user,
 					getResource(resource), createSocialData).getId();
-			return metadataManager.findByResource(rid);
+			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}
@@ -98,9 +98,9 @@ public class MediaController extends SCController {
 			throw new SecurityException();
 		}
 		try {
-			String rid = mediaManager.storage(accountId, user,
+			String resourceId = mediaManager.storage(accountId, user,
 					getResource(resource), createSocialData).getId();
-			return metadataManager.findByResource(rid);
+			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
 		}

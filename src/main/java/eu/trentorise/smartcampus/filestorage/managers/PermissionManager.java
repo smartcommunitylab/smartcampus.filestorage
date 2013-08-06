@@ -119,15 +119,15 @@ public class PermissionManager {
 	 * 
 	 * @param user
 	 *            the user who want to access to the resource
-	 * @param rid
+	 * @param resourceId
 	 *            the resource id
 	 * @return true if user can access, false otherwise
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public boolean checkResourcePermission(User user, String rid)
+	public boolean checkResourcePermission(User user, String resourceId)
 			throws NotFoundException {
-		Metadata meta = metaManager.findByResource(rid);
+		Metadata meta = metaManager.findByResource(resourceId);
 		return user.getId().equals(
 				accountManager.findById(meta.getAccountId()).getUserId());
 	}
@@ -137,14 +137,14 @@ public class PermissionManager {
 	 * 
 	 * @param appId
 	 *            application id
-	 * @param rid
+	 * @param resourceId
 	 *            resource id
 	 * @return true if application owns the resource, false otherwise
 	 * @throws NotFoundException
 	 */
-	public boolean checkResourcePermission(String appId, String rid)
+	public boolean checkResourcePermission(String appId, String resourceId)
 			throws NotFoundException {
-		Metadata meta = metaManager.findByResource(rid);
+		Metadata meta = metaManager.findByResource(resourceId);
 		Account account = accountManager.findById(meta.getAccountId());
 		return account.getAppId().equals(appId);
 	}
@@ -154,13 +154,13 @@ public class PermissionManager {
 	 * 
 	 * @param user
 	 * @param appId
-	 * @param rid
+	 * @param resourceId
 	 * @return
 	 * @throws NotFoundException
 	 */
-	public boolean checkResourcePermission(User user, String appId, String rid)
-			throws NotFoundException {
-		Metadata meta = metaManager.findByResource(rid);
+	public boolean checkResourcePermission(User user, String appId,
+			String resourceId) throws NotFoundException {
+		Metadata meta = metaManager.findByResource(resourceId);
 		Account account = accountManager.findById(meta.getAccountId());
 		return account.getUserId().equals(user.getId())
 				&& account.getAppId().equals(appId);

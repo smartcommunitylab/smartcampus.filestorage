@@ -77,19 +77,19 @@ public class MetadataManager {
 	/**
 	 * deletes {@link Metadata}
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            the id of the resource binded with metadata
 	 * @throws NotFoundException
 	 *             if metadata for given resource doesn't exist
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void delete(String rid) throws NotFoundException,
+	public void delete(String resourceId) throws NotFoundException,
 			SmartcampusException {
 		String eid = null;
 		try {
-			eid = metadataSrv.getEntityByResource(rid);
-			metadataSrv.delete(rid);
+			eid = metadataSrv.getEntityByResource(resourceId);
+			metadataSrv.delete(resourceId);
 			socialManager.deleteEntity(Long.parseLong(eid));
 		} catch (NumberFormatException e) {
 			logger.error("Exception parsing entity id: " + eid);
@@ -118,20 +118,20 @@ public class MetadataManager {
 	/**
 	 * retrieves a {@link Metadata} given binded resource id
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            the resource id
 	 * @return {@link Metadata} binded to resource
 	 * @throws NotFoundException
 	 *             if metadata doesn't exist
 	 */
-	public Metadata findByResource(String rid) throws NotFoundException {
-		return metadataSrv.getMetadata(rid);
+	public Metadata findByResource(String resourceId) throws NotFoundException {
+		return metadataSrv.getMetadata(resourceId);
 	}
 
 	/**
 	 * updates the social data relative to a resource
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            the resource id
 	 * @param entityId
 	 *            social id to associate to the resource
@@ -141,9 +141,9 @@ public class MetadataManager {
 	 * @throws SecurityException
 	 *             social entity is not owned by the user
 	 */
-	public Metadata updateSocialData(User owner, String rid, String entityId)
-			throws NotFoundException, SecurityException {
-		Metadata meta = findByResource(rid);
+	public Metadata updateSocialData(User owner, String resourceId,
+			String entityId) throws NotFoundException, SecurityException {
+		Metadata meta = findByResource(resourceId);
 
 		// check if entityId is owned by owner of the resource
 		if (socialManager.isOwnedBy(owner, entityId)) {
