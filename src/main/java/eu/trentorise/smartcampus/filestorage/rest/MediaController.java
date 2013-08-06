@@ -29,9 +29,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.MediaManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
@@ -51,6 +53,9 @@ public class MediaController extends SCController {
 	MediaManager mediaManager;
 
 	@Autowired
+	AccountManager accountManager;
+
+	@Autowired
 	MetadataManager metadataManager;
 
 	@Autowired
@@ -62,17 +67,19 @@ public class MediaController extends SCController {
 	@Autowired
 	AuthServices authServices;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/app/{appId}/{userId}/{accountId}")
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/app/{appId}/{accountId}")
 	public @ResponseBody
-	Metadata storeResource(@PathVariable String userId,
-			@PathVariable String appId, @PathVariable String accountId,
+	Metadata storeResource(@PathVariable String appId,
+			@PathVariable String accountId,
 			@RequestParam("file") MultipartFile resource,
 			@RequestParam(defaultValue = "true") boolean createSocialData)
 			throws AlreadyStoredException, SmartcampusException,
 			NotFoundException {
-		User user = getUserObject(userId);
 
-		if (!permissionManager.checkAccountPermission(user, accountId)) {
+		Account account = accountManager.findById(accountId);
+		User user = getUserObject(account.getUserId());
+
+		if (!permissionManager.checkAccountPermission(user, account)) {
 			throw new SecurityException();
 		}
 		try {
