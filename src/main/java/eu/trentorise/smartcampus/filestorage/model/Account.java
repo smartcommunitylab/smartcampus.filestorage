@@ -131,7 +131,7 @@ public class Account {
 
 	public boolean isSame(Account account) {
 		return id.equals(account.getId()) && appId.equals(account.getAppId())
-				&& userId == account.getUserId()
+				&& userId.equals(account.getUserId())
 				&& storageType == account.getStorageType()
 				&& storageId.equals(account.getStorageId());
 	}
