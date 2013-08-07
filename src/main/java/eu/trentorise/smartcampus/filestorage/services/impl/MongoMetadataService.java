@@ -135,7 +135,7 @@ public class MongoMetadataService implements MetadataService {
 	public String getResourceByFilename(String accountId, String filename)
 			throws NotFoundException {
 		Criteria criteria = new Criteria();
-		criteria.and("userAccountId").is(accountId);
+		criteria.and("accountId").is(accountId);
 		criteria.and("name").is(filename);
 		List<Metadata> results = db.find(Query.query(criteria), Metadata.class);
 		if (results.size() < 1) {
@@ -158,7 +158,7 @@ public class MongoMetadataService implements MetadataService {
 	public List<Metadata> getAccountMetadata(String accountId)
 			throws NotFoundException {
 		Criteria criteria = new Criteria();
-		criteria.and("userAccountId").is(accountId);
+		criteria.and("accountId").is(accountId);
 		return db.find(Query.query(criteria), Metadata.class);
 	}
 }
