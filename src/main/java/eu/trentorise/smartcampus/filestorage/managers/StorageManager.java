@@ -58,6 +58,7 @@ public class StorageManager {
 	}
 
 	private Storage update(Storage destination, Storage source) {
+		destination.setName(source.getName());
 		destination.setConfigurations(source.getConfigurations());
 		return destination;
 	}
