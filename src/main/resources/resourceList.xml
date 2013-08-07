@@ -74,7 +74,7 @@
 		pathPattern="/metadata/app/{appName}/{resourceId}" method="GET">
 	</resourceMapping>
 
-	<resourceMapping uri="filestorage.metadata.uri.{appName}.read"
+	<resourceMapping uri="filestorage.metadata.user.{appName}.read"
 		pathPattern="/metadata/user/{appName}/{resourceId}" method="GET">
 	</resourceMapping>
 
@@ -120,7 +120,7 @@
 	
 	<!--  real POST -->
 	<resourceMapping uri="filestorage.resource.app.{appName}.manage"
-		pathPattern="/resource/create/app/{appName}/{userId}/{accountId}" method="POST">
+		pathPattern="/resource/create/app/{appName}/{accountId}" method="POST">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.resource.user.{appName}.manage"
