@@ -78,21 +78,20 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Resource store(String userAccountId, Resource resource)
+	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 
 		// check if file already exists int
 		try {
-			metaService
-					.getResourceByFilename(userAccountId, resource.getName());
+			metaService.getResourceByFilename(accountId, resource.getName());
 			throw new AlreadyStoredException();
 		} catch (NotFoundException e1) {
 
 			AccessTokenPair token = null;
 			AppKeyPair app = null;
 			try {
-				token = getUserToken(userAccountId);
-				app = getAppToken(userAccountId);
+				token = getUserToken(accountId);
+				app = getAppToken(accountId);
 				logger.info("Retrieved dropbox account informations");
 			} catch (NotFoundException e2) {
 				throw new SmartcampusException(e2);
@@ -197,16 +196,15 @@ public class DropboxStorage implements StorageService {
 
 	}
 
-	private AccessTokenPair getUserToken(String userAccountId)
+	private AccessTokenPair getUserToken(String accountId)
 			throws NotFoundException {
-		Account account = accountManager.findById(userAccountId);
+		Account account = accountManager.findById(accountId);
 
 		return getUserToken(account.getConfigurations());
 	}
 
-	private AppKeyPair getAppToken(String userAccountId)
-			throws NotFoundException {
-		Account account = accountManager.findById(userAccountId);
+	private AppKeyPair getAppToken(String accountId) throws NotFoundException {
+		Account account = accountManager.findById(accountId);
 
 		Storage appAccount = appAccountManager.getStorageById(account
 				.getStorageId());
@@ -254,15 +252,15 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getToken(String userAccountId, String resourceId)
+	public Token getToken(String accountId, String resourceId)
 			throws NotFoundException, SmartcampusException {
 		// get user token
 		AccessTokenPair token = null;
 		AppKeyPair app = null;
 
 		try {
-			token = getUserToken(userAccountId);
-			app = getAppToken(userAccountId);
+			token = getUserToken(accountId);
+			app = getAppToken(accountId);
 		} catch (NotFoundException e2) {
 			throw new SmartcampusException(e2);
 		}

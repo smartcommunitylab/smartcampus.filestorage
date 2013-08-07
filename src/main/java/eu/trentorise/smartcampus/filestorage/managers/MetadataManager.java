@@ -155,7 +155,7 @@ public class MetadataManager {
 		return meta;
 	}
 
-	private Metadata createMetadata(String userAccountId, User user,
+	private Metadata createMetadata(String accountId, User user,
 			Resource resource, boolean createSocialData)
 			throws SmartcampusException {
 		Metadata metadata = new Metadata();
@@ -163,18 +163,17 @@ public class MetadataManager {
 		metadata.setCreationTs(System.currentTimeMillis());
 		metadata.setName(resource.getName());
 		metadata.setResourceId(resource.getId());
-		metadata.setAccountId(userAccountId);
+		metadata.setAccountId(accountId);
 		metadata.setFileExternalId(resource.getName());
 		metadata.setSize(resource.getContent().length);
 		// appaccount data
 		Account userAccount;
 		try {
-			userAccount = userAccountManager.findById(userAccountId);
+			userAccount = userAccountManager.findById(accountId);
 			metadata.setStorageId(userAccount.getStorageId());
 			metadata.setAppId(userAccount.getAppId());
 		} catch (NotFoundException e1) {
-			logger.error(String.format("userAccount not found: %s",
-					userAccountId));
+			logger.error(String.format("userAccount not found: %s", accountId));
 			throw new SmartcampusException("Account not found");
 		}
 		if (createSocialData) {
