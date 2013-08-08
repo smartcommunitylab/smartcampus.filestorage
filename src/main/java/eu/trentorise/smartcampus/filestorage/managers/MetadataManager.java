@@ -90,7 +90,16 @@ public class MetadataManager {
 		try {
 			eid = metadataSrv.getEntityByResource(resourceId);
 			metadataSrv.delete(resourceId);
-			socialManager.deleteEntity(Long.parseLong(eid));
+			logger.info(String.format("Deleted metadata of resource %s",
+					resourceId));
+			if (eid != null) {
+				socialManager.deleteEntity(Long.parseLong(eid));
+				logger.info(String.format(
+						"Deleted entity associated to resource %s", resourceId));
+			} else {
+				logger.info(String.format(
+						"Resource %s not associated to any entity", resourceId));
+			}
 		} catch (NumberFormatException e) {
 			logger.error("Exception parsing entity id: " + eid);
 			throw new NotFoundException();
