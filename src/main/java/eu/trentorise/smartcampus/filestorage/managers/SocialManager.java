@@ -104,8 +104,13 @@ public class SocialManager {
 	 */
 	public boolean checkPermission(User user, String eid)
 			throws WebApiException {
-		return SemanticHelper.isEntitySharedWithUser(socialClient,
-				Long.decode(eid), Long.valueOf(user.getSocialId()));
+		if (eid != null) {
+			return SemanticHelper.isEntitySharedWithUser(socialClient,
+					Long.decode(eid), Long.valueOf(user.getSocialId()));
+		} else {
+			logger.info("Try to check permission of null entity resource");
+			return false;
+		}
 	}
 
 	/**
