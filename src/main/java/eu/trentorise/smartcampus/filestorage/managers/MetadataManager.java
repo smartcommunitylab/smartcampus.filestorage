@@ -49,7 +49,7 @@ public class MetadataManager {
 	SocialManager socialManager;
 
 	@Autowired
-	AccountManager userAccountManager;
+	AccountManager accountManager;
 
 	/**
 	 * creates and saves metadata info for given {@link Resource}
@@ -138,6 +138,12 @@ public class MetadataManager {
 		return metadataSrv.getMetadata(resourceId);
 	}
 
+	public String getOwner(String resourceId) throws NotFoundException {
+		Metadata meta = metadataSrv.getMetadata(resourceId);
+		Account account = accountManager.findById(meta.getAccountId());
+		return account.getUserId();
+	}
+
 	/**
 	 * updates the social data relative to a resource
 	 * 
@@ -179,7 +185,7 @@ public class MetadataManager {
 		// appaccount data
 		Account userAccount;
 		try {
-			userAccount = userAccountManager.findById(accountId);
+			userAccount = accountManager.findById(accountId);
 			metadata.setStorageId(userAccount.getStorageId());
 			metadata.setAppId(userAccount.getAppId());
 		} catch (NotFoundException e1) {
