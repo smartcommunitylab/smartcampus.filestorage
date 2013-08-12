@@ -165,6 +165,30 @@ public class AccountController extends SCController {
 		accountManager.update(account);
 	}
 
+	@RequestMapping(method = RequestMethod.POST, value = "/account/user/{appId}")
+	public @ResponseBody
+	Account saveMyAccount(@RequestBody Account account,
+			@PathVariable String appId) throws SmartcampusException,
+			AlreadyStoredException, NotFoundException {
+
+		if (!account.isValid()) {
+			throw new IllegalArgumentException("Account is not valid");
+		}
+
+		try {
+			getUserObject(getUserId());
+			account.setUserId(getUserId());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("userId MUST be valid");
+		}
+
+		account.setAppId(appId);
+		if (!permissionManager.checkAccountPermission(appId, account)) {
+			throw new SecurityException();
+		}
+		return accountManager.save(account);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appId}")
 	public @ResponseBody
 	ListAccount getMyAccounts(HttpServletRequest request,
