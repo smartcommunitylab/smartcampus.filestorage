@@ -74,6 +74,10 @@ public class AccountManager {
 	 *            new informations to update
 	 */
 	public void update(Account account) {
+		if (account.getId() == null) {
+			logger.error("account d cannot be null");
+			throw new IllegalArgumentException("id cannot be null");
+		}
 		db.save(account);
 	}
 
