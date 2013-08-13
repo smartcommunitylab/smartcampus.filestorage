@@ -217,7 +217,7 @@ public class MediaController extends SCController {
 		return metadataManager.findAllBy(appId, null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/myresource/user/{appId}/{resourceId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Token getMyResourceUser(HttpServletRequest request,
 			@PathVariable String appId, @PathVariable String resourceId)
@@ -230,7 +230,7 @@ public class MediaController extends SCController {
 				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/myresource/app/{appId}/{resourceId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/resource/app/{appId}/{resourceId}")
 	public @ResponseBody
 	Token getMyResourceApp(@PathVariable String appId,
 			@PathVariable String resourceId) throws SmartcampusException,
