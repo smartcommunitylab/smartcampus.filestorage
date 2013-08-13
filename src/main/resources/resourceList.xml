@@ -98,12 +98,12 @@
 	
 	<!-- SHARED RESOURCES -->
 	
-	<resourceMapping uri="filestorage.resource.app.{appId}.read"
-		pathPattern="/resource/app/{appId}/{userId}/{resourceId}" method="GET">
+	<resourceMapping uri="filestorage.sharedresource.app.{appId}.read"
+		pathPattern="/sharedresource/app/{appId}/{userId}/{resourceId}" method="GET">
 	</resourceMapping>
 
-	<resourceMapping uri="filestorage.resource.user.{appId}.read"
-		pathPattern="/resource/user/{appId}/{resourceId}" method="GET">
+	<resourceMapping uri="filestorage.sharedresource.user.{appId}.read"
+		pathPattern="/sharedresource/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
 
 	<!-- MANAGE RESOURCES -->
