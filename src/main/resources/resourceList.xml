@@ -78,10 +78,6 @@
 		pathPattern="/metadata/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
 
-	<resourceMapping uri="filestorage.metadata.read"
-		pathPattern="/metadata/any/{resourceId}" method="GET">
-	</resourceMapping>
-
 	<!--  MY RESOURCES -->
 	
 	<resourceMapping uri="filestorage.myresource.app.{appId}.read"
@@ -102,12 +98,6 @@
 		pathPattern="/resource/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
 
-	<!-- read any resource  -->
-	<resourceMapping uri="filestorage.resource.read"
-		pathPattern="/resource/any/{resourceId}" method="GET">
-	</resourceMapping>
-
-	
 	<!-- MANAGE RESOURCES -->
 	
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"

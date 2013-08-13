@@ -187,14 +187,6 @@ public class MediaController extends SCController {
 		return metadataManager.findByResource(resourceId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/metadata/any/{resourceId}")
-	public @ResponseBody
-	Metadata getAnyResourceMetadata(@PathVariable String resourceId)
-			throws SmartcampusException, SecurityException, NotFoundException {
-
-		return metadataManager.findByResource(resourceId);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Metadata getMyResourceMetadata(@PathVariable String appId,
@@ -257,19 +249,6 @@ public class MediaController extends SCController {
 		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		User user = getUserObject(userId);
-
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
-				false);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/resource/any/{resourceId}")
-	public @ResponseBody
-	Token getAnySharedResource(HttpServletRequest request,
-			@PathVariable String appId, @PathVariable String resourceId)
-			throws SmartcampusException, SecurityException, NotFoundException {
-
-		String userId = metadataManager.getOwner(resourceId);
 		User user = getUserObject(userId);
 
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
