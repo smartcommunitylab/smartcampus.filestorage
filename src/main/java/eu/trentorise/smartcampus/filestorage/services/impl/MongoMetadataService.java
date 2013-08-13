@@ -161,4 +161,11 @@ public class MongoMetadataService implements MetadataService {
 		criteria.and("accountId").is(accountId);
 		return db.find(Query.query(criteria), Metadata.class);
 	}
+
+	@Override
+	public List<Metadata> getMetadataByApp(String appId) {
+		Criteria criteria = new Criteria();
+		criteria.and("appId").is(appId);
+		return db.find(Query.query(criteria), Metadata.class);
+	}
 }

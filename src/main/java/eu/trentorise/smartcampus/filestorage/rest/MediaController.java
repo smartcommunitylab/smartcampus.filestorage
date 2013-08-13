@@ -17,6 +17,7 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -198,6 +199,22 @@ public class MediaController extends SCController {
 			throw new SecurityException();
 		}
 		return metadataManager.findByResource(resourceId);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/all/user/{appId}")
+	public @ResponseBody
+	List<Metadata> getAllMyResourceMetadata(@PathVariable String appId)
+			throws SmartcampusException, SecurityException, NotFoundException {
+
+		return metadataManager.findAllBy(appId, getUserId());
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/metadata/all/app/{appId}")
+	public @ResponseBody
+	List<Metadata> getAllAppResourceMetadata(@PathVariable String appId)
+			throws SmartcampusException, SecurityException, NotFoundException {
+
+		return metadataManager.findAllBy(appId, null);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/myresource/user/{appId}/{resourceId}")

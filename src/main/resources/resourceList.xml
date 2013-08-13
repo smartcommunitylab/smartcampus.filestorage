@@ -77,6 +77,14 @@
 	<resourceMapping uri="filestorage.metadata.user.{appId}.read"
 		pathPattern="/metadata/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.metadata.user.all.{appId}.read"
+		pathPattern="/metadata/all/user/{appId}" method="GET">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.metadata.app.all.{appId}.read"
+		pathPattern="/metadata/all/app/{appId}" method="GET">
+	</resourceMapping>
 
 	<!--  MY RESOURCES -->
 	

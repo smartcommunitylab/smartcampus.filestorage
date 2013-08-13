@@ -123,7 +123,9 @@ public class AccountManager {
 
 	public List<Account> findBy(String userId, String appId) {
 		Criteria criteria = new Criteria();
-		criteria.and("userId").is(userId);
+		if (userId != null) {
+			criteria.and("userId").is(userId);
+		}
 		if (appId != null) {
 			criteria.and("appId").is(appId);
 		}

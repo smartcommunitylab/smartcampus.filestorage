@@ -18,6 +18,9 @@ package eu.trentorise.smartcampus.filestorage.managers;
 
 import it.unitn.disi.sweb.webapi.client.WebApiException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,6 +139,24 @@ public class MetadataManager {
 	 */
 	public Metadata findByResource(String resourceId) throws NotFoundException {
 		return metadataSrv.getMetadata(resourceId);
+	}
+
+	public List<Metadata> findAllBy(String appId, String userId)
+			throws NotFoundException {
+		List<Metadata> metadata = new ArrayList<Metadata>();
+		if (appId != null && userId != null) {
+			List<Account> accounts = accountManager.findBy(userId, appId);
+			for (Account account : accounts) {
+				metadata.addAll(metadataSrv.getAccountMetadata(account.getId()));
+			}
+		} else if (appId != null) {
+			metadata = metadataSrv.getMetadataByApp(appId);
+		} else {
+			throw new IllegalArgumentException(
+					"userId and appId cannot be either null");
+		}
+
+		return metadata;
 	}
 
 	public String getOwner(String resourceId) throws NotFoundException {

@@ -93,6 +93,17 @@ public interface MetadataService {
 			throws NotFoundException;
 
 	/**
+	 * retrieves all of {@link Metadata} of given appId
+	 * 
+	 * @param appId
+	 *            appId
+	 * @return the list of metadata found
+	 * @throws NotFoundException
+	 *             if the user storage account doesn't exist
+	 */
+	public List<Metadata> getMetadataByApp(String appId);
+
+	/**
 	 * saves a {@link Metadata}
 	 * 
 	 * @param metadata
