@@ -22,6 +22,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +68,10 @@ public class MediaController extends SCController {
 
 	@Autowired
 	AuthServices authServices;
+
+	@Autowired
+	@Value("${max.number.metadata}")
+	private int maxNumberMetadataResult;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/app/{appId}/{accountId}")
 	public @ResponseBody
@@ -203,18 +208,28 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/all/user/{appId}")
 	public @ResponseBody
-	List<Metadata> getAllMyResourceMetadata(@PathVariable String appId)
+	List<Metadata> getAllMyResourceMetadata(@PathVariable String appId,
+			@RequestParam(required = false) Integer position,
+			@RequestParam(required = false) Integer size)
 			throws SmartcampusException, SecurityException, NotFoundException {
 
-		return metadataManager.findAllBy(appId, getUserId());
+		if (size == null || size > maxNumberMetadataResult) {
+			size = maxNumberMetadataResult;
+		}
+		return metadataManager.findAllBy(appId, getUserId(), position, size);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/all/app/{appId}")
 	public @ResponseBody
-	List<Metadata> getAllAppResourceMetadata(@PathVariable String appId)
+	List<Metadata> getAllAppResourceMetadata(@PathVariable String appId,
+			@RequestParam(required = false) Integer position,
+			@RequestParam(required = false) Integer size)
 			throws SmartcampusException, SecurityException, NotFoundException {
 
-		return metadataManager.findAllBy(appId, null);
+		if (size == null || size > maxNumberMetadataResult) {
+			size = maxNumberMetadataResult;
+		}
+		return metadataManager.findAllBy(appId, null, position, size);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/resource/user/{appId}/{resourceId}")

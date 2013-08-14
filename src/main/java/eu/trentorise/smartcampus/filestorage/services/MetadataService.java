@@ -16,6 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
+import java.util.Collection;
 import java.util.List;
 
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
@@ -97,11 +98,30 @@ public interface MetadataService {
 	 * 
 	 * @param appId
 	 *            appId
+	 * @param position
+	 *            integer to paginate result, null to not use it
+	 * @param size
+	 *            integer to paginate result,null to not use it
 	 * @return the list of metadata found
 	 * @throws NotFoundException
 	 *             if the user storage account doesn't exist
 	 */
-	public List<Metadata> getMetadataByApp(String appId);
+	public List<Metadata> getMetadataByApp(String appId, Integer position,
+			Integer size);
+
+	/**
+	 * retrieves all of {@link Metadata} present in a collection of accountIds
+	 * 
+	 * @param accountIds
+	 *            collections of accountId owners of Metadata
+	 * @param position
+	 *            integer to paginate result, null to not use it
+	 * @param size
+	 *            integer to paginate result,null to not use it
+	 * @return
+	 */
+	public List<Metadata> getMetadataByAccountIds(
+			Collection<String> accountIds, Integer position, Integer size);
 
 	/**
 	 * saves a {@link Metadata}

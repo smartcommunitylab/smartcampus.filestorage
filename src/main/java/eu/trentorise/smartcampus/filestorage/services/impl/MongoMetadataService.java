@@ -16,6 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.services.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -46,6 +47,7 @@ public class MongoMetadataService implements MetadataService {
 	public String getResourceBySocialId(String socialId)
 			throws NotFoundException {
 		Criteria criteria = new Criteria("socialId").is(socialId);
+
 		Metadata meta = db.findOne(Query.query(criteria), Metadata.class);
 		if (meta == null) {
 			logger.error("Metadata not found: " + socialId);
@@ -163,9 +165,34 @@ public class MongoMetadataService implements MetadataService {
 	}
 
 	@Override
-	public List<Metadata> getMetadataByApp(String appId) {
+	public List<Metadata> getMetadataByApp(String appId, Integer position,
+			Integer size) {
 		Criteria criteria = new Criteria();
 		criteria.and("appId").is(appId);
-		return db.find(Query.query(criteria), Metadata.class);
+		Query query = Query.query(criteria);
+		// REMEMBER: use skip create performance issue on big collections
+		if (position != null && position > 0) {
+			query.skip(position);
+		}
+		if (size != null && size > 0) {
+			query.limit(size);
+		}
+		return db.find(query, Metadata.class);
+	}
+
+	@Override
+	public List<Metadata> getMetadataByAccountIds(
+			Collection<String> accountIds, Integer position, Integer size) {
+		Criteria criteria = new Criteria();
+		criteria.and("accountId").in(accountIds);
+		Query query = Query.query(criteria);
+		// REMEMBER: use skip create performance issue on big collections
+		if (position != null && position > 0) {
+			query.skip(position);
+		}
+		if (size != null && size > 0) {
+			query.limit(size);
+		}
+		return db.find(query, Metadata.class);
 	}
 }

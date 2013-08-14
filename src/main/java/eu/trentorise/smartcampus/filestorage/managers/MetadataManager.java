@@ -141,16 +141,19 @@ public class MetadataManager {
 		return metadataSrv.getMetadata(resourceId);
 	}
 
-	public List<Metadata> findAllBy(String appId, String userId)
-			throws NotFoundException {
+	public List<Metadata> findAllBy(String appId, String userId,
+			Integer position, Integer size) throws NotFoundException {
 		List<Metadata> metadata = new ArrayList<Metadata>();
 		if (appId != null && userId != null) {
 			List<Account> accounts = accountManager.findBy(userId, appId);
+			List<String> accountIds = new ArrayList<String>();
 			for (Account account : accounts) {
-				metadata.addAll(metadataSrv.getAccountMetadata(account.getId()));
+				accountIds.add(account.getId());
 			}
+			metadata = metadataSrv.getMetadataByAccountIds(accountIds,
+					position, size);
 		} else if (appId != null) {
-			metadata = metadataSrv.getMetadataByApp(appId);
+			metadata = metadataSrv.getMetadataByApp(appId, position, size);
 		} else {
 			throw new IllegalArgumentException(
 					"userId and appId cannot be either null");
