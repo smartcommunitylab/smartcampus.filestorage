@@ -87,4 +87,6 @@ public interface StorageService {
 	public Token getToken(String accountId, String rid)
 			throws NotFoundException, SmartcampusException;
 
+	public String getAccountAuthUrl(String storageId) throws NotFoundException;
+
 }

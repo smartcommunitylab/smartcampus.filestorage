@@ -24,23 +24,31 @@
 	<!-- ************** STORAGE ************** -->
 
 	<resourceMapping uri="filestorage.storage.{appId}"
-		pathPattern="/storage/{appId}" method="POST">
+		pathPattern="/storage/app/{appId}" method="POST">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.storage.{appId}"
-		pathPattern="/storage/{appId}/{storageId}" method="PUT">
+		pathPattern="/storage/app/{appId}/{storageId}" method="PUT">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.storage.{appId}"
-		pathPattern="/storage/{appId}/{storageId}" method="DELETE">
+		pathPattern="/storage/app/{appId}/{storageId}" method="DELETE">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.storage.{appId}"
-		pathPattern="/storage/{appId}/{storageId}" method="GET">
+		pathPattern="/storage/app/{appId}/{storageId}" method="GET">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.storage.{appId}"
-		pathPattern="/storage/{appId}" method="GET">
+		pathPattern="/storage/app/{appId}" method="GET">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.storage.user.{appId}.read"
+		pathPattern="/storage/user/{appId}/{storageId}" method="GET">
+	</resourceMapping>
+
+	<resourceMapping uri="filestorage.storage.user.{appId}.read"
+		pathPattern="/storage/user/{appId}" method="GET">
 	</resourceMapping>
 
 
@@ -62,7 +70,10 @@
 	<resourceMapping uri="filestorage.account.user.{appId}"
 		pathPattern="/account/user/{appId}/{accountId}" method="GET,PUT,DELETE">
 	</resourceMapping>
-
+	
+	<resourceMapping uri="filestorage.account.user.{appId}"
+		pathPattern="/getAccount/{appId}/{storageId}" method="GET">
+	</resourceMapping>
 
 
 	<!-- ************** RESOURCE ************** -->

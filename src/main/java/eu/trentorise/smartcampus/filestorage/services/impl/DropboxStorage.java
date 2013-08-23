@@ -32,6 +32,7 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
+import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
 
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
@@ -199,16 +200,17 @@ public class DropboxStorage implements StorageService {
 	private AccessTokenPair getUserToken(String accountId)
 			throws NotFoundException {
 		Account account = accountManager.findById(accountId);
-
 		return getUserToken(account.getConfigurations());
 	}
 
 	private AppKeyPair getAppToken(String accountId) throws NotFoundException {
 		Account account = accountManager.findById(accountId);
+		return getAppTokenByStorage(account.getStorageId());
+	}
 
-		Storage appAccount = appAccountManager.getStorageById(account
-				.getStorageId());
-
+	private AppKeyPair getAppTokenByStorage(String storageId)
+			throws NotFoundException {
+		Storage appAccount = appAccountManager.getStorageById(storageId);
 		return getAppToken(appAccount.getConfigurations());
 	}
 
@@ -286,5 +288,19 @@ public class DropboxStorage implements StorageService {
 		userSessionToken.setMethodREST("GET");
 		userSessionToken.setStorageType(appAccount.getStorageType());
 		return userSessionToken;
+	}
+
+	@Override
+	public String getAccountAuthUrl(String storageId) throws NotFoundException {
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
+		try {
+			// TODO store info ?
+			WebAuthSession.WebAuthInfo info = session.getAuthInfo();
+			return info.url;
+		} catch (DropboxException e) {
+			System.out.println("Dropbox exception");
+		}
+		return null;
 	}
 }

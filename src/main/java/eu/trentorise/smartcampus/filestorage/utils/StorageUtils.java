@@ -22,9 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
-import eu.trentorise.smartcampus.filestorage.model.Account;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.services.impl.DropboxStorage;
 
@@ -43,6 +46,9 @@ public class StorageUtils {
 	private AccountManager accountManager;
 
 	@Autowired
+	private StorageManager storageManager;
+
+	@Autowired
 	private ApplicationContextProvider ctxProvider;
 
 	/**
@@ -55,28 +61,44 @@ public class StorageUtils {
 	 *         account
 	 * @throws SmartcampusException
 	 */
-	public StorageService getStorageService(String accountId)
+	public StorageService getStorageServiceByAccount(String accountId)
 			throws SmartcampusException {
-		BeanFactory beanFactory = ctxProvider.getApplicationContext();
-		Account account;
 		try {
-			account = accountManager.findById(accountId);
+			Account account = accountManager.findById(accountId);
+			return getStorageService(account.getStorageType());
 		} catch (NotFoundException e) {
 			logger.error(String.format("Account %s doesn't exist", accountId));
 			throw new SmartcampusException("Account doesn't exist");
 		}
-		StorageService service = null;
-		switch (account.getStorageType()) {
-		case DROPBOX:
+	}
+
+	public StorageService getStorageServiceByStorage(String storageId)
+			throws SmartcampusException {
+		try {
+			Storage storage = storageManager.getStorageById(storageId);
 			logger.info(String.format(
-					"Requested storageService for account %s, type %s",
-					accountId, "DROPBOX"));
+					"Requested storageService for storage %s, type %s",
+					storageId, storage.getStorageType().toString()));
+			return getStorageService(storage.getStorageType());
+		} catch (NotFoundException e) {
+			logger.error(String.format("Storage %s doesn't exist", storageId));
+			throw new SmartcampusException(String.format(
+					"Storage %s doesn't exist", storageId));
+		}
+
+	}
+
+	private StorageService getStorageService(StorageType type)
+			throws SmartcampusException {
+		BeanFactory beanFactory = ctxProvider.getApplicationContext();
+		StorageService service = null;
+		switch (type) {
+		case DROPBOX:
 			service = beanFactory.getBean(DropboxStorage.class);
 			break;
 		default:
 			throw new SmartcampusException("Storage type not supported");
 		}
-
 		return service;
 	}
 }

@@ -89,4 +89,8 @@ public class StorageManager {
 		return storage;
 	}
 
+	public static Storage deletePrivateData(Storage storage) {
+		storage.getConfigurations().clear();
+		return storage;
+	}
 }

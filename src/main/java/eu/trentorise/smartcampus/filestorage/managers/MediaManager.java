@@ -75,7 +75,7 @@ public class MediaManager {
 			SmartcampusException {
 
 		StorageService storageService = storageUtils
-				.getStorageService(accountId);
+				.getStorageServiceByAccount(accountId);
 		logger.info("Retrieved storageService");
 		resource = storageService.store(accountId, resource);
 		metadataManager.create(accountId, user, resource, createSocialData);
@@ -97,7 +97,7 @@ public class MediaManager {
 			NotFoundException {
 
 		Metadata meta = metadataManager.findByResource(resourceId);
-		StorageService storageService = storageUtils.getStorageService(meta
+		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
 				.getAccountId());
 		storageService.remove(resourceId);
 		metadataManager.delete(resourceId);
@@ -123,7 +123,7 @@ public class MediaManager {
 
 		Metadata meta = metadataManager.findByResource(resource.getId());
 
-		StorageService storageService = storageUtils.getStorageService(meta
+		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
 				.getAccountId());
 		storageService.replace(resource);
 		metadataManager.update(resource);

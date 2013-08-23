@@ -122,7 +122,7 @@ public class ScAcl implements ACLService {
 	private Token generateToken(String resourceId) throws NotFoundException,
 			SmartcampusException {
 		Metadata meta = metaService.getMetadata(resourceId);
-		StorageService storageService = storageUtils.getStorageService(meta
+		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
 				.getAccountId());
 		return storageService.getToken(meta.getAccountId(), resourceId);
 	}

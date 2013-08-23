@@ -1,6 +1,7 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,18 +37,17 @@ public class StorageController extends SCController {
 	@Autowired
 	AuthServices authServices;
 
-	@RequestMapping(method = RequestMethod.POST, value = "/storage/{appId}")
+	@RequestMapping(method = RequestMethod.POST, value = "/storage/app/{appId}")
 	public @ResponseBody
-	Storage create(HttpServletRequest request, @RequestBody Storage storage,
-			@PathVariable String appId) throws SmartcampusException,
-			AlreadyStoredException {
+	Storage create(@RequestBody Storage storage, @PathVariable String appId)
+			throws SmartcampusException, AlreadyStoredException {
 		storage.setAppId(appId);
 		return storageManager.save(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/storage/{appId}/{storageId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/storage/app/{appId}/{storageId}")
 	public @ResponseBody
-	Storage update(HttpServletRequest request, @RequestBody Storage storage,
+	Storage update(@RequestBody Storage storage,
 			@PathVariable String storageId, @PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
@@ -59,10 +59,10 @@ public class StorageController extends SCController {
 		return storageManager.update(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/{appId}/{storageId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/app/{appId}/{storageId}")
 	public @ResponseBody
-	boolean delete(HttpServletRequest request, @PathVariable String storageId,
-			@PathVariable String appId) throws SmartcampusException {
+	boolean delete(@PathVariable String storageId, @PathVariable String appId)
+			throws SmartcampusException {
 
 		if (!permissionManager.checkStoragePermission(appId, storageId)) {
 			throw new SecurityException();
@@ -71,27 +71,55 @@ public class StorageController extends SCController {
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/app/{appId}")
 	public @ResponseBody
-	ListStorage getStorages(HttpServletRequest request,
-			@PathVariable String appId) throws SmartcampusException {
+	ListStorage getStorages(@PathVariable String appId)
+			throws SmartcampusException {
 
 		ListStorage result = new ListStorage();
 		result.setStorages(storageManager.getStorages(appId));
 		return result;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/{appId}/{storageId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
 	public @ResponseBody
-	Storage getStorage(HttpServletRequest request,
-			@PathVariable String storageId, @PathVariable String appId)
-			throws SmartcampusException, NotFoundException {
+	ListStorage getStoragesByUser(@PathVariable String appId)
+			throws SmartcampusException {
+
+		ListStorage result = new ListStorage();
+		List<Storage> publicStorageData = new ArrayList<Storage>();
+		for (Storage storage : storageManager.getStorages(appId)) {
+			publicStorageData.add(StorageManager.deletePrivateData(storage));
+		}
+		result.setStorages(publicStorageData);
+		return result;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/app/{appId}/{storageId}")
+	public @ResponseBody
+	Storage getStorage(@PathVariable String storageId,
+			@PathVariable String appId) throws SmartcampusException,
+			NotFoundException {
 
 		if (!permissionManager.checkStoragePermission(appId, storageId)) {
 			throw new SecurityException();
 		}
 
 		return storageManager.getStorageById(storageId);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}/{storageId}")
+	public @ResponseBody
+	Storage getStorageByUser(@PathVariable String storageId,
+			@PathVariable String appId) throws SmartcampusException,
+			NotFoundException {
+
+		if (!permissionManager.checkStoragePermission(appId, storageId)) {
+			throw new SecurityException();
+		}
+
+		return StorageManager.deletePrivateData(storageManager
+				.getStorageById(storageId));
 	}
 
 	@Override
