@@ -48,7 +48,7 @@ public class StorageManager {
 	}
 
 	public Storage update(Storage storage) throws NotFoundException {
-		Storage toUpdate = getStorageByAppId(storage.getId());
+		Storage toUpdate = getStorageByAppId(storage.getAppId());
 		toUpdate = update(toUpdate, storage);
 		db.save(toUpdate);
 		return toUpdate;
