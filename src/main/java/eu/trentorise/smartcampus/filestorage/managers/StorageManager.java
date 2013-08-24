@@ -1,7 +1,5 @@
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +36,7 @@ public class StorageManager {
 		}
 
 		if (StringUtils.isNullOrEmpty(storage.getName(), true)) {
-			storage.setName(DEFAULT_ACCOUNT_NAME + " "
-					+ getStoragesCount(storage.getAppId()));
+			storage.setName(DEFAULT_ACCOUNT_NAME);
 		}
 
 		if (StringUtils.isNullOrEmpty(storage.getId(), true)) {
@@ -51,7 +48,7 @@ public class StorageManager {
 	}
 
 	public Storage update(Storage storage) throws NotFoundException {
-		Storage toUpdate = getStorageById(storage.getId());
+		Storage toUpdate = getStorageByAppId(storage.getId());
 		toUpdate = update(toUpdate, storage);
 		db.save(toUpdate);
 		return toUpdate;
@@ -63,22 +60,18 @@ public class StorageManager {
 		return destination;
 	}
 
-	public void delete(String storageId) {
+	public void delete(String appId) {
 		Criteria crit = new Criteria();
-		crit.and("id").is(storageId);
+		crit.and("appId").is(appId);
 		Query query = Query.query(crit);
 		db.remove(query, Storage.class);
 	}
 
-	private int getStoragesCount(String appId) {
-		return getStorages(appId).size();
-	}
-
-	public List<Storage> getStorages(String appId) {
+	public Storage getStorageByAppId(String appId) {
 		Criteria crit = new Criteria();
 		crit.and("appId").is(appId);
 		Query query = Query.query(crit);
-		return db.find(query, Storage.class);
+		return db.findOne(query, Storage.class);
 	}
 
 	public Storage getStorageById(String storageId) throws NotFoundException {

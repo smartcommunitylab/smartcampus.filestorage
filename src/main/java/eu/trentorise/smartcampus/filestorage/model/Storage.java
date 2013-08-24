@@ -15,6 +15,7 @@ public class Storage {
 	private String appId;
 	private String name;
 	private StorageType storageType;
+	private String redirect;
 
 	@XmlElementWrapper
 	@XmlElement(name = "configuration")
@@ -60,4 +61,11 @@ public class Storage {
 		this.configurations = configurations;
 	}
 
+	public String getRedirect() {
+		return redirect;
+	}
+
+	public void setRedirect(String redirect) {
+		this.redirect = redirect;
+	}
 }

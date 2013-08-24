@@ -29,9 +29,8 @@ public class StorageManagerTest {
 
 	@Before
 	public void cleanup() {
-		for (Storage temp : manager.getStorages(APP_NAME)) {
-			manager.delete(temp.getId());
-		}
+		Storage s = manager.getStorageByAppId(APP_NAME);
+		if (s != null) manager.delete(s.getAppId());
 	}
 
 	@Test
@@ -39,11 +38,11 @@ public class StorageManagerTest {
 		Storage storage = createStorage(APP_NAME);
 
 		// create
-		Assert.assertEquals(0, manager.getStorages(APP_NAME).size());
+		Assert.assertNull(manager.getStorageByAppId(APP_NAME));
 		manager.save(storage);
 
-		Assert.assertEquals(1, manager.getStorages(APP_NAME).size());
-		storage = manager.getStorages(APP_NAME).get(0);
+		Assert.assertNotNull(manager.getStorageByAppId(APP_NAME));
+		storage = manager.getStorageByAppId(APP_NAME);
 		Assert.assertEquals(2, storage.getConfigurations().size());
 		Assert.assertEquals("sampleAccount", storage.getName());
 
@@ -51,12 +50,12 @@ public class StorageManagerTest {
 		storage.setConfigurations(new ArrayList<Configuration>());
 		manager.update(storage);
 
-		storage = manager.getStorages(APP_NAME).get(0);
+		storage = manager.getStorageByAppId(APP_NAME);
 		Assert.assertEquals(0, storage.getConfigurations().size());
 
 		// delete
 		manager.delete(storage.getId());
-		Assert.assertEquals(0, manager.getStorages(APP_NAME).size());
+		Assert.assertNull(manager.getStorageByAppId(APP_NAME));
 
 	}
 

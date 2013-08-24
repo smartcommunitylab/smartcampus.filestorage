@@ -1,8 +1,5 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import eu.trentorise.smartcampus.filestorage.managers.PermissionManager;
 import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
-import eu.trentorise.smartcampus.filestorage.model.ListStorage;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
@@ -25,7 +21,7 @@ import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
 @Controller
 public class StorageController extends SCController {
 
-	private static final Logger logger = Logger
+	static final Logger logger = Logger
 			.getLogger(StorageController.class);
 
 	@Autowired
@@ -45,82 +41,57 @@ public class StorageController extends SCController {
 		return storageManager.save(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/storage/app/{appId}/{storageId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/storage/app/{appId}")
 	public @ResponseBody
-	Storage update(@RequestBody Storage storage,
-			@PathVariable String storageId, @PathVariable String appId)
+	Storage update(@RequestBody Storage storage, @PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
-		storage.setId(storageId);
-
-		if (!permissionManager.checkStoragePermission(appId, storageId)) {
-			throw new SecurityException();
-		}
+		storage.setAppId(appId);
 		return storageManager.update(storage);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/app/{appId}/{storageId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/storage/app/{appId}")
 	public @ResponseBody
-	boolean delete(@PathVariable String storageId, @PathVariable String appId)
-			throws SmartcampusException {
+	boolean delete(@PathVariable String appId) throws SmartcampusException {
 
-		if (!permissionManager.checkStoragePermission(appId, storageId)) {
-			throw new SecurityException();
-		}
-		storageManager.delete(storageId);
+		storageManager.delete(appId);
 		return true;
 	}
 
+//	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
+//	public @ResponseBody
+//	ListStorage getStoragesByUser(@PathVariable String appId)
+//			throws SmartcampusException {
+//
+//		ListStorage result = new ListStorage();
+//		List<Storage> publicStorageData = new ArrayList<Storage>();
+//		for (Storage storage : storageManager.getStorages(appId)) {
+//			publicStorageData.add(StorageManager.deletePrivateData(storage));
+//		}
+//		result.setStorages(publicStorageData);
+//		return result;
+//	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/storage/app/{appId}")
 	public @ResponseBody
-	ListStorage getStorages(@PathVariable String appId)
-			throws SmartcampusException {
+	Storage getStorage(@PathVariable String appId) throws SmartcampusException, NotFoundException {
 
-		ListStorage result = new ListStorage();
-		result.setStorages(storageManager.getStorages(appId));
-		return result;
+		return storageManager.getStorageByAppId(appId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
-	public @ResponseBody
-	ListStorage getStoragesByUser(@PathVariable String appId)
-			throws SmartcampusException {
-
-		ListStorage result = new ListStorage();
-		List<Storage> publicStorageData = new ArrayList<Storage>();
-		for (Storage storage : storageManager.getStorages(appId)) {
-			publicStorageData.add(StorageManager.deletePrivateData(storage));
-		}
-		result.setStorages(publicStorageData);
-		return result;
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/app/{appId}/{storageId}")
-	public @ResponseBody
-	Storage getStorage(@PathVariable String storageId,
-			@PathVariable String appId) throws SmartcampusException,
-			NotFoundException {
-
-		if (!permissionManager.checkStoragePermission(appId, storageId)) {
-			throw new SecurityException();
-		}
-
-		return storageManager.getStorageById(storageId);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}/{storageId}")
-	public @ResponseBody
-	Storage getStorageByUser(@PathVariable String storageId,
-			@PathVariable String appId) throws SmartcampusException,
-			NotFoundException {
-
-		if (!permissionManager.checkStoragePermission(appId, storageId)) {
-			throw new SecurityException();
-		}
-
-		return StorageManager.deletePrivateData(storageManager
-				.getStorageById(storageId));
-	}
+//	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
+//	public @ResponseBody
+//	Storage getStorageByUser(@PathVariable String storageId,
+//			@PathVariable String appId) throws SmartcampusException,
+//			NotFoundException {
+//
+//		if (!permissionManager.checkStoragePermission(appId, storageId)) {
+//			throw new SecurityException();
+//		}
+//
+//		return StorageManager.deletePrivateData(storageManager
+//				.getStorageById(storageId));
+//	}
 
 	@Override
 	protected AuthServices getAuthServices() {

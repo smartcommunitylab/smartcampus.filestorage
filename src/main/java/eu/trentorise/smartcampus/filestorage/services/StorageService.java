@@ -16,6 +16,10 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
@@ -87,6 +91,34 @@ public interface StorageService {
 	public Token getToken(String accountId, String rid)
 			throws NotFoundException, SmartcampusException;
 
-	public String getAccountAuthUrl(String storageId) throws NotFoundException;
+	/**
+	 * Specifies whether the storage requires user authorization for access.
+	 * @return true if the authorization required
+	 */
+	public boolean authorizationSessionRequired();
+	
+	/**
+	 * Starts the authorization flow session. May persist the temporal information
+	 * in the request session.
+	 * 
+	 * @param storageId storage ID
+	 * @param userId user ID
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	public void startSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception;
+	/**
+	 * Complete the authorization session given the attributes received in the
+	 * request. Reconstruct the {@link Account} instance out of those properties.
+	 * 
+	 * @param storageId
+	 * @param userId
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public Account finishSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

@@ -19,7 +19,11 @@ package eu.trentorise.smartcampus.filestorage.services.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -34,6 +38,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
+import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
@@ -45,6 +50,7 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -291,16 +297,36 @@ public class DropboxStorage implements StorageService {
 	}
 
 	@Override
-	public String getAccountAuthUrl(String storageId) throws NotFoundException {
+	public boolean authorizationSessionRequired() {
+		return true;
+	}
+
+	@Override
+	public void startSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AppKeyPair app = getAppTokenByStorage(storageId);
 		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
-		try {
-			// TODO store info ?
-			WebAuthSession.WebAuthInfo info = session.getAuthInfo();
-			return info.url;
-		} catch (DropboxException e) {
-			System.out.println("Dropbox exception");
-		}
-		return null;
+		WebAuthSession.WebAuthInfo info = session.getAuthInfo("http://localhost:8088/smartcampus.filestorage/authorize/success");
+		request.getSession().setAttribute("WebAuthInfo", info);
+		response.sendRedirect(info.url);
 	}
+
+	@Override
+	public Account finishSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
+		WebAuthSession.WebAuthInfo info = (WebAuthInfo) request.getSession().getAttribute("WebAuthInfo");
+		session.retrieveWebAccessToken(info.requestTokenPair);
+		AccessTokenPair token = session.getAccessTokenPair();
+		Account a = new Account();
+		Storage storage = appAccountManager.getStorageById(storageId);
+		a.setAppId(storage.getAppId());
+		a.setUserId(userId);
+		a.setStorageId(storageId);
+		a.setName(null);
+		a.setStorageType(StorageType.DROPBOX);
+		a.setConfigurations(Arrays.asList(new Configuration[]{new Configuration(USER_KEY,token.key), new Configuration(USER_SECRET,token.secret)}));
+		return a;
+	}
+	
+	
 }
