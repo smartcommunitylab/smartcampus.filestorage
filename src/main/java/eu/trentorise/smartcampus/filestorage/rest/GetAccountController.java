@@ -100,6 +100,11 @@ public class GetAccountController extends SCController {
 		storageService.startSession(req.storageId, req.userId, request, response);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/authorize/done")
+	public @ResponseBody String done() throws Exception {
+		return "";
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/authorize/success")
 	public void storeAccount(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AuthorizationRequest req = (AuthorizationRequest) request.getSession().getAttribute("authorizationRequest");
@@ -126,9 +131,9 @@ public class GetAccountController extends SCController {
 			}
 		} catch (Exception e) {
 			if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
-				redirect(response, StringUtils.appURL(request)+"/authorize/done", e.getMessage());
+				redirect(response, StringUtils.appURL(request)+"/authorize/done", "authorization failed");
 			} else {
-				redirect(response, storage.getRedirect(), e.getMessage());
+				redirect(response, storage.getRedirect(), "authorization failed");
 			}
 		}
 		
