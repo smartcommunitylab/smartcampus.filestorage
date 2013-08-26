@@ -47,11 +47,7 @@
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.account.user.{appId}"
-		pathPattern="/account/user/{appId}" method="GET,POST">
-	</resourceMapping>
-
-	<resourceMapping uri="filestorage.account.user.{appId}"
-		pathPattern="/account/user/{appId}/{accountId}" method="GET,PUT,DELETE">
+		pathPattern="/account/user/{appId}">
 	</resourceMapping>
 	
 	<resourceMapping uri="filestorage.account.user.{appId}"

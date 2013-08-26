@@ -137,17 +137,14 @@ public class AccountController extends SCController {
 
 	// METHODS USED BY USER
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/account/user/{appId}/{accountId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/account/user/{appId}")
 	public @ResponseBody
 	void updateMyAccount(@RequestBody Account account,
-			@PathVariable String appId, @PathVariable String accountId)
+			@PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
-		Account old = accountManager.findById(accountId);
 		User user = getUserObject(getUserId());
-		if (account.getId() == null) {
-			account.setId(accountId);
-		}
+		Account old = accountManager.findUserAccount(appId,user.getId());
 
 		if (!account.isValid()) {
 			throw new IllegalArgumentException(
@@ -156,9 +153,12 @@ public class AccountController extends SCController {
 
 		if (!account.isSame(old)) {
 			throw new IllegalArgumentException(String.format(
-					"Not the same account of %s", accountId));
+					"Not the same account user %s account of %s", user.getId(), appId));
 		}
-
+		account.setAppId(appId);
+		account.setUserId(user.getId());
+		account.setId(old.getId());
+		
 		if (!permissionManager.checkAccountPermission(user, account)) {
 			throw new SecurityException();
 		}
@@ -191,42 +191,23 @@ public class AccountController extends SCController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appId}")
 	public @ResponseBody
-	ListAccount getMyAccounts(HttpServletRequest request,
-			@PathVariable String appId) throws SmartcampusException {
-		User user = getUserObject(getUserId());
-		ListAccount result = new ListAccount();
-		result.setAccounts(accountManager.findAccounts(appId, user.getId()));
-		return result;
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/account/user/{appId}/{accountId}")
-	public @ResponseBody
-	Account getMyAccountById(@PathVariable String accountId,
-			@PathVariable String appId) throws SmartcampusException,
+	Account getMyAccount(@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 		User user = getUserObject(getUserId());
-		Account account = accountManager.findById(accountId);
-		if (!permissionManager.checkAccountPermission(user, account)) {
-			throw new SecurityException();
-		}
+		Account account = accountManager.findUserAccount(appId, user.getId());
 		return account;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appId}/{accountId}")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appId}")
 	public @ResponseBody
-	void deleteMyAccount(@PathVariable String accountId,
-			@PathVariable String appId) throws SmartcampusException,
+	void deleteMyAccount(@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 
 		User user = getUserObject(getUserId());
-
-		Account todel = accountManager.findById(accountId);
-
-		if (!permissionManager.checkAccountPermission(user, todel)) {
-			throw new SecurityException();
+		Account account = accountManager.findUserAccount(appId, user.getId());
+		if (account != null) {
+			accountManager.delete(account);
 		}
-
-		accountManager.delete(accountId);
 	}
 
 	@Override

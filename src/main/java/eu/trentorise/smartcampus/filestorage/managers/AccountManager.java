@@ -101,11 +101,11 @@ public class AccountManager {
 		return db.find(Query.query(criteria), Account.class);
 	}
 
-	public List<Account> findAccounts(String appId, String userId) {
+	public Account findUserAccount(String appId, String userId) {
 		Criteria criteria = new Criteria();
 		criteria.and("appId").is(appId);
 		criteria.and("userId").is(userId);
-		return db.find(Query.query(criteria), Account.class);
+		return db.findOne(Query.query(criteria), Account.class);
 	}
 
 	/**
