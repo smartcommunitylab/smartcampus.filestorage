@@ -125,15 +125,15 @@ public class GetAccountController extends SCController {
 			}
 			a = accountManager.save(a);
 			if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
-				redirect(response, StringUtils.appURL(request)+"/authorize/done", null);
+				redirect(response, a.getId(), StringUtils.appURL(request)+"/authorize/done", null);
 			} else {
-				redirect(response, storage.getRedirect(), null);
+				redirect(response, a.getId(), storage.getRedirect(), null);
 			}
 		} catch (Exception e) {
 			if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
-				redirect(response, StringUtils.appURL(request)+"/authorize/done", "authorization failed");
+				redirect(response, null, StringUtils.appURL(request)+"/authorize/done", "authorization failed");
 			} else {
-				redirect(response, storage.getRedirect(), "authorization failed");
+				redirect(response, null, storage.getRedirect(), "authorization failed");
 			}
 		}
 		
@@ -144,14 +144,14 @@ public class GetAccountController extends SCController {
 	 * @param message
 	 * @throws IOException 
 	 */
-	private void redirect(HttpServletResponse response, String redirect, String message) throws IOException {
+	private void redirect(HttpServletResponse response, String id, String redirect, String message) throws IOException {
 		if (redirect.indexOf('?') > 0) {
 			redirect += "&";
 		} else {
 			redirect += "?";
 		}
-		if (message == null) {
-			redirect += "status=ok";
+		if (message == null && !StringUtils.isNullOrEmpty(id, true)) {
+			redirect += "status=ok&accountId="+id;
 		} else {
 			redirect += "status=error&error_message="+message;
 		}
