@@ -16,16 +16,18 @@
 
 package eu.trentorise.smartcampus.filestorage.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.activemq.util.ByteArrayInputStream;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.DropboxAPI;
@@ -34,19 +36,25 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
+import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
+import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
-import eu.trentorise.smartcampus.filestorage.managers.UserAccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
+import eu.trentorise.smartcampus.filestorage.utils.StringUtils;
 
 /**
  * Storage on a user Dropbox account
@@ -57,25 +65,19 @@ import eu.trentorise.smartcampus.filestorage.services.StorageService;
 @Service
 public class DropboxStorage implements StorageService {
 
-	AppKeyPair app;
-
-	@Value("${dropbox.app.key}")
-	private String appKey;
-
-	@Value("${dropbox.app.secret}")
-	private String appSecret;
+	private static final Logger logger = Logger.getLogger(DropboxStorage.class);
 
 	private static final String USER_KEY = "USER_KEY";
 	private static final String USER_SECRET = "USER_SECRET";
 
-	@PostConstruct
-	@SuppressWarnings("unused")
-	private void init() {
-		app = new AppKeyPair(appKey, appSecret);
-	}
+	private static final String APP_KEY = "APP_KEY";
+	private static final String APP_SECRET = "APP_SECRET";
 
 	@Autowired
-	private UserAccountManager accountManager;
+	private AccountManager accountManager;
+
+	@Autowired
+	StorageManager appAccountManager;
 
 	@Autowired
 	private MetadataService metaService;
@@ -93,9 +95,12 @@ public class DropboxStorage implements StorageService {
 			throw new AlreadyStoredException();
 		} catch (NotFoundException e1) {
 
-			AccessTokenPair token;
+			AccessTokenPair token = null;
+			AppKeyPair app = null;
 			try {
 				token = getUserToken(accountId);
+				app = getAppToken(accountId);
+				logger.info("Retrieved dropbox account informations");
 			} catch (NotFoundException e2) {
 				throw new SmartcampusException(e2);
 			}
@@ -111,6 +116,7 @@ public class DropboxStorage implements StorageService {
 						resource.getContent().length, null, null);
 				sourceSession.unlink();
 				in.close();
+				logger.info("Resource stored on dropbox");
 				if (resource.getId() == null) {
 					resource.setId(new ObjectId().toString());
 				}
@@ -128,20 +134,22 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void replace(String accountId, Resource resource)
-			throws NotFoundException, SmartcampusException {
+	public void replace(Resource resource) throws NotFoundException,
+			SmartcampusException {
 		if (resource.getId() == null) {
 			throw new NotFoundException();
 		}
 
-		AccessTokenPair token;
+		Metadata meta = metaService.getMetadata(resource.getId());
+
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
 		try {
-			token = getUserToken(accountId);
+			token = getUserToken(meta.getAccountId());
+			app = getAppToken(meta.getAccountId());
 		} catch (NotFoundException e2) {
 			throw new SmartcampusException(e2);
 		}
-
-		Metadata meta = metaService.getMetadata(resource.getId());
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -165,14 +173,22 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void remove(String accountId, String rid) throws NotFoundException,
+	public void remove(String resourceId) throws NotFoundException,
 			SmartcampusException {
-		// get user token
-		UserAccount account = accountManager.findById(accountId);
-		AccessTokenPair token = getUserToken(account.getConfigurations());
 
+		Metadata metadata = metaService.getMetadata(resourceId);
+		// get user token
+
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(metadata.getAccountId());
+			app = getAppToken(metadata.getAccountId());
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
 		// find resource name
-		Metadata metadata = metaService.getMetadata(rid);
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -190,9 +206,42 @@ public class DropboxStorage implements StorageService {
 
 	private AccessTokenPair getUserToken(String accountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(accountId);
-
+		Account account = accountManager.findById(accountId);
 		return getUserToken(account.getConfigurations());
+	}
+
+	private AppKeyPair getAppToken(String accountId) throws NotFoundException {
+		Account account = accountManager.findById(accountId);
+		return getAppTokenByApp(account.getAppId());
+	}
+
+	private AppKeyPair getAppTokenByStorage(String storageId)
+			throws NotFoundException {
+		Storage appAccount = appAccountManager.getStorageById(storageId);
+		return getAppToken(appAccount.getConfigurations());
+	}
+	private AppKeyPair getAppTokenByApp(String appId)
+			throws NotFoundException {
+		Storage appAccount = appAccountManager.getStorageByAppId(appId);
+		return getAppToken(appAccount.getConfigurations());
+	}
+
+	private AppKeyPair getAppToken(List<Configuration> confs) {
+		String appKey = null;
+		String appSecret = null;
+		if (confs == null) {
+			return null;
+		}
+		for (Configuration tmp : confs) {
+			if (tmp.getName().equals(APP_KEY)) {
+				appKey = tmp.getValue();
+			}
+			if (tmp.getName().equals(APP_SECRET)) {
+				appSecret = tmp.getValue();
+			}
+		}
+		return new AppKeyPair(appKey, appSecret);
+
 	}
 
 	private AccessTokenPair getUserToken(List<Configuration> confs) {
@@ -217,17 +266,26 @@ public class DropboxStorage implements StorageService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getToken(String accountId, String rid)
+	public Token getToken(String accountId, String resourceId)
 			throws NotFoundException, SmartcampusException {
 		// get user token
-		UserAccount account = accountManager.findById(accountId);
-		AccessTokenPair dropboxToken = getUserToken(account.getConfigurations());
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+
+		try {
+			token = getUserToken(accountId);
+			app = getAppToken(accountId);
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
 
 		// find resource name
-		Metadata metadata = metaService.getMetadata(rid);
+		Metadata metadata = metaService.getMetadata(resourceId);
+		Storage appAccount = appAccountManager.getStorageByAppId(metadata
+				.getAppId());
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
-				Session.AccessType.APP_FOLDER, dropboxToken);
+				Session.AccessType.APP_FOLDER, token);
 		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
 				sourceSession);
 
@@ -237,9 +295,43 @@ public class DropboxStorage implements StorageService {
 		} catch (DropboxException e) {
 			throw new SmartcampusException();
 		}
-		Token token = new Token();
-		token.setUrl(link.url);
-		token.setMethodREST("GET");
-		return token;
+		Token userSessionToken = new Token();
+		userSessionToken.setUrl(link.url);
+		userSessionToken.setMethodREST("GET");
+		userSessionToken.setStorageType(appAccount.getStorageType());
+		return userSessionToken;
 	}
+
+	@Override
+	public boolean authorizationSessionRequired() {
+		return true;
+	}
+
+	@Override
+	public void startSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
+		WebAuthSession.WebAuthInfo info = session.getAuthInfo(StringUtils.appURL(request)+"/authorize/success");
+		request.getSession().setAttribute("WebAuthInfo", info);
+		response.sendRedirect(info.url);
+	}
+
+	@Override
+	public Account finishSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
+		WebAuthSession.WebAuthInfo info = (WebAuthInfo) request.getSession().getAttribute("WebAuthInfo");
+		session.retrieveWebAccessToken(info.requestTokenPair);
+		AccessTokenPair token = session.getAccessTokenPair();
+		Account a = new Account();
+		Storage storage = appAccountManager.getStorageById(storageId);
+		a.setAppId(storage.getAppId());
+		a.setUserId(userId);
+		a.setName(null);
+		a.setStorageType(StorageType.DROPBOX);
+		a.setConfigurations(Arrays.asList(new Configuration[]{new Configuration(USER_KEY,token.key), new Configuration(USER_SECRET,token.secret)}));
+		return a;
+	}
+	
+	
 }

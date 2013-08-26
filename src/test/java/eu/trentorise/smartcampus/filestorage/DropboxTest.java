@@ -16,13 +16,12 @@
 
 package eu.trentorise.smartcampus.filestorage;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import org.apache.activemq.util.ByteArrayInputStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -35,6 +34,7 @@ import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.WebAuthSession;
 
 import eu.trentorise.smartcampus.filestorage.utils.DropboxUtils;
+import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
 
 public class DropboxTest {
 
@@ -73,9 +73,9 @@ public class DropboxTest {
 		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
 				sourceSession);
 
-		File f = getSampleFile();
+		File f = TestUtils.getSampleTextFile("sample file");
 		byte[] content = FileUtils.readFileToByteArray(f);
-		InputStream in = new ByteArrayInputStream(content);
+		InputStream in = new java.io.ByteArrayInputStream(content);
 		sourceClient.putFile("/test.txt", in, content.length, null, null);
 		sourceClient.delete("/test.txt");
 		sourceSession.unlink();
@@ -95,40 +95,10 @@ public class DropboxTest {
 		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
 				sourceSession);
 
-		File f = getSampleFileUpdate();
+		File f = TestUtils.getSampleTextFile("sample file updated");
 		byte[] content = FileUtils.readFileToByteArray(f);
 		InputStream in = new ByteArrayInputStream(content);
 		sourceClient.putFileOverwrite("/test.txt", in, content.length, null);
-
-		f = getPngFile();
-		content = FileUtils.readFileToByteArray(f);
-		in = new ByteArrayInputStream(content);
-		sourceClient.putFileOverwrite("/test.txt", in, content.length, null);
-		sourceSession.unlink();
-	}
-
-	private File getPngFile() throws URISyntaxException {
-		File png = new File(getClass().getResource("image.png").toURI());
-		return png;
-	}
-
-	private File getSampleFileUpdate() throws IOException {
-		File t = File.createTempFile("dropbox", ".txt");
-		t.deleteOnExit();
-		FileWriter fw = new FileWriter(t);
-		fw.write("sample file Updated");
-		fw.close();
-		return t;
-
-	}
-
-	private File getSampleFile() throws IOException {
-		File t = File.createTempFile("dropbox", ".txt");
-		t.deleteOnExit();
-		FileWriter fw = new FileWriter(t);
-		fw.write("sample file");
-		fw.close();
-		return t;
 
 	}
 }

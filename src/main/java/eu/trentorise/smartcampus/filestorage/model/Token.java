@@ -18,6 +18,12 @@ package eu.trentorise.smartcampus.filestorage.model;
 
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Token {
 	/* Token data */
 	/**
@@ -39,6 +45,11 @@ public class Token {
 	 * optional HTTP headers to access the resource
 	 */
 	private Map<String, String> httpHeaders;
+
+	/**
+	 * storage which stores the resource
+	 */
+	private StorageType storageType;
 
 	public Map<String, Object> getMetadata() {
 		return metadata;
@@ -71,5 +82,13 @@ public class Token {
 
 	public void setHttpHeaders(Map<String, String> httpHeaders) {
 		this.httpHeaders = httpHeaders;
+	}
+
+	public StorageType getStorageType() {
+		return storageType;
+	}
+
+	public void setStorageType(StorageType storageType) {
+		this.storageType = storageType;
 	}
 }

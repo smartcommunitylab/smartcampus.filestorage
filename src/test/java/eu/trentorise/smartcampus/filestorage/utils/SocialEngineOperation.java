@@ -104,6 +104,13 @@ public class SocialEngineOperation {
 		SemanticHelper.shareEntityWith(client, eid, owner, addressee);
 	}
 
+	public Entity createEntity(
+			eu.trentorise.smartcampus.social.model.User owner, EntityTypes type)
+			throws WebApiException {
+		User socialUser = client.readUser(owner.getSocialId());
+		return createEntity(socialUser.getEntityBaseId(), type);
+	}
+
 	public Entity createEntity(long ebid, EntityTypes type)
 			throws WebApiException {
 
@@ -222,30 +229,29 @@ public class SocialEngineOperation {
 		return client.readCommunity("Smartcampus").getId();
 	}
 
-}
+	public enum EntityTypes {
+		event, experience, computerFile, journey, location, portfolio, narrative;
 
-enum EntityTypes {
-	event, experience, computerFile, journey, location, portfolio, narrative;
-
-	public String toString() {
-		switch (this) {
-		case event:
-			return "event";
-		case experience:
-			return "experience";
-		case computerFile:
-			return "computer file";
-		case journey:
-			return "journey";
-		case location:
-			return "location";
-		case portfolio:
-			return "portfolio";
-		case narrative:
-			return "narrative";
-		default:
-			return "";
+		public String toString() {
+			switch (this) {
+			case event:
+				return "event";
+			case experience:
+				return "experience";
+			case computerFile:
+				return "computer file";
+			case journey:
+				return "journey";
+			case location:
+				return "location";
+			case portfolio:
+				return "portfolio";
+			case narrative:
+				return "narrative";
+			default:
+				return "";
+			}
 		}
-	}
 
-};
+	};
+}

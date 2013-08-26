@@ -24,12 +24,13 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.common.SemanticHelper;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>SocialManager</i> manages interaction with social engine.
@@ -39,7 +40,10 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
  */
 @Service
 public class SocialManager {
-	SCWebApiClient socialClient;
+
+	private static final Logger logger = Logger.getLogger(SocialManager.class);
+
+	private SCWebApiClient socialClient;
 
 	@Value("${smartcampus.vas.web.socialengine.host}")
 	private String socialEngineHost;
@@ -68,8 +72,8 @@ public class SocialManager {
 	public Long createEntity(Resource resource, User user)
 			throws WebApiException {
 		Entity entity = SemanticHelper.createEntity(socialClient,
-				user.getSocialId(), "computer file", resource.getName(),
-				resource.getId(), null, null);
+				Long.valueOf(user.getSocialId()), "computer file",
+				resource.getName(), resource.getId(), null, null);
 
 		return entity.getId();
 	}
@@ -100,9 +104,42 @@ public class SocialManager {
 	 */
 	public boolean checkPermission(User user, String eid)
 			throws WebApiException {
-		return SemanticHelper.isEntitySharedWithUser(socialClient,
-				Long.decode(eid), user.getSocialId());
+		if (eid != null) {
+			return SemanticHelper.isEntitySharedWithUser(socialClient,
+					Long.decode(eid), Long.valueOf(user.getSocialId()));
+		} else {
+			logger.info("Try to check permission of null entity resource");
+			return false;
+		}
+	}
 
+	/**
+	 * checks if social entity is owned by the given user
+	 * 
+	 * @param user
+	 *            user owner of entity
+	 * @param entityId
+	 *            social entity id
+	 * @return true if entity is owned by the user, false otherwise
+	 */
+	public boolean isOwnedBy(User user, String entityId) {
+		try {
+			Entity entity = socialClient
+					.readEntity(Long.decode(entityId), null);
+			it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialClient
+					.readUser(user.getSocialId());
+			return entity.getOwnerId().equals(socialUser.getEntityBaseId());
+		} catch (NumberFormatException e) {
+			logger.error(String.format(
+					"Exception converting in long entityId %s", entityId));
+			return false;
+		} catch (WebApiException e) {
+			logger.error("Exception invoking socialEngineClient", e);
+			return false;
+		} catch (Exception e) {
+			logger.error("A general exception is occurred", e);
+			return false;
+		}
 	}
 
 }

@@ -16,6 +16,7 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
+import java.util.Collection;
 import java.util.List;
 
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
@@ -54,29 +55,31 @@ public interface MetadataService {
 	 * @throws NotFoundException
 	 *             if resource dosn't exist
 	 */
-	public String getResourceByEntity(String eid) throws NotFoundException;
+	public String getResourceBySocialId(String sociaId)
+			throws NotFoundException;
 
 	/**
 	 * retrieves social entity id given the id of the resource
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @return social entity id
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public String getEntityByResource(String rid) throws NotFoundException;
+	public String getEntityByResource(String resourceId)
+			throws NotFoundException;
 
 	/**
 	 * retrieves {@link Metadata} given its resource id
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            id of the resource
 	 * @return the metadata binded to the resource
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public Metadata getMetadata(String rid) throws NotFoundException;
+	public Metadata getMetadata(String resourceId) throws NotFoundException;
 
 	/**
 	 * retrieves all of {@link Metadata} binded to a given account id
@@ -91,6 +94,36 @@ public interface MetadataService {
 			throws NotFoundException;
 
 	/**
+	 * retrieves all of {@link Metadata} of given appId
+	 * 
+	 * @param appId
+	 *            appId
+	 * @param position
+	 *            integer to paginate result, null to not use it
+	 * @param size
+	 *            integer to paginate result,null to not use it
+	 * @return the list of metadata found
+	 * @throws NotFoundException
+	 *             if the user storage account doesn't exist
+	 */
+	public List<Metadata> getMetadataByApp(String appId, Integer position,
+			Integer size);
+
+	/**
+	 * retrieves all of {@link Metadata} present in a collection of accountIds
+	 * 
+	 * @param accountIds
+	 *            collections of accountId owners of Metadata
+	 * @param position
+	 *            integer to paginate result, null to not use it
+	 * @param size
+	 *            integer to paginate result,null to not use it
+	 * @return
+	 */
+	public List<Metadata> getMetadataByAccountIds(
+			Collection<String> accountIds, Integer position, Integer size);
+
+	/**
 	 * saves a {@link Metadata}
 	 * 
 	 * @param metadata
@@ -103,10 +136,10 @@ public interface MetadataService {
 	/**
 	 * deletes a {@link Metadata}
 	 * 
-	 * @param rid
+	 * @param resourceId
 	 *            the id of the resource binded to the metadata to delete
 	 */
-	public void delete(String rid);
+	public void delete(String resourceId);
 
 	/**
 	 * updates a {@link Metadata}. In particular updates the last modification
@@ -115,7 +148,7 @@ public interface MetadataService {
 	 * @param metadata
 	 *            metadata to update
 	 * @throws NotFoundException
-	 *             if rid field in metadata doesn't exist
+	 *             if resourceId field in metadata doesn't exist
 	 */
 	public void update(Metadata metadata) throws NotFoundException;
 }

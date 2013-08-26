@@ -16,11 +16,12 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
+import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
@@ -29,6 +30,7 @@ import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>MediaManager</i> manages all other managers and exposes the main core
@@ -39,6 +41,8 @@ import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
  */
 @Service
 public class MediaManager {
+
+	private static final Logger logger = Logger.getLogger(MediaManager.class);
 
 	@Autowired
 	MetadataManager metadataManager;
@@ -58,29 +62,30 @@ public class MediaManager {
 	 *            the user who stores the resource
 	 * @param resource
 	 *            resource to store
+	 * @param createSocialData
+	 *            true to create a social entity associated to the resource
 	 * @return the resource stored with the id assigned from storage
 	 * @throws AlreadyStoredException
 	 *             if resource is already stored.
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public Resource storage(String accountId, User user, Resource resource)
-			throws AlreadyStoredException, SmartcampusException {
+	public Resource storage(String accountId, User user, Resource resource,
+			boolean createSocialData) throws AlreadyStoredException,
+			SmartcampusException {
 
 		StorageService storageService = storageUtils
-				.getStorageService(accountId);
+				.getStorageServiceByAccount(accountId);
+		logger.info("Retrieved storageService");
 		resource = storageService.store(accountId, resource);
-		metadataManager.create(accountId, user, resource);
+		metadataManager.create(accountId, user, resource, createSocialData);
+		logger.info("Created resource metadata");
 		return resource;
 	}
 
 	/**
 	 * deletes a {@link Resource}
 	 * 
-	 * @param accountId
-	 *            id of user storage account in which resource is stored
-	 * @param user
-	 *            user that do the operation
 	 * @param resourceId
 	 *            id of the resource to delete
 	 * @throws SmartcampusException
@@ -88,11 +93,13 @@ public class MediaManager {
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public void remove(String accountId, User user, String resourceId)
-			throws SmartcampusException, NotFoundException {
-		StorageService storageService = storageUtils
-				.getStorageService(accountId);
-		storageService.remove(accountId, resourceId);
+	public void remove(String resourceId) throws SmartcampusException,
+			NotFoundException {
+
+		Metadata meta = metadataManager.findByResource(resourceId);
+		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
+				.getAccountId());
+		storageService.remove(resourceId);
 		metadataManager.delete(resourceId);
 	}
 
@@ -101,10 +108,6 @@ public class MediaManager {
 	 * only lastModifiedTs field of
 	 * {@link eu.trentorise.smartcampus.filestorage.model.Metadata}.
 	 * 
-	 * @param accountId
-	 *            id of user storage account in which resource is stored
-	 * @param user
-	 *            user that do the operation
 	 * @param resource
 	 *            the new resource
 	 * @throws NotFoundException
@@ -112,11 +115,17 @@ public class MediaManager {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void replace(String accountId, User user, Resource resource)
-			throws NotFoundException, SmartcampusException {
-		StorageService storageService = storageUtils
-				.getStorageService(accountId);
-		storageService.replace(accountId, resource);
+	public void replace(Resource resource) throws NotFoundException,
+			SmartcampusException {
+		if (resource.getId() == null) {
+			throw new IllegalArgumentException("Resource SHOULD have a id");
+		}
+
+		Metadata meta = metadataManager.findByResource(resource.getId());
+
+		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
+				.getAccountId());
+		storageService.replace(resource);
 		metadataManager.update(resource);
 	}
 
@@ -138,7 +147,7 @@ public class MediaManager {
 	public Token getResourceToken(User user, String rid, Operation op)
 			throws SmartcampusException, SecurityException {
 
-		return scAcl.getSessionToken(op, user, rid);
+		return scAcl.getSessionToken(op, user, rid, true);
 	}
 
 }

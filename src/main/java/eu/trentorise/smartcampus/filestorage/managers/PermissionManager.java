@@ -19,10 +19,11 @@ package eu.trentorise.smartcampus.filestorage.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.ac.provider.model.User;
+import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
-import eu.trentorise.smartcampus.filestorage.model.UserAccount;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * <i>PermissionManager</i> checks the permissions about resources and storage
@@ -34,7 +35,10 @@ import eu.trentorise.smartcampus.filestorage.model.UserAccount;
 @Service
 public class PermissionManager {
 	@Autowired
-	UserAccountManager accountManager;
+	AccountManager accountManager;
+
+	@Autowired
+	StorageManager storageManager;
 
 	@Autowired
 	MetadataManager metaManager;
@@ -47,10 +51,27 @@ public class PermissionManager {
 	 * @param account
 	 *            storage account
 	 * @return true if user can access, false otherwise
-	 * @see UserAccount
+	 * @see Account
 	 */
-	public boolean checkAccountPermission(User user, UserAccount account) {
+	public boolean checkAccountPermission(User user, Account account) {
 		return user.getId().equals(account.getUserId());
+	}
+
+	/**
+	 * checks if account belongs to a specific appId
+	 * 
+	 * @param appId
+	 * @param account
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkAccountPermission(String appId, Account account)
+			throws NotFoundException {
+		if (appId != null && account.getAppId() != null) {
+			return account.getAppId().equals(appId);
+		} else {
+			return appId == null && account.getAppId() == null;
+		}
 	}
 
 	/**
@@ -61,14 +82,31 @@ public class PermissionManager {
 	 * @param accountId
 	 *            storage account id
 	 * @return true if user can access, false otherwise
-	 * @see UserAccount
+	 * @see Account
 	 * @throws NotFoundException
 	 *             if account doesn't exist
 	 */
 	public boolean checkAccountPermission(User user, String accountId)
 			throws NotFoundException {
-		UserAccount account = accountManager.findById(accountId);
-		return user.getId().equals(account.getUserId());
+		Account account = accountManager.findById(accountId);
+		return user.getId().equals("" + account.getUserId());
+	}
+
+	/**
+	 * checks if an account belongs to an application and is accessible by a
+	 * user
+	 * 
+	 * @param user
+	 * @param appId
+	 * @param accountId
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkAccountPermission(User user, String appId,
+			String accountId) throws NotFoundException {
+		Account account = accountManager.findById(accountId);
+		return user.getId().equals(account.getUserId())
+				&& account.getAppId().equals(appId);
 	}
 
 	/**
@@ -76,17 +114,67 @@ public class PermissionManager {
 	 * 
 	 * @param user
 	 *            the user who want to access to the resource
-	 * @param rid
+	 * @param resourceId
 	 *            the resource id
 	 * @return true if user can access, false otherwise
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public boolean checkResourcePermission(User user, String rid)
+	public boolean checkResourcePermission(User user, String resourceId)
 			throws NotFoundException {
-		Metadata meta = metaManager.findByResource(rid);
+		Metadata meta = metaManager.findByResource(resourceId);
 		return user.getId().equals(
 				accountManager.findById(meta.getAccountId()).getUserId());
 	}
 
+	/**
+	 * checks if a resource is owned by an application
+	 * 
+	 * @param appId
+	 *            application id
+	 * @param resourceId
+	 *            resource id
+	 * @return true if application owns the resource, false otherwise
+	 * @throws NotFoundException
+	 */
+	public boolean checkResourcePermission(String appId, String resourceId)
+			throws NotFoundException {
+		Metadata meta = metaManager.findByResource(resourceId);
+		Account account = accountManager.findById(meta.getAccountId());
+		return account.getAppId().equals(appId);
+	}
+
+	/**
+	 * checks if a resource is owned by an application and a user
+	 * 
+	 * @param user
+	 * @param appId
+	 * @param resourceId
+	 * @return
+	 * @throws NotFoundException
+	 */
+	public boolean checkResourcePermission(User user, String appId,
+			String resourceId) throws NotFoundException {
+		Metadata meta = metaManager.findByResource(resourceId);
+		Account account = accountManager.findById(meta.getAccountId());
+		return account.getUserId().equals(user.getId())
+				&& account.getAppId().equals(appId);
+	}
+
+	/**
+	 * checks if application can access to the storage configurations
+	 * 
+	 * @param appId
+	 * @param storageId
+	 * @return
+	 */
+	public boolean checkStoragePermission(String appId, String storageId) {
+		Storage retrieved;
+		try {
+			retrieved = storageManager.getStorageById(storageId);
+			return retrieved.getAppId().equals(appId);
+		} catch (NotFoundException e) {
+			return false;
+		}
+	}
 }

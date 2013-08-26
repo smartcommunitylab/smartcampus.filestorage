@@ -52,4 +52,6 @@
 	<bean id="applicationContextProvider"
 		class="eu.trentorise.smartcampus.filestorage.utils.ApplicationContextProvider" />
 
+	<!-- Smartcampus Exception resolver -->
+	<bean id="exceptionResolver" class="eu.trentorise.smartcampus.filestorage.rest.SCExceptionResolver" />
 </beans>

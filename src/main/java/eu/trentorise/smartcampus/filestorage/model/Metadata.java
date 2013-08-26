@@ -16,6 +16,10 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.springframework.data.annotation.Id;
 
 /**
@@ -24,6 +28,8 @@ import org.springframework.data.annotation.Id;
  * @author mirko perillo
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Metadata {
 	/**
 	 * name of the resource
@@ -34,22 +40,31 @@ public class Metadata {
 	 * resource id
 	 */
 	@Id
-	private String rid;
+	private String resourceId;
 
 	/**
 	 * entity id binded to resource
 	 */
-	private String eid;
+	private String socialId;
+
+	private String fileExternalId;
 
 	/**
 	 * account id in which resource is stored
 	 */
 	private String accountId;
 
+	private String appId;
+
 	/**
 	 * MIME type of resource
 	 */
 	private String contentType;
+
+	/**
+	 * file size in bytes
+	 */
+	private long size;
 
 	/**
 	 * creation time
@@ -69,20 +84,20 @@ public class Metadata {
 		this.name = name;
 	}
 
-	public String getRid() {
-		return rid;
+	public String getResourceId() {
+		return resourceId;
 	}
 
-	public void setRid(String rid) {
-		this.rid = rid;
+	public void setResourceId(String resourceId) {
+		this.resourceId = resourceId;
 	}
 
-	public String getEid() {
-		return eid;
+	public String getSocialId() {
+		return socialId;
 	}
 
-	public void setEid(String eid) {
-		this.eid = eid;
+	public void setSocialId(String socialId) {
+		this.socialId = socialId;
 	}
 
 	public String getContentType() {
@@ -115,6 +130,30 @@ public class Metadata {
 
 	public void setAccountId(String accountId) {
 		this.accountId = accountId;
+	}
+
+	public String getFileExternalId() {
+		return fileExternalId;
+	}
+
+	public void setFileExternalId(String fileExternalId) {
+		this.fileExternalId = fileExternalId;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 }

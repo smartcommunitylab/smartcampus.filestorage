@@ -16,6 +16,10 @@
 
 package eu.trentorise.smartcampus.filestorage.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * <i>Configuration</i> is the representation of a configuration in a user
  * storage account
@@ -23,6 +27,8 @@ package eu.trentorise.smartcampus.filestorage.model;
  * @author mirko perillo
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Configuration {
 	/**
 	 * name of configuration
