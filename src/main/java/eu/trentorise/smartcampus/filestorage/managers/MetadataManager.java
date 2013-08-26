@@ -210,7 +210,6 @@ public class MetadataManager {
 		Account userAccount;
 		try {
 			userAccount = accountManager.findById(accountId);
-			metadata.setStorageId(userAccount.getStorageId());
 			metadata.setAppId(userAccount.getAppId());
 		} catch (NotFoundException e1) {
 			logger.error(String.format("userAccount not found: %s", accountId));

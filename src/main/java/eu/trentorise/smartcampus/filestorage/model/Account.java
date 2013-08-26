@@ -41,12 +41,6 @@ public class Account {
 	 * id of the user
 	 */
 	private String userId;
-
-	/**
-	 * storage account reference
-	 */
-	private String storageId;
-
 	/**
 	 * appId reference
 	 */
@@ -100,14 +94,6 @@ public class Account {
 		this.id = id;
 	}
 
-	public String getStorageId() {
-		return storageId;
-	}
-
-	public void setStorageId(String storageId) {
-		this.storageId = storageId;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -125,15 +111,13 @@ public class Account {
 	}
 
 	public boolean isValid() {
-		return appId != null && userId != null && storageType != null
-				&& storageId != null;
+		return appId != null && userId != null && storageType != null;
 	}
 
 	public boolean isSame(Account account) {
 		return id.equals(account.getId()) && appId.equals(account.getAppId())
 				&& userId.equals(account.getUserId())
-				&& storageType == account.getStorageType()
-				&& storageId.equals(account.getStorageId());
+				&& storageType == account.getStorageType();
 	}
 
 }

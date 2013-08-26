@@ -211,12 +211,12 @@ public class DropboxStorage implements StorageService {
 
 	private AppKeyPair getAppToken(String accountId) throws NotFoundException {
 		Account account = accountManager.findById(accountId);
-		return getAppTokenByStorage(account.getStorageId());
+		return getAppTokenByStorage(account.getAppId());
 	}
 
-	private AppKeyPair getAppTokenByStorage(String storageId)
+	private AppKeyPair getAppTokenByStorage(String appId)
 			throws NotFoundException {
-		Storage appAccount = appAccountManager.getStorageById(storageId);
+		Storage appAccount = appAccountManager.getStorageByAppId(appId);
 		return getAppToken(appAccount.getConfigurations());
 	}
 
@@ -275,8 +275,8 @@ public class DropboxStorage implements StorageService {
 
 		// find resource name
 		Metadata metadata = metaService.getMetadata(resourceId);
-		Storage appAccount = appAccountManager.getStorageById(metadata
-				.getStorageId());
+		Storage appAccount = appAccountManager.getStorageByAppId(metadata
+				.getAppId());
 
 		WebAuthSession sourceSession = new WebAuthSession(app,
 				Session.AccessType.APP_FOLDER, token);
@@ -321,7 +321,6 @@ public class DropboxStorage implements StorageService {
 		Storage storage = appAccountManager.getStorageById(storageId);
 		a.setAppId(storage.getAppId());
 		a.setUserId(userId);
-		a.setStorageId(storageId);
 		a.setName(null);
 		a.setStorageType(StorageType.DROPBOX);
 		a.setConfigurations(Arrays.asList(new Configuration[]{new Configuration(USER_KEY,token.key), new Configuration(USER_SECRET,token.secret)}));

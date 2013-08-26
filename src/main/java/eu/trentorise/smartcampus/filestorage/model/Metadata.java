@@ -54,8 +54,6 @@ public class Metadata {
 	 */
 	private String accountId;
 
-	private String storageId;
-
 	private String appId;
 
 	/**
@@ -140,14 +138,6 @@ public class Metadata {
 
 	public void setFileExternalId(String fileExternalId) {
 		this.fileExternalId = fileExternalId;
-	}
-
-	public String getStorageId() {
-		return storageId;
-	}
-
-	public void setStorageId(String storageId) {
-		this.storageId = storageId;
 	}
 
 	public String getAppId() {

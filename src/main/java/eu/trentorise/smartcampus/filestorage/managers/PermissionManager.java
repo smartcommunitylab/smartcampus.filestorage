@@ -67,15 +67,10 @@ public class PermissionManager {
 	 */
 	public boolean checkAccountPermission(String appId, Account account)
 			throws NotFoundException {
-		if (account.getStorageId() != null) {
-			Storage storage = storageManager.getStorageById(account
-					.getStorageId());
-
-			return storage.getAppId().equals(appId)
-					&& account.getAppId() != null
-					&& account.getAppId().equals(appId);
+		if (appId != null && account.getAppId() != null) {
+			return account.getAppId().equals(appId);
 		} else {
-			return false;
+			return appId == null && account.getAppId() == null;
 		}
 	}
 

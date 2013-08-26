@@ -83,7 +83,6 @@ public class DropboxStorageTest {
 		account.setName("dropbox personal");
 		account.setUserId(TEST_USER_ID);
 		account.setStorageType(StorageType.DROPBOX);
-		account.setStorageId(appAccount.getId());
 		account.setAppId(appAccount.getAppId());
 		List<Configuration> configurations = new ArrayList<Configuration>();
 		configurations.add(new Configuration("USER_KEY", DropboxUtils.userkey));

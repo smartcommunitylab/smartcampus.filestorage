@@ -67,7 +67,6 @@ public class TestUtils {
 		account.setId(new ObjectId().toString());
 		account.setUserId(userId);
 		account.setName("smartcampus test");
-		account.setStorageId(appAccount.getId());
 		account.setAppId(appAccount.getAppId());
 		account.setStorageType(appAccount.getStorageType());
 
