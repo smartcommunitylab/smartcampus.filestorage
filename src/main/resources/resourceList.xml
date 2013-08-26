@@ -72,11 +72,11 @@
 		pathPattern="/metadata/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
 	
-	<resourceMapping uri="filestorage.metadata.user.all.{appId}.read"
+	<resourceMapping uri="filestorage.metadata.user.{appId}.read"
 		pathPattern="/metadata/all/user/{appId}" method="GET">
 	</resourceMapping>
 	
-	<resourceMapping uri="filestorage.metadata.app.all.{appId}.read"
+	<resourceMapping uri="filestorage.metadata.app.{appId}.read"
 		pathPattern="/metadata/all/app/{appId}" method="GET">
 	</resourceMapping>
 
@@ -138,7 +138,7 @@
 	</resourceMapping>
 	
 
-	<resourceMapping uri="filestorage.resource.app.{appId}.updatesocial"
+	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
 		pathPattern="/updatesocial/{appId}/{resourceId}/{entityId}" method="PUT">
 	</resourceMapping>
 
