@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.rest;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +33,6 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
-import eu.trentorise.smartcampus.social.model.User;
 
 @Controller
 public class AccountController extends SCController {
@@ -143,8 +140,7 @@ public class AccountController extends SCController {
 			@PathVariable String appId)
 			throws SmartcampusException, NotFoundException {
 
-		User user = getUserObject(getUserId());
-		Account old = accountManager.findUserAccount(appId,user.getId());
+		Account old = accountManager.findUserAccount(appId,getUserId());
 
 		if (!account.isValid()) {
 			throw new IllegalArgumentException(
@@ -153,15 +149,12 @@ public class AccountController extends SCController {
 
 		if (!account.isSame(old)) {
 			throw new IllegalArgumentException(String.format(
-					"Not the same account user %s account of %s", user.getId(), appId));
+					"Not the same account user %s account of %s", getUserId(), appId));
 		}
 		account.setAppId(appId);
-		account.setUserId(user.getId());
+		account.setUserId(getUserId());
 		account.setId(old.getId());
 		
-		if (!permissionManager.checkAccountPermission(user, account)) {
-			throw new SecurityException();
-		}
 		accountManager.update(account);
 	}
 
@@ -176,7 +169,6 @@ public class AccountController extends SCController {
 		}
 
 		try {
-			getUserObject(getUserId());
 			account.setUserId(getUserId());
 		} catch (Exception e) {
 			throw new IllegalArgumentException("userId MUST be valid");
@@ -193,9 +185,13 @@ public class AccountController extends SCController {
 	public @ResponseBody
 	Account getMyAccount(@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
-		User user = getUserObject(getUserId());
-		Account account = accountManager.findUserAccount(appId, user.getId());
-		return account;
+		try {
+			Account account = accountManager.findUserAccount(appId, getUserId());
+			return account;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/account/user/{appId}")
@@ -203,8 +199,7 @@ public class AccountController extends SCController {
 	void deleteMyAccount(@PathVariable String appId) throws SmartcampusException,
 			NotFoundException {
 
-		User user = getUserObject(getUserId());
-		Account account = accountManager.findUserAccount(appId, user.getId());
+		Account account = accountManager.findUserAccount(appId, getUserId());
 		if (account != null) {
 			accountManager.delete(account);
 		}

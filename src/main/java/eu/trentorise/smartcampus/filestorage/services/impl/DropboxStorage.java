@@ -54,6 +54,7 @@ import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
+import eu.trentorise.smartcampus.filestorage.utils.StringUtils;
 
 /**
  * Storage on a user Dropbox account
@@ -211,10 +212,15 @@ public class DropboxStorage implements StorageService {
 
 	private AppKeyPair getAppToken(String accountId) throws NotFoundException {
 		Account account = accountManager.findById(accountId);
-		return getAppTokenByStorage(account.getAppId());
+		return getAppTokenByApp(account.getAppId());
 	}
 
-	private AppKeyPair getAppTokenByStorage(String appId)
+	private AppKeyPair getAppTokenByStorage(String storageId)
+			throws NotFoundException {
+		Storage appAccount = appAccountManager.getStorageById(storageId);
+		return getAppToken(appAccount.getConfigurations());
+	}
+	private AppKeyPair getAppTokenByApp(String appId)
 			throws NotFoundException {
 		Storage appAccount = appAccountManager.getStorageByAppId(appId);
 		return getAppToken(appAccount.getConfigurations());
@@ -305,7 +311,7 @@ public class DropboxStorage implements StorageService {
 	public void startSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AppKeyPair app = getAppTokenByStorage(storageId);
 		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
-		WebAuthSession.WebAuthInfo info = session.getAuthInfo("http://localhost:8088/smartcampus.filestorage/authorize/success");
+		WebAuthSession.WebAuthInfo info = session.getAuthInfo(StringUtils.appURL(request)+"/authorize/success");
 		request.getSession().setAttribute("WebAuthInfo", info);
 		response.sendRedirect(info.url);
 	}
