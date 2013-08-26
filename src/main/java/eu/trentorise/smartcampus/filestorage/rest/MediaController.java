@@ -259,7 +259,7 @@ public class MediaController extends SCController {
 				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/shared/resource/user/{appId}/{resourceId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/sharedresource/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Token getMySharedResource(@PathVariable String appId,
 			@PathVariable String resourceId) throws SmartcampusException,
