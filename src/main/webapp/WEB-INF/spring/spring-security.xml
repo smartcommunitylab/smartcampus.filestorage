@@ -15,12 +15,13 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 
 	<context:property-placeholder location="classpath:filestorage.properties" />
 
-	<http pattern="/authorize/**" entry-point-ref="oauthAuthenticationEntryPoint"
-		xmlns="http://www.springframework.org/schema/security"
-		authentication-manager-ref="resourceAuthenticationManager">
-		<anonymous enabled="true" />
-	</http>
-	
+	<http xmlns="http://www.springframework.org/schema/security" pattern="/css/**" security="none"/>
+  <http xmlns="http://www.springframework.org/schema/security" pattern="/img/**" security="none"/>
+  <http xmlns="http://www.springframework.org/schema/security" pattern="/js/**" security="none"/>
+  <http xmlns="http://www.springframework.org/schema/security" pattern="/lib/**" security="none"/>
+	<http xmlns="http://www.springframework.org/schema/security" pattern="/authorize/**" security="none"/>
+  <http xmlns="http://www.springframework.org/schema/security" pattern="/conf/**" security="none"/>
+		
 	<http create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
 		xmlns="http://www.springframework.org/schema/security"
 		authentication-manager-ref="resourceAuthenticationManager">

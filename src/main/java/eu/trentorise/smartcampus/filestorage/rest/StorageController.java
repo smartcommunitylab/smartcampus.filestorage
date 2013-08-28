@@ -79,6 +79,11 @@ public class StorageController extends SCController {
 		return storageManager.getStorageByAppId(appId);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/conf/storage")
+	public String storageConf() throws SmartcampusException, NotFoundException {
+		return "storage";
+	}
+
 //	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
 //	public @ResponseBody
 //	Storage getStorageByUser(@PathVariable String storageId,

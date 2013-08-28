@@ -54,4 +54,17 @@
 
 	<!-- Smartcampus Exception resolver -->
 	<bean id="exceptionResolver" class="eu.trentorise.smartcampus.filestorage.rest.SCExceptionResolver" />
+	
+	<!--Basic application beans. -->
+  <bean id="viewResolver"
+    class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+    <property name="viewResolvers">
+      <bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+      </bean>
+    </property>
+  </bean>
+	
 </beans>
