@@ -135,7 +135,11 @@
 	
 
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
-		pathPattern="/updatesocial/{appId}/{resourceId}/{entityId}" method="PUT">
+		pathPattern="/updatesocial/app/{appId}/{resourceId}/{entityId}" method="PUT">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
+		pathPattern="/updatesocial/user/{appId}/{resourceId}/{entityId}" method="PUT">
 	</resourceMapping>
 
 </service>

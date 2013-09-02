@@ -287,7 +287,7 @@ public class MediaController extends SCController {
 				false);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/{appId}/{resourceId}/{entityId}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/app/{appId}/{resourceId}/{entityId}")
 	public @ResponseBody
 	Metadata updateSocialData(@PathVariable String appId,
 			@PathVariable String resourceId, @PathVariable String entityId)
@@ -295,6 +295,20 @@ public class MediaController extends SCController {
 
 		String userId = metadataManager.getOwner(resourceId);
 		User user = getUserObject(userId);
+
+		return metadataManager.updateSocialData(user, resourceId, entityId);
+	}
+
+	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/user/{appId}/{resourceId}/{entityId}")
+	public @ResponseBody
+	Metadata updateMySocialData(@PathVariable String appId,
+			@PathVariable String resourceId, @PathVariable String entityId)
+			throws SmartcampusException, SecurityException, NotFoundException {
+
+		User user = getUserObject(getUserId());
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+			throw new SecurityException();
+		}
 
 		return metadataManager.updateSocialData(user, resourceId, entityId);
 	}
