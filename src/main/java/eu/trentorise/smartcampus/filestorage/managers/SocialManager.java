@@ -127,7 +127,7 @@ public class SocialManager {
 			Entity entity = socialClient
 					.readEntity(Long.decode(entityId), null);
 			it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialClient
-					.readUser(user.getSocialId());
+					.readUser(Long.valueOf(user.getSocialId()));
 			return entity.getOwnerId().equals(socialUser.getEntityBaseId());
 		} catch (NumberFormatException e) {
 			logger.error(String.format(
