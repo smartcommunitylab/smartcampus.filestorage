@@ -200,7 +200,7 @@ public class MediaController extends SCController {
 			SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
 
-		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+		if (!scAcl.isPermitted(Operation.DOWNLOAD, resourceId, user)) {
 			throw new SecurityException();
 		}
 		return metadataManager.findByResource(resourceId);

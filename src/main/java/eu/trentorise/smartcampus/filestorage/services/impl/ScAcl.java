@@ -55,7 +55,35 @@ public class ScAcl implements ACLService {
 	 */
 	@Override
 	public boolean isPermitted(Operation operation, String resourceId, User user) {
-		throw new IllegalArgumentException("Operation not implemented");
+		Metadata resourceInfo = null;
+		try {
+			resourceInfo = metaService.getMetadata(resourceId);
+			Account account = userAccountManager.findById(resourceInfo
+					.getAccountId());
+			if (account.getUserId().equals(user.getId())) return true;
+		} catch (NotFoundException e) {
+			logger.error(String.format("%s resource not found", resourceId));
+			return false;
+		}
+		
+		switch (operation) {
+		case DOWNLOAD:
+			try {
+				if (socialManager.checkPermission(user, metaService.getEntityByResource(resourceId))) {
+					logger.info(String.format(
+							"Access permission ok, user: %s, resource: %s",
+							user.getId(), resourceId));
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		default:
+			throw new IllegalArgumentException("Operation not supported");
+		}
 	}
 
 	/**
