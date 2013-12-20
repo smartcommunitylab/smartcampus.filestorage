@@ -142,5 +142,9 @@
 		pathPattern="/updatesocial/user/{appId}/{resourceId}/{entityId}" method="PUT">
 	</resourceMapping>
 
+	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
+		pathPattern="/metadata/user/{appId}/{accountId}" method="POST">
+	</resourceMapping>
+	
 </service>
 

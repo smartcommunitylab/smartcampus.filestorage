@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -191,6 +192,22 @@ public class MediaController extends SCController {
 			new SecurityException();
 		}
 		return metadataManager.findByResource(resourceId);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/metadata/user/{appId}/{accountId}")
+	public @ResponseBody
+	Metadata createMyMetadata(@PathVariable String appId,
+			@PathVariable String accountId, @RequestBody Resource resource,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, SecurityException, NotFoundException,
+			AlreadyStoredException {
+		User user = getUserObject(getUserId());
+
+		if (!permissionManager.checkAccountPermission(user, appId, accountId)) {
+			new SecurityException();
+		}
+		return metadataManager.create(accountId, user, resource,
+				createSocialData);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
