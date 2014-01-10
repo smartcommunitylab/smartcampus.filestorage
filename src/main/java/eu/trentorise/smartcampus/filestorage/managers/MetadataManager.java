@@ -207,7 +207,7 @@ public class MetadataManager {
 		metadata.setAccountId(accountId);
 		metadata.setFileExternalId(resource.getName());
 		metadata.setSize(resource.getContent() != null ? resource.getContent().length
-				: 0);
+				: resource.getSize());
 		// account data
 		Account userAccount;
 		try {

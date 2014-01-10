@@ -46,6 +46,11 @@ public class Resource {
 	 */
 	private String contentType;
 
+	/**
+	 * file size
+	 */
+	private long size;
+
 	public String getName() {
 		return name;
 	}
@@ -76,6 +81,14 @@ public class Resource {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 }
