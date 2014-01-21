@@ -17,9 +17,12 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -303,6 +306,28 @@ public class MediaController extends SCController {
 
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
 				false);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/thumbnail/user/{appId}/{resourceId}")
+	public @ResponseBody
+	void getThumbnail(HttpServletResponse response, @PathVariable String appId,
+			@PathVariable String resourceId) throws SmartcampusException,
+			SecurityException, NotFoundException, IOException {
+
+		User user = getUserObject(getUserId());
+		if (!permissionManager.checkSharingPermission(user, resourceId)) {
+			throw new SecurityException();
+		}
+
+		InputStream in = mediaManager.getThumbnailStream(resourceId);
+		if (in != null) {
+			byte[] buffer = new byte[1024];
+			int readed = 0;
+			OutputStream out = response.getOutputStream();
+			while ((readed = in.read(buffer)) > 0) {
+				out.write(buffer, 0, readed);
+			}
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/app/{appId}/{resourceId}/{entityId}")

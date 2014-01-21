@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxLink;
+import com.dropbox.client2.DropboxAPI.ThumbFormat;
+import com.dropbox.client2.DropboxAPI.ThumbSize;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
@@ -341,4 +343,30 @@ public class DropboxStorage implements StorageService {
 		return a;
 	}
 
+	@Override
+	public InputStream getThumbnailStream(String resourceId)
+			throws NotFoundException, SmartcampusException {
+		Metadata metadata = metaService.getMetadata(resourceId);
+		AppKeyPair app = null;
+		AccessTokenPair token = null;
+		try {
+			app = getAppToken(metadata.getAccountId());
+			token = getUserToken(metadata.getAccountId());
+		} catch (NotFoundException e) {
+			throw new SmartcampusException(e);
+		}
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+		try {
+			return sourceClient.getThumbnailStream("/" + metadata.getName(),
+					ThumbSize.BESTFIT_320x240, ThumbFormat.JPEG);
+		} catch (DropboxException e) {
+			logger.error(String.format(
+					"Dropbox exception getting thumbnail resource %s: "
+							+ e.getMessage(), resourceId));
+		}
+		return null;
+	}
 }

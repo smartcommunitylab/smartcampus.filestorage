@@ -26,15 +26,6 @@
 	<resourceMapping uri="filestorage.storage.{appId}"
 		pathPattern="/storage/app/{appId}">
 	</resourceMapping>
-<!-- 	<resourceMapping uri="filestorage.storage.user.{appId}.read" -->
-<!-- 		pathPattern="/storage/user/{appId}/{storageId}" method="GET"> -->
-<!-- 	</resourceMapping> -->
-
-<!-- 	<resourceMapping uri="filestorage.storage.user.{appId}.read" -->
-<!-- 		pathPattern="/storage/user/{appId}" method="GET"> -->
-<!-- 	</resourceMapping> -->
-
-
 
 	<!-- ************** ACCOUNT ************** -->
 
@@ -144,6 +135,10 @@
 
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/metadata/user/{appId}/{accountId}" method="POST">
+	</resourceMapping>
+	
+	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
+		pathPattern="/thumbnail/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
 	
 </service>
