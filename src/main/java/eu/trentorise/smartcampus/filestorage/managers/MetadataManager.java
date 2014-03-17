@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +46,8 @@ public class MetadataManager {
 	@Autowired
 	MetadataService metadataSrv;
 
-	@Autowired
-	SocialManager socialManager;
+	// @Autowired
+	// SocialManager socialManager;
 
 	@Autowired
 	AccountManager accountManager;
@@ -98,7 +96,7 @@ public class MetadataManager {
 			logger.info(String.format("Deleted metadata of resource %s",
 					resourceId));
 			if (eid != null) {
-				socialManager.deleteEntity(Long.parseLong(eid));
+				// socialManager.deleteEntity(Long.parseLong(eid));
 				logger.info(String.format(
 						"Deleted entity associated to resource %s", resourceId));
 			} else {
@@ -108,11 +106,11 @@ public class MetadataManager {
 		} catch (NumberFormatException e) {
 			logger.error("Exception parsing entity id: " + eid);
 			throw new NotFoundException();
-		} catch (WebApiException e) {
-			logger.error("Exception invoking social engine", e);
-			throw new SmartcampusException(
-					"Social engine error deleting entity");
-		}
+		}/*
+		 * catch (WebApiException e) {
+		 * logger.error("Exception invoking social engine", e); throw new
+		 * SmartcampusException( "Social engine error deleting entity"); }
+		 */
 	}
 
 	/**
@@ -188,12 +186,12 @@ public class MetadataManager {
 		Metadata meta = findByResource(resourceId);
 
 		// check if entityId is owned by owner of the resource
-		if (socialManager.isOwnedBy(owner, entityId)) {
-			meta.setSocialId(entityId);
-			metadataSrv.update(meta);
-		} else {
-			throw new SecurityException("Entity is not owned by the user");
-		}
+		// if (socialManager.isOwnedBy(owner, entityId)) {
+		// meta.setSocialId(entityId);
+		// metadataSrv.update(meta);
+		// } else {
+		// throw new SecurityException("Entity is not owned by the user");
+		// }
 		return meta;
 	}
 
@@ -217,16 +215,16 @@ public class MetadataManager {
 			logger.error(String.format("userAccount not found: %s", accountId));
 			throw new SmartcampusException("Account not found");
 		}
-		if (createSocialData) {
-			try {
-				metadata.setSocialId(socialManager.createEntity(resource, user)
-						.toString());
-			} catch (WebApiException e) {
-				logger.error("Exception invoking social engine", e);
-				throw new SmartcampusException(
-						"Social engine error creating entity");
-			}
-		}
+		// if (createSocialData) {
+		// try {
+		// metadata.setSocialId(socialManager.createEntity(resource, user)
+		// .toString());
+		// } catch (WebApiException e) {
+		// logger.error("Exception invoking social engine", e);
+		// throw new SmartcampusException(
+		// "Social engine error creating entity");
+		// }
+		// }
 		return metadata;
 	}
 }

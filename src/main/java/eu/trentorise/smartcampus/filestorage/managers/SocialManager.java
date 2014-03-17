@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.common.SemanticHelper;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
@@ -38,7 +37,7 @@ import eu.trentorise.smartcampus.social.model.User;
  * @author mirko perillo
  * 
  */
-@Service
+// @Service
 public class SocialManager {
 
 	private static final Logger logger = Logger.getLogger(SocialManager.class);

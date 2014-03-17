@@ -51,7 +51,7 @@ import eu.trentorise.smartcampus.filestorage.utils.DropboxUtils;
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")
 public class DropboxStorageTest {
 
-	private static final String TEST_USER_ID = "50";
+	private static final String TEST_USER_ID = "1";
 	@Autowired
 	StorageService storageService;
 

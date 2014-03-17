@@ -1,7 +1,5 @@
 package eu.trentorise.smartcampus.filestorage.utils;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,7 +11,6 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Configuration;
@@ -22,7 +19,7 @@ import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.social.model.User;
 
-@Service
+//@Service
 public class TestUtils {
 
 	/**

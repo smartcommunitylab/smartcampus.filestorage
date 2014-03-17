@@ -44,8 +44,8 @@ public class ScAcl implements ACLService {
 	@Autowired
 	AccountManager userAccountManager;
 
-	@Autowired
-	SocialManager socialManager;
+	//@Autowired
+	//SocialManager socialManager;
 
 	@Autowired
 	StorageUtils storageUtils;
@@ -78,8 +78,8 @@ public class ScAcl implements ACLService {
 		case DOWNLOAD:
 			try {
 				if ((owned && isMyResource(user, resourceId))
-						|| (!owned && socialManager.checkPermission(user,
-								metaService.getEntityByResource(resourceId)))) {
+						|| (!owned && true /*socialManager.checkPermission(user,
+								metaService.getEntityByResource(resourceId))*/)) {
 					logger.info(String.format(
 							"Download permission ok, user: %s, resource: %s",
 							user.getId(), resourceId));
