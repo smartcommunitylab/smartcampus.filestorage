@@ -32,7 +32,7 @@ import eu.trentorise.smartcampus.filestorage.services.StorageService;
 @Component
 public class LocalStorage implements StorageService {
 	private String LOCAL_STORAGE_PATH = "C:\\local_storage";
-	private String LOCAL_URL = "http://localhost:8080/core.filestorage";
+	private String LOCAL_URL = "http:\\localhost:8080\\core.filestorage";
 	private long ONE_HOUR = 3600000;
 	private static final Logger logger = Logger.getLogger(LocalStorage.class);
 
@@ -167,14 +167,17 @@ public class LocalStorage implements StorageService {
 			throw new NotFoundException();
 		}
 		try {
-			localRes.setDate(System.currentTimeMillis() + ONE_HOUR);
+			localRes.setId(new ObjectId().toString());
+			// Valid for 24-hours
+			localRes.setDate(System.currentTimeMillis() + ONE_HOUR * 24);
 			localRes.setUrl(fileToGet.getAbsolutePath());
+			localRes.setResourceId(rid);
 			localManager.save(localRes);
 		} catch (AlreadyStoredException e) {
 			logger.error("Cannot save LocalResource data in database");
 		}
 
-		token.setUrl("/.../" + localRes.getId());
+		token.setUrl(LOCAL_URL + "\\localstorage\\" + localRes.getId());
 		token.setMethodREST("GET");
 		token.setStorageType(StorageType.LOCAL);
 		return token;

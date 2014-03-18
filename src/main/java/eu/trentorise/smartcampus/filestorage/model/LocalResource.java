@@ -1,19 +1,38 @@
 package eu.trentorise.smartcampus.filestorage.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 // Used to get access to a resource in the local storage
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class LocalResource {
 	/**
 	 * Id of the LocalResource
 	 */
 	private String id;
 	/**
-	 * Date of the tocken expiration
+	 * Date of the token expiration
 	 */
 	private Long date;
 	/**
 	 * Url of the resource
 	 */
 	private String url;
+	/**
+	 * Id of the resource
+	 */
+	private String rid;
+
+	public String getResourceId() {
+		return rid;
+	}
+
+	public void setResourceId(String rid) {
+		this.rid = rid;
+	}
 
 	public String getId() {
 		return id;
