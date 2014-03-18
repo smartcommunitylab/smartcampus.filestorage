@@ -30,6 +30,7 @@ import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.services.impl.DropboxStorage;
+import eu.trentorise.smartcampus.filestorage.services.impl.LocalStorage;
 
 /**
  * Utility on storage
@@ -65,6 +66,8 @@ public class StorageUtils {
 			throws SmartcampusException {
 		try {
 			Account account = accountManager.findById(accountId);
+			logger.info("Retrived account with type: "
+					+ account.getStorageType());
 			return getStorageService(account.getStorageType());
 		} catch (NotFoundException e) {
 			logger.error(String.format("Account %s doesn't exist", accountId));
@@ -95,6 +98,9 @@ public class StorageUtils {
 		switch (type) {
 		case DROPBOX:
 			service = beanFactory.getBean(DropboxStorage.class);
+			break;
+		case LOCAL:
+			service = beanFactory.getBean(LocalStorage.class);
 			break;
 		default:
 			throw new SmartcampusException("Storage type not supported");

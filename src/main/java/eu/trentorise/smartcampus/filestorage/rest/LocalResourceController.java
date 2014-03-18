@@ -66,6 +66,7 @@ public class LocalResourceController extends SCController {
 			}
 
 			metadata = metadataManager.findByResource(localRes.getResourceId());
+			resource.setId(localRes.getResourceId());
 			resource.setContent(bFile);
 			resource.setName(metadata.getName());
 			resource.setSize(metadata.getSize());
