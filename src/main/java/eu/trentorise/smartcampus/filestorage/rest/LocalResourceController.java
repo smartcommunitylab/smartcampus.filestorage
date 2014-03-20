@@ -16,7 +16,6 @@ import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
 import eu.trentorise.smartcampus.filestorage.model.LocalResource;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
-import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
@@ -40,22 +39,20 @@ public class LocalResourceController extends SCController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/localstorage/{localResourceId}")
 	public @ResponseBody
-	Resource GetMyResource(
-			@PathVariable("localResourceId") String localResourceId)
+	byte[] GetMyResource(@PathVariable("localResourceId") String localResourceId)
 			throws SmartcampusException, NotFoundException {
 		Metadata metadata = null;
+		byte[] bFile = null;
 		LocalResource localRes = null;
 		localRes = localManager.getLocalResById(localResourceId);
-		Resource resource = null;
 		if (localRes.getDate() < System.currentTimeMillis()) {
 			logger.warn(String.format("LocalResource %s time expired",
 					localRes.getId()));
 			throw new IllegalArgumentException("Token time expired");
 		} else {
-			resource = new Resource();
 			FileInputStream fileInputStream = null;
 			File file = new File(localRes.getUrl());
-			byte[] bFile = new byte[(int) file.length()];
+			bFile = new byte[(int) file.length()];
 			try {
 				// convert file into array of bytes
 				fileInputStream = new FileInputStream(file);
@@ -65,14 +62,8 @@ public class LocalResourceController extends SCController {
 				logger.error("Error converting file to byte[]");
 			}
 
-			metadata = metadataManager.findByResource(localRes.getResourceId());
-			resource.setId(localRes.getResourceId());
-			resource.setContent(bFile);
-			resource.setName(metadata.getName());
-			resource.setSize(metadata.getSize());
-			resource.setContentType(metadata.getContentType());
 		}
+		return bFile;
 
-		return resource;
 	}
 }
