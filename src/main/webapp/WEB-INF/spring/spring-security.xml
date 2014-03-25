@@ -15,13 +15,23 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 
 	<context:property-placeholder location="classpath:filestorage.properties" />
 
-	<http xmlns="http://www.springframework.org/schema/security" pattern="/css/**" security="none"/>
-  <http xmlns="http://www.springframework.org/schema/security" pattern="/img/**" security="none"/>
-  <http xmlns="http://www.springframework.org/schema/security" pattern="/js/**" security="none"/>
-  <http xmlns="http://www.springframework.org/schema/security" pattern="/lib/**" security="none"/>
-	<http xmlns="http://www.springframework.org/schema/security" pattern="/authorize/**" security="none"/>
-  <http xmlns="http://www.springframework.org/schema/security" pattern="/conf/**" security="none"/>
-		
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/css/**" security="none" />
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/img/**" security="none" />
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/js/**" security="none" />
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/lib/**" security="none" />
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/authorize/**" security="none" />
+	<http xmlns="http://www.springframework.org/schema/security"
+		pattern="/conf/**" security="none" />
+
+	<http create-session="never" 
+		xmlns="http://www.springframework.org/schema/security"
+		 security="none" pattern="/localstorage/**">
+	</http>
 	<http create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
 		xmlns="http://www.springframework.org/schema/security"
 		authentication-manager-ref="resourceAuthenticationManager">
@@ -30,14 +40,16 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 		<sec:intercept-url pattern="/account/**" access="IS_AUTHENTICATED_FULLY" />
 		<sec:intercept-url pattern="/getAccount/**" access="IS_AUTHENTICATED_FULLY" />
 		<sec:intercept-url pattern="/resource/**" access="IS_AUTHENTICATED_FULLY" />
-		<sec:intercept-url pattern="/sharedresource/**" access="IS_AUTHENTICATED_FULLY" />
-		<sec:intercept-url pattern="/updatedsocial/**" access="IS_AUTHENTICATED_FULLY" />
+		<sec:intercept-url pattern="/sharedresource/**"
+			access="IS_AUTHENTICATED_FULLY" />
+		<sec:intercept-url pattern="/updatedsocial/**"
+			access="IS_AUTHENTICATED_FULLY" />
 		<sec:intercept-url pattern="/metadata/**" access="IS_AUTHENTICATED_FULLY" />
 		<custom-filter ref="resourceFilter" before="PRE_AUTH_FILTER" />
 		<access-denied-handler ref="oauthAccessDeniedHandler" />
 	</http>
-	
-	
+
+
 
 	<bean id="oauthAuthenticationEntryPoint"
 		class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint" />

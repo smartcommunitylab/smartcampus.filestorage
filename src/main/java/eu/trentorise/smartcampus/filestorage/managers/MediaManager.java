@@ -56,6 +56,37 @@ public class MediaManager {
 	StorageUtils storageUtils;
 
 	/**
+	 * 
+	 * @param accountId
+	 *            id of user storage account where store the resource
+	 * @param user
+	 *            the user who stores the resource
+	 * @param inputStream
+	 *            inputstream of the file
+	 * @param resource
+	 *            resource to store
+	 * @param createSocialData
+	 *            true to create a social entity associated to the resource
+	 * @return the resource stored with the id assigned from storage
+	 * @throws AlreadyStoredException
+	 *             if resource is already stored.
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
+	public Resource storage(String accountId, User user,
+			InputStream inputStream, Resource resource, boolean createSocialData)
+			throws AlreadyStoredException, SmartcampusException {
+
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(accountId);
+		logger.info("Retrieved storageService");
+		resource = storageService.store(accountId, resource, inputStream);
+		metadataManager.create(accountId, user, resource, createSocialData);
+		logger.info("Created resource metadata");
+		return resource;
+	}
+
+	/**
 	 * stores a {@link Resource} in the storage.
 	 * 
 	 * @param accountId

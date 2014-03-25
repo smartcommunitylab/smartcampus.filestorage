@@ -369,4 +369,12 @@ public class DropboxStorage implements StorageService {
 		}
 		return null;
 	}
+
+	@Override
+	public Resource store(String accountId, Resource resource,
+			InputStream inputStream) throws AlreadyStoredException,
+			SmartcampusException {
+		// TODO Use previous method, implement new logic
+		return store(accountId, resource);
+	}
 }

@@ -52,6 +52,22 @@ public interface StorageService {
 			throws AlreadyStoredException, SmartcampusException;
 
 	/**
+	 * 
+	 * @param accountId
+	 *            the id of user storage account in which store the resource
+	 * @param resource
+	 *            the resource to store
+	 * @param the
+	 *            inputstream of file
+	 * @return the resource populated with the id given from storage
+	 * @throws AlreadyStoredException
+	 * @throws SmartcampusException
+	 */
+	public Resource store(String accountId, Resource resource,
+			InputStream inputStream) throws AlreadyStoredException,
+			SmartcampusException;
+
+	/**
 	 * updates of a resource
 	 * 
 	 * @param resource

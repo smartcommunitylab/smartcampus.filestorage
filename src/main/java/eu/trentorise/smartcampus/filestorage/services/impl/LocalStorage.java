@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,8 +47,9 @@ public class LocalStorage implements StorageService {
 	MetadataManager metadataManager;
 
 	@Override
-	public Resource store(String accountId, Resource resource)
-			throws AlreadyStoredException, SmartcampusException {
+	public Resource store(String accountId, Resource resource,
+			InputStream inputStream) throws AlreadyStoredException,
+			SmartcampusException {
 		try {
 			Account account = accountManager.findById(accountId);
 			if (!isFileExist(LOCAL_STORAGE_PATH)) {
@@ -88,17 +90,44 @@ public class LocalStorage implements StorageService {
 				fileToStore = file_temp;
 			}
 			// Creation of the file
-			try {
-				FileOutputStream fileOuputStream;
-				fileOuputStream = new FileOutputStream(fileToStore);
-				fileOuputStream.write(resource.getContent());
-				fileOuputStream.close();
-				logger.info(String.format("Created file %s",
-						fileToStore.getName()));
-			} catch (FileNotFoundException e) {
-				logger.error("File not found.");
-			} catch (IOException e) {
-				logger.error("Unable to convert resource to file.");
+			if (inputStream == null) {
+				try {
+					FileOutputStream fileOutputStream;
+					fileOutputStream = new FileOutputStream(fileToStore);
+					fileOutputStream.write(resource.getContent());
+					fileOutputStream.close();
+					logger.info(String.format("Created file %s",
+							fileToStore.getName()));
+				} catch (FileNotFoundException e) {
+					logger.error("File not found.");
+				} catch (IOException e) {
+					logger.error("Unable to convert resource to file.");
+				}
+			} else {
+				try {
+					OutputStream outputStream = new FileOutputStream(
+							fileToStore);
+					try {
+						int read = 0;
+						byte[] bytes = new byte[2048 * 10];
+
+						while ((read = inputStream.read(bytes)) != -1) {
+							outputStream.write(bytes, 0, read);
+						}
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					outputStream.close();
+					inputStream.close();
+					resource.setSize(fileToStore.length());
+					logger.info(String.format("Created file %s",
+							fileToStore.getName()));
+				} catch (FileNotFoundException e) {
+					logger.error("File not found.");
+				} catch (IOException e) {
+					logger.error("Unable to convert resource to file.");
+				}
 			}
 			// Creation of the id
 			if (resource.getId() == null) {
@@ -217,6 +246,12 @@ public class LocalStorage implements StorageService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Resource store(String accountId, Resource resource)
+			throws AlreadyStoredException, SmartcampusException {
+		return store(accountId, resource, null);
 	}
 
 }

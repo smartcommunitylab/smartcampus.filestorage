@@ -28,8 +28,8 @@ public class FileStorageSample {
 			FilestorageException, Exception {
 		Filestorage fs = new Filestorage(
 				"http://localhost:8080/core.filestorage", "test");
-		final String APPID = "4eb46a12-54fc-4395-8c35-971fc708336e";
-		final String USERID = "8910920d-fe1d-4e09-9b71-873aaff40d61";
+		final String APPID = "93d0aada-a476-4f1a-8f77-1f05e97cec1c";
+		final String USERID = "423dabd7-cd68-4e90-bd6d-bf086b4dc5dc";
 
 		// Take the first storage of the app in db
 		Storage s = fs.getStorage(APPID);
@@ -63,29 +63,8 @@ public class FileStorageSample {
 		File logo2 = new File("C:\\local_storage\\logo2.jpg");
 		File pathToLogo2 = new File("C:\\local_storage\\" + account.getUserId()
 				+ "\\logo2.jpg");
-		File logo3 = new File("C:\\local_storage\\logo3.jpg");
-
-		// STORE AND UPDATE
-		if (!pathToLogo1.exists()) {
-			Metadata metaLogo1 = fs.storeResourceByApp(logo1, APPID,
-					account.getId(), false);
-			logger.info("Created file: " + metaLogo1.getName());
-			fs.updateResourceByApp(APPID, metaLogo1.getResourceId(), logo2);
-			logger.info(String.format("Updated %s with %s",
-					metaLogo1.getName(), logo2.getName()));
-		} else {
-			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
-					100);
-			for (int i = 0; i < metadatas.size(); i++) {
-				if (pathToLogo1.getName().equals(metadatas.get(i).getName())) {
-					fs.updateResourceByApp(APPID, metadatas.get(i)
-							.getResourceId(), logo3);
-					logger.info(String.format("Updated %s with %s", metadatas
-							.get(i).getName(), logo3.getName()));
-				}
-			}
-		}
-
+		File logo6 = new File("C:\\local_storage\\logo6.png");
+		File video = new File("C:\\local_storage\\video.mp4");
 		// STORE, TOKEN AND DELETE
 		if (!pathToLogo2.exists()) {
 			Metadata metaLogo2 = fs.storeResourceByApp(logo2, APPID,
