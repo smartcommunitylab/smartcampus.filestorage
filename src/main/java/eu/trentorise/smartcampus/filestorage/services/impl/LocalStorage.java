@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
@@ -32,9 +33,13 @@ import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
 @Component
 public class LocalStorage implements StorageService {
-	private String LOCAL_STORAGE_PATH = "C:\\local_storage";
+
+	@Autowired
+	@Value("${local.storage.path}")
+	private String localStoragePath;
+
 	private String LOCAL_URL = "http://localhost:8080/core.filestorage";
-	private long ONE_HOUR = 3600000;
+	private final long ONE_HOUR = 3600000;
 	private static final Logger logger = Logger.getLogger(LocalStorage.class);
 
 	@Autowired
@@ -52,24 +57,24 @@ public class LocalStorage implements StorageService {
 			SmartcampusException {
 		try {
 			Account account = accountManager.findById(accountId);
-			if (!isFileExist(LOCAL_STORAGE_PATH)) {
-				File folder = new File(LOCAL_STORAGE_PATH);
+			if (!isFileExist(localStoragePath)) {
+				File folder = new File(localStoragePath);
 				folder.mkdirs();
 			}
-			if (!isFileExist(LOCAL_STORAGE_PATH + "\\" + account.getUserId())) {
-				File accountFolder = new File(LOCAL_STORAGE_PATH + "\\"
+			if (!isFileExist(localStoragePath + "\\" + account.getUserId())) {
+				File accountFolder = new File(localStoragePath + "\\"
 						+ account.getUserId());
 				accountFolder.mkdirs();
 			}
 
-			File fileToStore = new File(LOCAL_STORAGE_PATH + "\\"
+			File fileToStore = new File(localStoragePath + "\\"
 					+ account.getUserId() + "\\" + resource.getName());
 			// Rename the file if it's already exist
 			if (fileToStore.exists()) {
 				Integer cont = 1;
 				File file_temp = fileToStore;
 				while (file_temp.exists()) {
-					file_temp = new File(LOCAL_STORAGE_PATH
+					file_temp = new File(localStoragePath
 							+ "\\"
 							+ account.getUserId()
 							+ "\\"
@@ -148,23 +153,65 @@ public class LocalStorage implements StorageService {
 		}
 		Metadata metadata = metadataManager.findByResource(resource.getId());
 		Account account = accountManager.findById(metadata.getAccountId());
-		File fileToReplace = new File(LOCAL_STORAGE_PATH + "\\"
+		// String extension = FilenameUtils.getExtension(resource.getName());
+		File fileToReplace = new File(localStoragePath + "\\"
 				+ account.getUserId() + "\\" + metadata.getName());
+		System.out.println("File to replace --> " + fileToReplace);
 		if (!fileToReplace.exists()) {
 			throw new NotFoundException();
 		} else {
 			try {
+				fileToReplace.delete();
+				fileToReplace = new File(localStoragePath + "\\"
+						+ account.getUserId() + "\\" + resource.getName());
+				if (fileToReplace.exists()) {
+					Integer cont = 1;
+					File file_temp = fileToReplace;
+					while (file_temp.exists()) {
+						file_temp = new File(localStoragePath
+								+ "\\"
+								+ account.getUserId()
+								+ "\\"
+								+ FilenameUtils.removeExtension(fileToReplace
+										.getName())
+								+ "("
+								+ cont
+								+ ")."
+								+ FilenameUtils.getExtension(fileToReplace
+										.getName()));
+						cont++;
+
+					}
+					// Decrease variable 'cont' to rename the resource
+					cont -= 1;
+					resource.setName(FilenameUtils
+							.removeExtension(fileToReplace.getName())
+							+ "("
+							+ cont
+							+ ")."
+							+ FilenameUtils.getExtension(fileToReplace
+									.getName()));
+					fileToReplace = file_temp;
+				}
 				FileOutputStream fileOuputStream;
 				fileOuputStream = new FileOutputStream(fileToReplace);
 				fileOuputStream.write(resource.getContent());
 				fileOuputStream.close();
+
 			} catch (FileNotFoundException e) {
 				logger.error("File not found.");
 			} catch (IOException e) {
 				logger.error("Unable to convert resource to file.");
 			}
 		}
+		Resource replaceResource = new Resource();
+		replaceResource.setId(metadata.getResourceId());
+		replaceResource.setContentType(metadata.getContentType());
+		replaceResource.setName(resource.getName());
+		replaceResource.setSize(resource.getSize());
+		metadataManager.update(replaceResource);
 		logger.info(String.format("Replaced file %s", metadata.getName()));
+
 	}
 
 	@Override
@@ -172,7 +219,7 @@ public class LocalStorage implements StorageService {
 			SmartcampusException {
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
-		File fileToDelete = new File(LOCAL_STORAGE_PATH + "\\"
+		File fileToDelete = new File(localStoragePath + "\\"
 				+ account.getUserId() + "\\" + metadata.getName());
 		if (!fileToDelete.exists()) {
 			throw new NotFoundException();
@@ -188,10 +235,11 @@ public class LocalStorage implements StorageService {
 			throws NotFoundException, SmartcampusException {
 		LocalResource localRes = new LocalResource();
 		Token token = new Token();
+
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
-		File fileToGet = new File(LOCAL_STORAGE_PATH + "\\"
-				+ account.getUserId() + "\\" + metadata.getName());
+		File fileToGet = new File(localStoragePath + "\\" + account.getUserId()
+				+ "\\" + metadata.getName());
 		if (!fileToGet.exists()) {
 			throw new NotFoundException();
 		}

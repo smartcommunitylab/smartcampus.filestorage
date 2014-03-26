@@ -87,7 +87,30 @@ public class LocalResourceController extends SCController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/localstorage/resource/create/user/test/{accountId}")
 	public @ResponseBody
-	Metadata StoreMyResource(@PathVariable("accountId") String accountId,
+	Metadata StoreMyResourceByUser(@PathVariable("accountId") String accountId,
+			HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		Resource resource = new Resource();
+		resource.setName(filename);
+		String resourceId;
+		try {
+			resourceId = mediaManager.storage(accountId, null, is, resource,
+					createSocialData).getId();
+			return metadataManager.findByResource(resourceId);
+		} catch (AlreadyStoredException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/localstorage/resource/create/app/test/{accountId}")
+	public @ResponseBody
+	Metadata StoreMyResourceByApp(@PathVariable("accountId") String accountId,
 			HttpServletRequest request,
 			@RequestParam(defaultValue = "true") boolean createSocialData)
 			throws SmartcampusException, NotFoundException, IOException {

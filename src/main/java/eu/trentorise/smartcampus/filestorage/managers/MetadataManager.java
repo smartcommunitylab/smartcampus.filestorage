@@ -123,7 +123,11 @@ public class MetadataManager {
 	 */
 	public void update(Resource resource) throws NotFoundException {
 		Metadata metadata = metadataSrv.getMetadata(resource.getId());
-		metadata.setSize(resource.getContent().length);
+		metadata.setName(resource.getName());
+		metadata.setContentType(resource.getContentType());
+		if (resource.getContent() != null) {
+			metadata.setSize(resource.getContent().length);
+		}
 		metadata.setLastModifiedTs(System.currentTimeMillis());
 		metadataSrv.update(metadata);
 	}

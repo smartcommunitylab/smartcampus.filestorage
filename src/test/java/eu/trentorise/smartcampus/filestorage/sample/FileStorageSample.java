@@ -28,8 +28,8 @@ public class FileStorageSample {
 			FilestorageException, Exception {
 		Filestorage fs = new Filestorage(
 				"http://localhost:8080/core.filestorage", "test");
-		final String APPID = "93d0aada-a476-4f1a-8f77-1f05e97cec1c";
-		final String USERID = "423dabd7-cd68-4e90-bd6d-bf086b4dc5dc";
+		final String APPID = "5ad10e91-5f6a-472c-a79a-f14825cf4276";
+		final String USERID = "db512769-bb98-465b-922e-741519565630";
 
 		// Take the first storage of the app in db
 		Storage s = fs.getStorage(APPID);
@@ -63,8 +63,31 @@ public class FileStorageSample {
 		File logo2 = new File("C:\\local_storage\\logo2.jpg");
 		File pathToLogo2 = new File("C:\\local_storage\\" + account.getUserId()
 				+ "\\logo2.jpg");
-		File logo6 = new File("C:\\local_storage\\logo6.png");
+		File logo3 = new File("C:\\local_storage\\logo3.jpg");
+		File pathToLogo3 = new File("C:\\local_storage\\" + account.getUserId()
+				+ "\\logo3.jpg");
+		File logo4 = new File("C:\\local_storage\\logo4.jpg");
 		File video = new File("C:\\local_storage\\video.mp4");
+		// STORE AND UPDATE
+		if (!pathToLogo3.exists()) {
+			Metadata metaLogo1 = fs.storeResourceByUser(video, USERID,
+					account.getId(), false);
+			logger.info("Created file: " + metaLogo1.getName());
+			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(), logo3);
+			logger.info(String.format("Updated %s with %s",
+					metaLogo1.getName(), logo3.getName()));
+		} else {
+			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
+					100);
+			for (int i = 0; i < metadatas.size(); i++) {
+				if (pathToLogo3.getName().equals(metadatas.get(i).getName())) {
+					fs.updateResourceByApp(APPID, metadatas.get(i)
+							.getResourceId(), logo4);
+					logger.info(String.format("Updated %s with %s", metadatas
+							.get(i).getName(), logo4.getName()));
+				}
+			}
+		}
 		// STORE, TOKEN AND DELETE
 		if (!pathToLogo2.exists()) {
 			Metadata metaLogo2 = fs.storeResourceByApp(logo2, APPID,
@@ -73,7 +96,7 @@ public class FileStorageSample {
 			Token token = fs.getResourceTokenByApp(APPID,
 					metaLogo2.getResourceId());
 			logger.info("Created token: " + token.getUrl());
-			fs.deleteResourceByApp(APPID, metaLogo2.getResourceId());
+			fs.deleteResourceByUser(USERID, metaLogo2.getResourceId());
 			logger.info("Deleted file: " + metaLogo2.getName());
 		} else {
 			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
