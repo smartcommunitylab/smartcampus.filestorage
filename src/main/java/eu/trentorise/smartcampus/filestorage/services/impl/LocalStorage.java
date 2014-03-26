@@ -146,8 +146,8 @@ public class LocalStorage implements StorageService {
 	}
 
 	@Override
-	public void replace(Resource resource) throws NotFoundException,
-			SmartcampusException {
+	public void replace(Resource resource, InputStream inputStream)
+			throws NotFoundException, SmartcampusException {
 		if (resource.getId() == null) {
 			throw new NotFoundException();
 		}
@@ -156,7 +156,6 @@ public class LocalStorage implements StorageService {
 		// String extension = FilenameUtils.getExtension(resource.getName());
 		File fileToReplace = new File(localStoragePath + "\\"
 				+ account.getUserId() + "\\" + metadata.getName());
-		System.out.println("File to replace --> " + fileToReplace);
 		if (!fileToReplace.exists()) {
 			throw new NotFoundException();
 		} else {
@@ -193,10 +192,37 @@ public class LocalStorage implements StorageService {
 									.getName()));
 					fileToReplace = file_temp;
 				}
-				FileOutputStream fileOuputStream;
-				fileOuputStream = new FileOutputStream(fileToReplace);
-				fileOuputStream.write(resource.getContent());
-				fileOuputStream.close();
+				if (inputStream == null) {
+					FileOutputStream fileOuputStream;
+					fileOuputStream = new FileOutputStream(fileToReplace);
+					fileOuputStream.write(resource.getContent());
+					fileOuputStream.close();
+				} else {
+					try {
+						OutputStream outputStream = new FileOutputStream(
+								fileToReplace);
+						try {
+							int read = 0;
+							byte[] bytes = new byte[2048 * 10];
+
+							while ((read = inputStream.read(bytes)) != -1) {
+								outputStream.write(bytes, 0, read);
+							}
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						outputStream.close();
+						inputStream.close();
+						resource.setSize(fileToReplace.length());
+						logger.info(String.format("Created file %s",
+								fileToReplace.getName()));
+					} catch (FileNotFoundException e) {
+						logger.error("File not found.");
+					} catch (IOException e) {
+						logger.error("Unable to convert resource to file.");
+					}
+				}
 
 			} catch (FileNotFoundException e) {
 				logger.error("File not found.");
@@ -300,6 +326,13 @@ public class LocalStorage implements StorageService {
 	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
 		return store(accountId, resource, null);
+	}
+
+	@Override
+	public void replace(Resource resource) throws NotFoundException,
+			SmartcampusException {
+		// TODO Auto-generated method stub
+		replace(resource, null);
 	}
 
 }

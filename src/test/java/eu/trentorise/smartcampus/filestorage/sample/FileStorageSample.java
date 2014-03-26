@@ -68,19 +68,21 @@ public class FileStorageSample {
 				+ "\\logo3.jpg");
 		File logo4 = new File("C:\\local_storage\\logo4.jpg");
 		File video = new File("C:\\local_storage\\video.mp4");
+		File largeFile = new File("C:\\local_storage\\bigfile.arc");
 		// STORE AND UPDATE
-		if (!pathToLogo3.exists()) {
-			Metadata metaLogo1 = fs.storeResourceByUser(video, USERID,
+		if (!pathToLogo1.exists()) {
+			Metadata metaLogo1 = fs.storeResourceByUser(logo1, USERID,
 					account.getId(), false);
 			logger.info("Created file: " + metaLogo1.getName());
-			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(), logo3);
+			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(),
+					largeFile);
 			logger.info(String.format("Updated %s with %s",
 					metaLogo1.getName(), logo3.getName()));
 		} else {
 			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
 					100);
 			for (int i = 0; i < metadatas.size(); i++) {
-				if (pathToLogo3.getName().equals(metadatas.get(i).getName())) {
+				if (pathToLogo1.getName().equals(metadatas.get(i).getName())) {
 					fs.updateResourceByApp(APPID, metadatas.get(i)
 							.getResourceId(), logo4);
 					logger.info(String.format("Updated %s with %s", metadatas

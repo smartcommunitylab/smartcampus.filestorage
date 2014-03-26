@@ -32,9 +32,9 @@ import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
 
 @Controller
-public class LocalResourceController extends SCController {
+public class LocalMediaController extends SCController {
 	private static final Logger logger = Logger
-			.getLogger(LocalResourceController.class);
+			.getLogger(LocalMediaController.class);
 
 	@Autowired
 	LocalResourceManager localManager;
@@ -130,4 +130,35 @@ public class LocalResourceController extends SCController {
 		return null;
 
 	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "localstorage/resource/user/test/{resourceId}")
+	public @ResponseBody
+	void ReplaceMyResourceByUser(@PathVariable("resourceId") String resourceId,
+			HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setId(resourceId);
+		mediaManager.replace(resource, is);
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "localstorage/resource/app/test/{resourceId}")
+	public @ResponseBody
+	void ReplaceMyResourceByApp(@PathVariable("resourceId") String resourceId,
+			HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setId(resourceId);
+		mediaManager.replace(resource, is);
+
+	}
+
 }

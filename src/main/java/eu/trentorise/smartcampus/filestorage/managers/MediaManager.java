@@ -163,6 +163,32 @@ public class MediaManager {
 	}
 
 	/**
+	 * updates the content of the {@link Resource} in the storage, then updates
+	 * only lastModifiedTs field of
+	 * {@link eu.trentorise.smartcampus.filestorage.model.Metadata}.
+	 * 
+	 * @param resource
+	 *            the new resource
+	 * @throws NotFoundException
+	 *             if resource doesn't exist
+	 * @throws SmartcampusException
+	 *             general exception
+	 */
+	public void replace(Resource resource, InputStream inputStream)
+			throws NotFoundException, SmartcampusException {
+		if (resource.getId() == null) {
+			throw new IllegalArgumentException("Resource SHOULD have a id");
+		}
+
+		Metadata meta = metadataManager.findByResource(resource.getId());
+
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(meta.getAccountId());
+		storageService.replace(resource, inputStream);
+		metadataManager.update(resource);
+	}
+
+	/**
 	 * retrieves a {@link Token} to access the resource content
 	 * 
 	 * @param user

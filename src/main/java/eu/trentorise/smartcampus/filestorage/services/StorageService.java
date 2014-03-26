@@ -151,4 +151,7 @@ public interface StorageService {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception;
 
+	void replace(Resource resource, InputStream inputStream)
+			throws NotFoundException, SmartcampusException;
+
 }

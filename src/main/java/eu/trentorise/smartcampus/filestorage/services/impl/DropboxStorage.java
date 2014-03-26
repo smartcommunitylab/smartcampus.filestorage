@@ -377,4 +377,11 @@ public class DropboxStorage implements StorageService {
 		// TODO Use previous method, implement new logic
 		return store(accountId, resource);
 	}
+
+	@Override
+	public void replace(Resource resource, InputStream inputStream)
+			throws NotFoundException, SmartcampusException {
+		replace(resource);
+
+	}
 }
