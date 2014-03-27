@@ -125,9 +125,7 @@ public class MetadataManager {
 		Metadata metadata = metadataSrv.getMetadata(resource.getId());
 		metadata.setName(resource.getName());
 		metadata.setContentType(resource.getContentType());
-		if (resource.getContent() != null) {
-			metadata.setSize(resource.getContent().length);
-		}
+		metadata.setSize(resource.getSize());
 		metadata.setLastModifiedTs(System.currentTimeMillis());
 		metadataSrv.update(metadata);
 	}

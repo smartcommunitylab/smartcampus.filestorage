@@ -40,15 +40,15 @@
 	<resourceMapping uri="filestorage.account.user.{appId}"
 		pathPattern="/account/user/{appId}">
 	</resourceMapping>
-	
+
 	<resourceMapping uri="filestorage.account.user.{appId}"
 		pathPattern="/requestAuth/{appId}" method="GET">
 	</resourceMapping>
 
 
 	<!-- ************** RESOURCE ************** -->
-	
-	
+
+
 	<!-- METADATA -->
 
 	<resourceMapping uri="filestorage.metadata.app.{appId}.read"
@@ -58,17 +58,17 @@
 	<resourceMapping uri="filestorage.metadata.user.{appId}.read"
 		pathPattern="/metadata/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
-	
+
 	<resourceMapping uri="filestorage.metadata.user.{appId}.read"
 		pathPattern="/metadata/all/user/{appId}" method="GET">
 	</resourceMapping>
-	
+
 	<resourceMapping uri="filestorage.metadata.app.{appId}.read"
 		pathPattern="/metadata/all/app/{appId}" method="GET">
 	</resourceMapping>
 
-	<!--  MY RESOURCES -->
-	
+	<!-- MY RESOURCES -->
+
 	<resourceMapping uri="filestorage.resource.app.{appId}.read"
 		pathPattern="/resource/app/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
@@ -76,11 +76,12 @@
 	<resourceMapping uri="filestorage.resource.user.{appId}.read"
 		pathPattern="/resource/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
-	
+
 	<!-- SHARED RESOURCES -->
-	
+
 	<resourceMapping uri="filestorage.sharedresource.app.{appId}.read"
-		pathPattern="/sharedresource/app/{appId}/{userId}/{resourceId}" method="GET">
+		pathPattern="/sharedresource/app/{appId}/{userId}/{resourceId}"
+		method="GET">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.sharedresource.user.{appId}.read"
@@ -88,7 +89,7 @@
 	</resourceMapping>
 
 	<!-- MANAGE RESOURCES -->
-	
+
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
 		pathPattern="/resource/app/{appId}/{resourceId}" method="DELETE">
 	</resourceMapping>
@@ -96,26 +97,42 @@
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/resource/user/{appId}/{resourceId}" method="DELETE">
 	</resourceMapping>
-	
-	<!--  real POST -->
+
+	<!-- real POST -->
+	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
+		pathPattern="/resource/create/stream/app/{appId}/{accountId}" method="POST">
+	</resourceMapping>
+
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
 		pathPattern="/resource/create/app/{appId}/{accountId}" method="POST">
 	</resourceMapping>
 
+
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/resource/create/user/{appId}/{accountId}" method="POST">
 	</resourceMapping>
-	
+
+	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
+		pathPattern="/resource/create/stream/user/{appId}/{accountId}" method="POST">
+	</resourceMapping>
+
 	<!-- PUT via POST for problem to upload a multipart file -->
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
 		pathPattern="/resource/app/{appId}/{resourceId}" method="POST">
 	</resourceMapping>
 
+	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
+		pathPattern="/resource/stream/app/{appId}/{resourceId}" method="POST">
+	</resourceMapping>
+
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/resource/user/{appId}/{resourceId}" method="POST">
 	</resourceMapping>
-	
-	
+
+	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
+		pathPattern="/resource/stream/user/{appId}/{resourceId}" method="POST">
+	</resourceMapping>
+
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
 		pathPattern="/resource/app/{appId}/{accountId}" method="POST">
 	</resourceMapping>
@@ -123,23 +140,25 @@
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/resource/user/{appId}/{accountId}" method="POST">
 	</resourceMapping>
-	
+
 
 	<resourceMapping uri="filestorage.resource.app.{appId}.manage"
-		pathPattern="/updatesocial/app/{appId}/{resourceId}/{entityId}" method="PUT">
+		pathPattern="/updatesocial/app/{appId}/{resourceId}/{entityId}"
+		method="PUT">
 	</resourceMapping>
-	
+
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
-		pathPattern="/updatesocial/user/{appId}/{resourceId}/{entityId}" method="PUT">
+		pathPattern="/updatesocial/user/{appId}/{resourceId}/{entityId}"
+		method="PUT">
 	</resourceMapping>
 
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/metadata/user/{appId}/{accountId}" method="POST">
 	</resourceMapping>
-	
+
 	<resourceMapping uri="filestorage.resource.user.{appId}.manage"
 		pathPattern="/thumbnail/user/{appId}/{resourceId}" method="GET">
 	</resourceMapping>
-	
+
 </service>
 

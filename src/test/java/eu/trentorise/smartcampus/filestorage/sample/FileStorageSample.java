@@ -1,6 +1,8 @@
 package eu.trentorise.smartcampus.filestorage.sample;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -28,8 +30,8 @@ public class FileStorageSample {
 			FilestorageException, Exception {
 		Filestorage fs = new Filestorage(
 				"http://localhost:8080/core.filestorage", "test");
-		final String APPID = "5ad10e91-5f6a-472c-a79a-f14825cf4276";
-		final String USERID = "db512769-bb98-465b-922e-741519565630";
+		final String APPID = "e2084d7b-e982-4649-8a92-cadb8046ddac";
+		final String USERID = "5b6353e9-d148-4fc5-8082-7206b14b3fff";
 
 		// Take the first storage of the app in db
 		Storage s = fs.getStorage(APPID);
@@ -69,22 +71,28 @@ public class FileStorageSample {
 		File logo4 = new File("C:\\local_storage\\logo4.jpg");
 		File video = new File("C:\\local_storage\\video.mp4");
 		File largeFile = new File("C:\\local_storage\\bigfile.arc");
+
 		// STORE AND UPDATE
+
 		if (!pathToLogo1.exists()) {
-			Metadata metaLogo1 = fs.storeResourceByUser(logo1, USERID,
+			InputStream is = new FileInputStream(logo1);
+			InputStream is2 = new FileInputStream(logo3);
+
+			Metadata metaLogo1 = fs.storeResourceByUser(logo1, is, USERID,
 					account.getId(), false);
 			logger.info("Created file: " + metaLogo1.getName());
-			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(),
-					largeFile);
+			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(), logo3,
+					is2);
 			logger.info(String.format("Updated %s with %s",
 					metaLogo1.getName(), logo3.getName()));
 		} else {
 			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
 					100);
+			InputStream is = new FileInputStream(logo4);
 			for (int i = 0; i < metadatas.size(); i++) {
 				if (pathToLogo1.getName().equals(metadatas.get(i).getName())) {
 					fs.updateResourceByApp(APPID, metadatas.get(i)
-							.getResourceId(), logo4);
+							.getResourceId(), logo4, is);
 					logger.info(String.format("Updated %s with %s", metadatas
 							.get(i).getName(), logo4.getName()));
 				}
@@ -92,7 +100,8 @@ public class FileStorageSample {
 		}
 		// STORE, TOKEN AND DELETE
 		if (!pathToLogo2.exists()) {
-			Metadata metaLogo2 = fs.storeResourceByApp(logo2, APPID,
+			InputStream is = new FileInputStream(logo2);
+			Metadata metaLogo2 = fs.storeResourceByApp(logo2, is, APPID,
 					account.getId(), false);
 			logger.info("Created file: " + metaLogo2.getName());
 			Token token = fs.getResourceTokenByApp(APPID,

@@ -19,6 +19,7 @@ package eu.trentorise.smartcampus.filestorage.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -354,6 +355,109 @@ public class MediaController extends SCController {
 		}
 
 		return metadataManager.updateSocialData(user, resourceId, entityId);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/stream/user/{appId}/{accountId}")
+	public @ResponseBody
+	Metadata storeMyResourceByUser(@PathVariable("accountId") String accountId,
+			@PathVariable("appId") String appId, HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		User user = getUserObject(getUserId());
+
+		if (!permissionManager.checkAccountPermission(user, appId, accountId)) {
+			throw new SecurityException();
+		}
+
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setContentType(mimeType);
+		String resourceId;
+		try {
+			resourceId = mediaManager.storage(accountId, null, is, resource,
+					createSocialData).getId();
+			return metadataManager.findByResource(resourceId);
+		} catch (AlreadyStoredException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/stream/app/{appId}/{accountId}")
+	public @ResponseBody
+	Metadata storeMyResourceByApp(@PathVariable("accountId") String accountId,
+			@PathVariable("appId") String appId, HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		Account account = accountManager.findById(accountId);
+		User user = getUserObject(account.getUserId());
+		if (!permissionManager.checkAccountPermission(user, account)) {
+			throw new SecurityException();
+		}
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setContentType(mimeType);
+		String resourceId;
+		try {
+			resourceId = mediaManager.storage(accountId, null, is, resource,
+					createSocialData).getId();
+			return metadataManager.findByResource(resourceId);
+		} catch (AlreadyStoredException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/stream/user/{appId}/{resourceId}")
+	public @ResponseBody
+	void replaceMyResourceByUser(@PathVariable("resourceId") String resourceId,
+			@PathVariable("appId") String appId, HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		User user = getUserObject(getUserId());
+
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+			throw new SecurityException();
+		}
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setContentType(mimeType);
+		resource.setId(resourceId);
+		mediaManager.replace(resource, is);
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/resource/stream/app/{appId}/{resourceId}")
+	public @ResponseBody
+	void replaceMyResourceByApp(@PathVariable("resourceId") String resourceId,
+			@PathVariable("appId") String appId, HttpServletRequest request,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, NotFoundException, IOException {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
+			throw new SecurityException();
+		}
+		InputStream is = request.getInputStream();
+		String filename = request.getHeader("filename");
+		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		Resource resource = new Resource();
+		resource.setName(filename);
+		resource.setContentType(mimeType);
+		resource.setId(resourceId);
+		mediaManager.replace(resource, is);
+
 	}
 
 	private Resource getResource(String resourceId, MultipartFile file)
