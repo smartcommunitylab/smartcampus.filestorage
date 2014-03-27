@@ -31,6 +31,12 @@ import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
+/**
+ * Local storage implementation
+ * 
+ * 
+ * 
+ */
 @Component
 public class LocalStorage implements StorageService {
 

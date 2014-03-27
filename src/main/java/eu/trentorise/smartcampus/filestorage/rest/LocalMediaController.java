@@ -53,8 +53,6 @@ public class LocalMediaController extends SCController {
 	void getMyResource(@PathVariable("localResourceId") String localResourceId,
 			HttpServletResponse response) throws SmartcampusException,
 			NotFoundException, IOException {
-		byte[] bFile = null;
-		FileInputStream fileInputStream = null;
 		LocalResource localRes = null;
 		localRes = localManager.getLocalResById(localResourceId);
 		if (localRes.getDate() < System.currentTimeMillis()) {
@@ -67,7 +65,6 @@ public class LocalMediaController extends SCController {
 			OutputStream outStream = response.getOutputStream();
 			byte[] buffer = new byte[2048 * 10000];
 			int bytesRead = -1;
-
 			// write bytes read from the input stream into the output stream
 			while ((bytesRead = fis.read(buffer)) != -1) {
 				outStream.write(buffer, 0, bytesRead);

@@ -169,6 +169,8 @@ public class MediaManager {
 	 * 
 	 * @param resource
 	 *            the new resource
+	 * @param inputStream
+	 *            the inputStream of the file
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 * @throws SmartcampusException

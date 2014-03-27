@@ -5,7 +5,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 // Used to get access to a resource in the local storage
-
+/**
+ * 
+ * <i>LocalResource</i> represents soem informations about a resource stored in
+ * local storage
+ * 
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LocalResource {

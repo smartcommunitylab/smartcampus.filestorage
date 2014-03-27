@@ -10,6 +10,12 @@ import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.LocalResource;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 
+/**
+ * <i>LocalResourceManager</i> mmanages all aspects about {@link LocalResource}.
+ * 
+ * 
+ * 
+ */
 @Service
 public class LocalResourceManager {
 
@@ -19,6 +25,14 @@ public class LocalResourceManager {
 	@Autowired
 	MongoTemplate db;
 
+	/**
+	 * store a localResource in the database
+	 * 
+	 * @param localRes
+	 *            the {@link LocalResource} to store
+	 * @return the stored {@link LocalResource}
+	 * @throws AlreadyStoredException
+	 */
 	public LocalResource save(LocalResource localRes)
 			throws AlreadyStoredException {
 		if (localRes.getId() != null
@@ -36,6 +50,14 @@ public class LocalResourceManager {
 		return localRes;
 	}
 
+	/**
+	 * search of the {@link LocalResource} in the database
+	 * 
+	 * @param localResourceId
+	 *            the id of the {@link LocalResource}
+	 * @return the {@link LocalResource}, if exists
+	 * @throws NotFoundException
+	 */
 	public LocalResource getLocalResById(String localResourceId)
 			throws NotFoundException {
 		LocalResource localRes;
