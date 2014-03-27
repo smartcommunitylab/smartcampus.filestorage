@@ -2,6 +2,7 @@ package eu.trentorise.smartcampus.filestorage.rest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -52,28 +53,36 @@ public class LocalMediaController extends SCController {
 	public @ResponseBody
 	void getMyResource(@PathVariable("localResourceId") String localResourceId,
 			HttpServletResponse response) throws SmartcampusException,
-			NotFoundException, IOException {
+			IOException {
 		LocalResource localRes = null;
-		localRes = localManager.getLocalResById(localResourceId);
-		if (localRes.getDate() < System.currentTimeMillis()) {
-			logger.warn(String.format("LocalResource %s time expired",
-					localRes.getId()));
-			throw new IllegalArgumentException("Token time expired");
-		} else {
-			FileInputStream fis = new FileInputStream(new File(
-					localRes.getUrl()));
-			OutputStream outStream = response.getOutputStream();
-			byte[] buffer = new byte[2048 * 10000];
-			int bytesRead = -1;
-			// write bytes read from the input stream into the output stream
-			while ((bytesRead = fis.read(buffer)) != -1) {
-				outStream.write(buffer, 0, bytesRead);
-			}
-			fis.close();
-			outStream.close();
+		try {
+			localRes = localManager.getLocalResById(localResourceId);
+			logger.warn(localRes.getDate() + " " + System.currentTimeMillis());
+			if (localRes.getDate() < System.currentTimeMillis()) {
+				logger.warn(String.format("LocalResource %s time expired",
+						localRes.getId()));
+				throw new IllegalArgumentException("Token time expired");
+			} else {
+				FileInputStream fis = new FileInputStream(new File(
+						localRes.getUrl()));
+				OutputStream outStream = response.getOutputStream();
+				byte[] buffer = new byte[2048 * 10000];
+				int bytesRead = -1;
+				// write bytes read from the input stream into the output stream
+				while ((bytesRead = fis.read(buffer)) != -1) {
+					outStream.write(buffer, 0, bytesRead);
+				}
+				fis.close();
+				outStream.close();
 
+			}
+		} catch (NotFoundException e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND,
+					"Wrong LocalResource id");
+		} catch (FileNotFoundException e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND,
+					"Wrong filepath");
 		}
 
 	}
-
 }
