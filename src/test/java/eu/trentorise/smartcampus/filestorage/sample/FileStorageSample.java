@@ -30,8 +30,8 @@ public class FileStorageSample {
 			FilestorageException, Exception {
 		Filestorage fs = new Filestorage(
 				"http://localhost:8080/core.filestorage", "test");
-		final String APPID = "e2084d7b-e982-4649-8a92-cadb8046ddac";
-		final String USERID = "5b6353e9-d148-4fc5-8082-7206b14b3fff";
+		final String APPID = "51755adb-fe62-43ed-bde9-673f3a1a8eb1";
+		final String USERID = "2bfaf3f3-a79a-4de5-aac3-1be6b7d809d6";
 
 		// Take the first storage of the app in db
 		Storage s = fs.getStorage(APPID);
@@ -60,21 +60,21 @@ public class FileStorageSample {
 				+ account.getName() + " TYPE: " + account.getStorageType());
 
 		File logo1 = new File("C:\\local_storage\\logo1.jpg");
-		File pathToLogo1 = new File("C:\\local_storage\\" + account.getUserId()
-				+ "\\logo1.jpg");
+		File pathToLogo1 = new File("C:\\local_storage\\" + account.getAppId()
+				+ "\\" + account.getUserId() + "\\logo1.jpg");
 		File logo2 = new File("C:\\local_storage\\logo2.jpg");
-		File pathToLogo2 = new File("C:\\local_storage\\" + account.getUserId()
-				+ "\\logo2.jpg");
+		File pathToLogo2 = new File("C:\\local_storage\\" + account.getAppId()
+				+ "\\" + account.getUserId() + "\\logo2.jpg");
 		File logo3 = new File("C:\\local_storage\\logo3.jpg");
-		File pathToLogo3 = new File("C:\\local_storage\\" + account.getUserId()
-				+ "\\logo3.jpg");
+		File pathToLogo3 = new File("C:\\local_storage\\" + account.getAppId()
+				+ "\\" + account.getUserId() + "\\logo3.jpg");
 		File logo4 = new File("C:\\local_storage\\logo4.jpg");
 		File video = new File("C:\\local_storage\\video.mp4");
 		File largeFile = new File("C:\\local_storage\\bigfile.arc");
 
 		// STORE AND UPDATE
 
-		if (!pathToLogo1.exists()) {
+		if (!pathToLogo3.exists()) {
 			InputStream is = new FileInputStream(logo1);
 			InputStream is2 = new FileInputStream(logo3);
 
@@ -90,7 +90,7 @@ public class FileStorageSample {
 					100);
 			InputStream is = new FileInputStream(logo4);
 			for (int i = 0; i < metadatas.size(); i++) {
-				if (pathToLogo1.getName().equals(metadatas.get(i).getName())) {
+				if (pathToLogo3.getName().equals(metadatas.get(i).getName())) {
 					fs.updateResourceByApp(APPID, metadatas.get(i)
 							.getResourceId(), logo4, is);
 					logger.info(String.format("Updated %s with %s", metadatas

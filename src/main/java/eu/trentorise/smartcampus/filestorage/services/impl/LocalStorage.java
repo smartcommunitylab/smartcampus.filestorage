@@ -67,20 +67,24 @@ public class LocalStorage implements StorageService {
 				File folder = new File(localStoragePath);
 				folder.mkdirs();
 			}
-			if (!isFileExist(localStoragePath + "\\" + account.getUserId())) {
+			if (!isFileExist(localStoragePath + "\\" + account.getAppId()
+					+ "\\" + account.getUserId())) {
 				File accountFolder = new File(localStoragePath + "\\"
-						+ account.getUserId());
+						+ account.getAppId() + "\\" + account.getUserId());
 				accountFolder.mkdirs();
 			}
 
 			File fileToStore = new File(localStoragePath + "\\"
-					+ account.getUserId() + "\\" + resource.getName());
+					+ account.getAppId() + "\\" + account.getUserId() + "\\"
+					+ resource.getName());
 			// Rename the file if it's already exist
 			if (fileToStore.exists()) {
 				Integer cont = 1;
 				File file_temp = fileToStore;
 				while (file_temp.exists()) {
 					file_temp = new File(localStoragePath
+							+ "\\"
+							+ account.getAppId()
 							+ "\\"
 							+ account.getUserId()
 							+ "\\"
@@ -161,19 +165,23 @@ public class LocalStorage implements StorageService {
 		Account account = accountManager.findById(metadata.getAccountId());
 		// String extension = FilenameUtils.getExtension(resource.getName());
 		File fileToReplace = new File(localStoragePath + "\\"
-				+ account.getUserId() + "\\" + metadata.getName());
+				+ account.getAppId() + "\\" + account.getUserId() + "\\"
+				+ metadata.getName());
 		if (!fileToReplace.exists()) {
 			throw new NotFoundException();
 		} else {
 			try {
 				fileToReplace.delete();
 				fileToReplace = new File(localStoragePath + "\\"
-						+ account.getUserId() + "\\" + resource.getName());
+						+ account.getAppId() + "\\" + account.getUserId()
+						+ "\\" + resource.getName());
 				if (fileToReplace.exists()) {
 					Integer cont = 1;
 					File file_temp = fileToReplace;
 					while (file_temp.exists()) {
 						file_temp = new File(localStoragePath
+								+ "\\"
+								+ account.getAppId()
 								+ "\\"
 								+ account.getUserId()
 								+ "\\"
@@ -252,7 +260,8 @@ public class LocalStorage implements StorageService {
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
 		File fileToDelete = new File(localStoragePath + "\\"
-				+ account.getUserId() + "\\" + metadata.getName());
+				+ account.getAppId() + "\\" + account.getUserId() + "\\"
+				+ metadata.getName());
 		if (!fileToDelete.exists()) {
 			throw new NotFoundException();
 		} else {
@@ -270,8 +279,8 @@ public class LocalStorage implements StorageService {
 
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
-		File fileToGet = new File(localStoragePath + "\\" + account.getUserId()
-				+ "\\" + metadata.getName());
+		File fileToGet = new File(localStoragePath + "\\" + account.getAppId()
+				+ "\\" + account.getUserId() + "\\" + metadata.getName());
 		if (!fileToGet.exists()) {
 			throw new NotFoundException();
 		}
