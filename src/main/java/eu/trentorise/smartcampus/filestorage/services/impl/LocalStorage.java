@@ -1,12 +1,16 @@
 package eu.trentorise.smartcampus.filestorage.services.impl;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +33,7 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
+import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 
 /**
@@ -47,6 +52,7 @@ public class LocalStorage implements StorageService {
 	private String LOCAL_URL = "http://localhost:8080/core.filestorage";
 	private final long ONE_HOUR = 3600000;
 	private static final Logger logger = Logger.getLogger(LocalStorage.class);
+	private final int IMAGE_HEIGHT = 100;
 
 	@Autowired
 	LocalResourceManager localManager;
@@ -56,6 +62,9 @@ public class LocalStorage implements StorageService {
 
 	@Autowired
 	MetadataManager metadataManager;
+
+	@Autowired
+	private MetadataService metaService;
 
 	@Override
 	public Resource store(String accountId, Resource resource,
@@ -171,6 +180,7 @@ public class LocalStorage implements StorageService {
 			throw new NotFoundException();
 		} else {
 			try {
+				deleteThumbnail(metadata, account);
 				fileToReplace.delete();
 				fileToReplace = new File(localStoragePath + "\\"
 						+ account.getAppId() + "\\" + account.getUserId()
@@ -254,11 +264,27 @@ public class LocalStorage implements StorageService {
 
 	}
 
+	private void deleteThumbnail(Metadata metadata, Account account) {
+		File thumbToDelete = new File(localStoragePath + "\\"
+				+ account.getAppId() + "\\" + account.getUserId()
+				+ "\\thumbnails\\thumb_"
+				+ FilenameUtils.getBaseName(metadata.getName()) + ".jpg");
+		if (thumbToDelete.exists()) {
+			if (!thumbToDelete.delete()) {
+				logger.warn("Thumbnail find but not deleted, check the permission");
+			} else {
+				logger.info("Thumbnail deleted becouse the image associated is updated or removed");
+			}
+		}
+
+	}
+
 	@Override
 	public void remove(String rid) throws NotFoundException,
 			SmartcampusException {
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
+		deleteThumbnail(metadata, account);
 		File fileToDelete = new File(localStoragePath + "\\"
 				+ account.getAppId() + "\\" + account.getUserId() + "\\"
 				+ metadata.getName());
@@ -304,8 +330,74 @@ public class LocalStorage implements StorageService {
 	@Override
 	public InputStream getThumbnailStream(String resourceId)
 			throws NotFoundException, SmartcampusException {
-		// TODO Auto-generated method stub
-		return null;
+		int imgFinalHeight;
+		int imgFinalWidth;
+		Metadata metadata = metaService.getMetadata(resourceId);
+		Account account = accountManager.findById(metadata.getAccountId());
+		if (!isFileExist(localStoragePath + "\\" + account.getAppId() + "\\"
+				+ account.getUserId() + "\\thumbnails")) {
+			File accountFolder = new File(localStoragePath + "\\"
+					+ account.getAppId() + "\\" + account.getUserId()
+					+ "\\thumbnails");
+			accountFolder.mkdirs();
+		}
+		String mimeType = metadata.getContentType();
+		if (mimeType != null && mimeType.split("/")[0].equals("image")) {
+			InputStream is = null;
+			File thumbToStore = new File(localStoragePath + "\\"
+					+ metadata.getAppId() + "\\" + account.getUserId()
+					+ "\\thumbnails\\" + "\\thumb_"
+					+ FilenameUtils.getBaseName(metadata.getName() + ".jpg"));
+			if (thumbToStore.exists()) {
+				try {
+					is = new FileInputStream(thumbToStore);
+				} catch (FileNotFoundException e) {
+					logger.error("File not found: " + thumbToStore.getPath());
+					return null;
+				}
+				return is;
+			} else {
+				// creation of the thumbnail in server-side
+				try {
+					BufferedImage source = ImageIO.read(new File(
+							localStoragePath + "\\" + metadata.getAppId()
+									+ "\\" + account.getUserId() + "\\"
+									+ metadata.getName()));
+					if (source.getHeight() >= IMAGE_HEIGHT) {
+						imgFinalHeight = IMAGE_HEIGHT;
+					} else {
+						imgFinalHeight = source.getHeight();
+					}
+					imgFinalWidth = (source.getWidth() * imgFinalHeight)
+							/ source.getHeight();
+					BufferedImage img = new BufferedImage(imgFinalWidth,
+							imgFinalHeight, BufferedImage.TYPE_INT_RGB);
+					img.createGraphics()
+							.drawImage(
+									ImageIO.read(
+											new File(localStoragePath + "\\"
+													+ metadata.getAppId()
+													+ "\\"
+													+ account.getUserId()
+													+ "\\" + metadata.getName()))
+											.getScaledInstance(imgFinalWidth,
+													imgFinalHeight,
+													Image.SCALE_SMOOTH), 0, 0,
+									null);
+
+					ImageIO.write(img, "jpg", thumbToStore);
+					is = new FileInputStream(thumbToStore);
+					return is;
+				} catch (IOException e) {
+					logger.error("IO Error generating thumbnail");
+					return null;
+				}
+			}
+
+		} else {
+			logger.error("File not an image");
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override

@@ -328,6 +328,8 @@ public class MediaController extends SCController {
 			while ((readed = in.read(buffer)) > 0) {
 				out.write(buffer, 0, readed);
 			}
+			out.close();
+			in.close();
 		}
 	}
 

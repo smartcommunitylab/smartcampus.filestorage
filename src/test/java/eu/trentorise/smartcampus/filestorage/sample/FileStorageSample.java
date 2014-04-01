@@ -2,7 +2,9 @@ package eu.trentorise.smartcampus.filestorage.sample;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,8 +32,8 @@ public class FileStorageSample {
 			FilestorageException, Exception {
 		Filestorage fs = new Filestorage(
 				"http://localhost:8080/core.filestorage", "test");
-		final String APPID = "51755adb-fe62-43ed-bde9-673f3a1a8eb1";
-		final String USERID = "2bfaf3f3-a79a-4de5-aac3-1be6b7d809d6";
+		final String APPID = "c5877765-43ec-4e74-aa86-5c2017f8edf3";
+		final String USERID = "84b1556c-c799-4d20-ae1b-b71a8598b571";
 
 		// Take the first storage of the app in db
 		Storage s = fs.getStorage(APPID);
@@ -69,22 +71,30 @@ public class FileStorageSample {
 		File pathToLogo3 = new File("C:\\local_storage\\" + account.getAppId()
 				+ "\\" + account.getUserId() + "\\logo3.jpg");
 		File logo4 = new File("C:\\local_storage\\logo4.jpg");
+		File logo6 = new File("C:\\local_storage\\logo6.png");
 		File video = new File("C:\\local_storage\\video.mp4");
 		File largeFile = new File("C:\\local_storage\\bigfile.arc");
+		File largeImage = new File("C:\\local_storage\\large.jpg");
+		File tinyImage = new File("C:\\local_storage\\tinygif.gif");
 
 		// STORE AND UPDATE
-
+		Metadata metaLogo1 = null;
 		if (!pathToLogo3.exists()) {
 			InputStream is = new FileInputStream(logo1);
 			InputStream is2 = new FileInputStream(logo3);
-
-			Metadata metaLogo1 = fs.storeResourceByUser(logo1, is, USERID,
+			metaLogo1 = fs.storeResourceByUser(logo1, is, USERID,
 					account.getId(), false);
 			logger.info("Created file: " + metaLogo1.getName());
 			fs.updateResourceByUser(USERID, metaLogo1.getResourceId(), logo3,
 					is2);
 			logger.info(String.format("Updated %s with %s",
 					metaLogo1.getName(), logo3.getName()));
+			// THUMBNAIL CREATION
+			OutputStream os = new FileOutputStream(
+					"c:\\local_storage\\thumb_client.jpg");
+			fs.getThumbnailByUser(USERID, metaLogo1.getResourceId(), os);
+			os.close();
+
 		} else {
 			List<Metadata> metadatas = fs.getAllResourceMetadataByApp(APPID, 0,
 					100);
