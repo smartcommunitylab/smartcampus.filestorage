@@ -16,6 +16,8 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
+import java.io.InputStream;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,8 +99,8 @@ public class MediaManager {
 			NotFoundException {
 
 		Metadata meta = metadataManager.findByResource(resourceId);
-		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
-				.getAccountId());
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(meta.getAccountId());
 		storageService.remove(resourceId);
 		metadataManager.delete(resourceId);
 	}
@@ -123,8 +125,8 @@ public class MediaManager {
 
 		Metadata meta = metadataManager.findByResource(resource.getId());
 
-		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
-				.getAccountId());
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(meta.getAccountId());
 		storageService.replace(resource);
 		metadataManager.update(resource);
 	}
@@ -148,6 +150,14 @@ public class MediaManager {
 			throws SmartcampusException, SecurityException {
 
 		return scAcl.getSessionToken(op, user, rid, true);
+	}
+
+	public InputStream getThumbnailStream(String resourceId)
+			throws NotFoundException, SmartcampusException {
+		Metadata meta = metadataManager.findByResource(resourceId);
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(meta.getAccountId());
+		return storageService.getThumbnailStream(resourceId);
 	}
 
 }

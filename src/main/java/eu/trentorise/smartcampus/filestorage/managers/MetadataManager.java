@@ -65,15 +65,17 @@ public class MetadataManager {
 	 *            the resource
 	 * @param createSocialData
 	 *            true to create social information to associate to the resource
+	 * @return metadata created
 	 * @throws AlreadyStoredException
 	 *             if metadata already exists
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public void create(String accountId, User user, Resource resource,
+	public Metadata create(String accountId, User user, Resource resource,
 			boolean createSocialData) throws AlreadyStoredException,
 			SmartcampusException {
-		metadataSrv.save(createMetadata(accountId, user, resource,
+
+		return metadataSrv.save(toMetadata(accountId, user, resource,
 				createSocialData));
 	}
 
@@ -195,9 +197,8 @@ public class MetadataManager {
 		return meta;
 	}
 
-	private Metadata createMetadata(String accountId, User user,
-			Resource resource, boolean createSocialData)
-			throws SmartcampusException {
+	public Metadata toMetadata(String accountId, User user, Resource resource,
+			boolean createSocialData) throws SmartcampusException {
 		Metadata metadata = new Metadata();
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());
@@ -205,8 +206,9 @@ public class MetadataManager {
 		metadata.setResourceId(resource.getId());
 		metadata.setAccountId(accountId);
 		metadata.setFileExternalId(resource.getName());
-		metadata.setSize(resource.getContent().length);
-		// appaccount data
+		metadata.setSize(resource.getContent() != null ? resource.getContent().length
+				: resource.getSize());
+		// account data
 		Account userAccount;
 		try {
 			userAccount = accountManager.findById(accountId);

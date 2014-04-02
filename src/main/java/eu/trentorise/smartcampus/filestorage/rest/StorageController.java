@@ -21,8 +21,7 @@ import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
 @Controller
 public class StorageController extends SCController {
 
-	static final Logger logger = Logger
-			.getLogger(StorageController.class);
+	static final Logger logger = Logger.getLogger(StorageController.class);
 
 	@Autowired
 	private StorageManager storageManager;
@@ -58,23 +57,10 @@ public class StorageController extends SCController {
 		return true;
 	}
 
-//	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
-//	public @ResponseBody
-//	ListStorage getStoragesByUser(@PathVariable String appId)
-//			throws SmartcampusException {
-//
-//		ListStorage result = new ListStorage();
-//		List<Storage> publicStorageData = new ArrayList<Storage>();
-//		for (Storage storage : storageManager.getStorages(appId)) {
-//			publicStorageData.add(StorageManager.deletePrivateData(storage));
-//		}
-//		result.setStorages(publicStorageData);
-//		return result;
-//	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/storage/app/{appId}")
 	public @ResponseBody
-	Storage getStorage(@PathVariable String appId) throws SmartcampusException, NotFoundException {
+	Storage getStorage(@PathVariable String appId) throws SmartcampusException,
+			NotFoundException {
 
 		return storageManager.getStorageByAppId(appId);
 	}
@@ -83,20 +69,6 @@ public class StorageController extends SCController {
 	public String storageConf() throws SmartcampusException, NotFoundException {
 		return "storage";
 	}
-
-//	@RequestMapping(method = RequestMethod.GET, value = "/storage/user/{appId}")
-//	public @ResponseBody
-//	Storage getStorageByUser(@PathVariable String storageId,
-//			@PathVariable String appId) throws SmartcampusException,
-//			NotFoundException {
-//
-//		if (!permissionManager.checkStoragePermission(appId, storageId)) {
-//			throw new SecurityException();
-//		}
-//
-//		return StorageManager.deletePrivateData(storageManager
-//				.getStorageById(storageId));
-//	}
 
 	@Override
 	protected AuthServices getAuthServices() {

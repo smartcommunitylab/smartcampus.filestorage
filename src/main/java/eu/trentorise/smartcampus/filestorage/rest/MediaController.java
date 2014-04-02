@@ -17,14 +17,18 @@
 package eu.trentorise.smartcampus.filestorage.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -193,6 +197,22 @@ public class MediaController extends SCController {
 		return metadataManager.findByResource(resourceId);
 	}
 
+	@RequestMapping(method = RequestMethod.POST, value = "/metadata/user/{appId}/{accountId}")
+	public @ResponseBody
+	Metadata createMyMetadata(@PathVariable String appId,
+			@PathVariable String accountId, @RequestBody Resource resource,
+			@RequestParam(defaultValue = "true") boolean createSocialData)
+			throws SmartcampusException, SecurityException, NotFoundException,
+			AlreadyStoredException {
+		User user = getUserObject(getUserId());
+
+		if (!permissionManager.checkAccountPermission(user, appId, accountId)) {
+			new SecurityException();
+		}
+		return metadataManager.create(accountId, user, resource,
+				createSocialData);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
 	public @ResponseBody
 	Metadata getMyResourceMetadata(@PathVariable String appId,
@@ -200,7 +220,8 @@ public class MediaController extends SCController {
 			SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
 
-		if (!scAcl.isPermitted(Operation.DOWNLOAD, resourceId, user)) {
+		if (!permissionManager.checkResourcePermission(user, appId, resourceId)
+				&& !permissionManager.checkSharingPermission(user, resourceId)) {
 			throw new SecurityException();
 		}
 		return metadataManager.findByResource(resourceId);
@@ -285,6 +306,28 @@ public class MediaController extends SCController {
 
 		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
 				false);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/thumbnail/user/{appId}/{resourceId}")
+	public @ResponseBody
+	void getThumbnail(HttpServletResponse response, @PathVariable String appId,
+			@PathVariable String resourceId) throws SmartcampusException,
+			SecurityException, NotFoundException, IOException {
+
+		User user = getUserObject(getUserId());
+		if (!permissionManager.checkSharingPermission(user, resourceId)) {
+			throw new SecurityException();
+		}
+
+		InputStream in = mediaManager.getThumbnailStream(resourceId);
+		if (in != null) {
+			byte[] buffer = new byte[1024];
+			int readed = 0;
+			OutputStream out = response.getOutputStream();
+			while ((readed = in.read(buffer)) > 0) {
+				out.write(buffer, 0, readed);
+			}
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/app/{appId}/{resourceId}/{entityId}")

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -85,13 +86,17 @@ public class MongoMetadataService implements MetadataService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void save(Metadata metadata) throws AlreadyStoredException {
+	public Metadata save(Metadata metadata) throws AlreadyStoredException {
 		if (metadata.getResourceId() != null
 				&& db.findById(metadata.getResourceId(), Metadata.class) != null) {
 			logger.error("Metadata already stored: " + metadata.getResourceId());
 			throw new AlreadyStoredException();
 		}
+		if (metadata.getResourceId() == null) {
+			metadata.setResourceId(new ObjectId().toString());
+		}
 		db.save(metadata);
+		return metadata;
 
 	}
 

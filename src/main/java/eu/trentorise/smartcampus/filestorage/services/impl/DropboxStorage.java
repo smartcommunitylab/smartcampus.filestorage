@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxLink;
+import com.dropbox.client2.DropboxAPI.ThumbFormat;
+import com.dropbox.client2.DropboxAPI.ThumbSize;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
@@ -220,8 +222,8 @@ public class DropboxStorage implements StorageService {
 		Storage appAccount = appAccountManager.getStorageById(storageId);
 		return getAppToken(appAccount.getConfigurations());
 	}
-	private AppKeyPair getAppTokenByApp(String appId)
-			throws NotFoundException {
+
+	private AppKeyPair getAppTokenByApp(String appId) throws NotFoundException {
 		Storage appAccount = appAccountManager.getStorageByAppId(appId);
 		return getAppToken(appAccount.getConfigurations());
 	}
@@ -308,19 +310,25 @@ public class DropboxStorage implements StorageService {
 	}
 
 	@Override
-	public void startSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void startSession(String storageId, String userId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		AppKeyPair app = getAppTokenByStorage(storageId);
 		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
-		WebAuthSession.WebAuthInfo info = session.getAuthInfo(StringUtils.appURL(request)+"/authorize/success");
+		WebAuthSession.WebAuthInfo info = session.getAuthInfo(StringUtils
+				.appURL(request) + "/authorize/success");
 		request.getSession().setAttribute("WebAuthInfo", info);
 		response.sendRedirect(info.url);
 	}
 
 	@Override
-	public Account finishSession(String storageId, String userId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public Account finishSession(String storageId, String userId,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		AppKeyPair app = getAppTokenByStorage(storageId);
 		WebAuthSession session = new WebAuthSession(app, AccessType.APP_FOLDER);
-		WebAuthSession.WebAuthInfo info = (WebAuthInfo) request.getSession().getAttribute("WebAuthInfo");
+		WebAuthSession.WebAuthInfo info = (WebAuthInfo) request.getSession()
+				.getAttribute("WebAuthInfo");
 		session.retrieveWebAccessToken(info.requestTokenPair);
 		AccessTokenPair token = session.getAccessTokenPair();
 		Account a = new Account();
@@ -329,9 +337,36 @@ public class DropboxStorage implements StorageService {
 		a.setUserId(userId);
 		a.setName(null);
 		a.setStorageType(StorageType.DROPBOX);
-		a.setConfigurations(Arrays.asList(new Configuration[]{new Configuration(USER_KEY,token.key), new Configuration(USER_SECRET,token.secret)}));
+		a.setConfigurations(Arrays.asList(new Configuration[] {
+				new Configuration(USER_KEY, token.key),
+				new Configuration(USER_SECRET, token.secret) }));
 		return a;
 	}
-	
-	
+
+	@Override
+	public InputStream getThumbnailStream(String resourceId)
+			throws NotFoundException, SmartcampusException {
+		Metadata metadata = metaService.getMetadata(resourceId);
+		AppKeyPair app = null;
+		AccessTokenPair token = null;
+		try {
+			app = getAppToken(metadata.getAccountId());
+			token = getUserToken(metadata.getAccountId());
+		} catch (NotFoundException e) {
+			throw new SmartcampusException(e);
+		}
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+		try {
+			return sourceClient.getThumbnailStream("/" + metadata.getName(),
+					ThumbSize.BESTFIT_320x240, ThumbFormat.JPEG);
+		} catch (DropboxException e) {
+			logger.error(String.format(
+					"Dropbox exception getting thumbnail resource %s: "
+							+ e.getMessage(), resourceId));
+		}
+		return null;
+	}
 }

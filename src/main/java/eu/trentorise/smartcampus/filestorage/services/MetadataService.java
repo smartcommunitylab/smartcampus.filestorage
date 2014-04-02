@@ -131,7 +131,7 @@ public interface MetadataService {
 	 * @throws AlreadyStoredException
 	 *             if metadata already exists
 	 */
-	public void save(Metadata metadata) throws AlreadyStoredException;
+	public Metadata save(Metadata metadata) throws AlreadyStoredException;
 
 	/**
 	 * deletes a {@link Metadata}
