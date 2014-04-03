@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
@@ -32,7 +31,7 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
-import eu.trentorise.smartcampus.social.model.User;
+import eu.trentorise.smartcampus.filestorage.social.SocialEngine;
 
 /**
  * <i>MetadataManager</i> manages all aspects about {@link Metadata} of a
@@ -49,7 +48,7 @@ public class MetadataManager {
 	MetadataService metadataSrv;
 
 	@Autowired
-	SocialManager socialManager;
+	SocialEngine socialManager;
 
 	@Autowired
 	AccountManager accountManager;
@@ -108,10 +107,6 @@ public class MetadataManager {
 		} catch (NumberFormatException e) {
 			logger.error("Exception parsing entity id: " + eid);
 			throw new NotFoundException();
-		} catch (WebApiException e) {
-			logger.error("Exception invoking social engine", e);
-			throw new SmartcampusException(
-					"Social engine error deleting entity");
 		}
 	}
 
@@ -218,14 +213,8 @@ public class MetadataManager {
 			throw new SmartcampusException("Account not found");
 		}
 		if (createSocialData) {
-			try {
-				metadata.setSocialId(socialManager.createEntity(resource, user)
-						.toString());
-			} catch (WebApiException e) {
-				logger.error("Exception invoking social engine", e);
-				throw new SmartcampusException(
-						"Social engine error creating entity");
-			}
+			metadata.setSocialId(socialManager.createEntity(resource, user)
+					.toString());
 		}
 		return metadata;
 	}

@@ -20,8 +20,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
-import eu.trentorise.smartcampus.filestorage.managers.SocialManager;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
@@ -31,8 +31,8 @@ import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
+import eu.trentorise.smartcampus.filestorage.social.SocialEngine;
 import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
-import eu.trentorise.smartcampus.social.model.User;
 
 @Service
 public class ScAcl implements ACLService {
@@ -45,7 +45,7 @@ public class ScAcl implements ACLService {
 	AccountManager userAccountManager;
 
 	@Autowired
-	SocialManager socialManager;
+	SocialEngine socialManager;
 
 	@Autowired
 	StorageUtils storageUtils;
@@ -60,16 +60,18 @@ public class ScAcl implements ACLService {
 			resourceInfo = metaService.getMetadata(resourceId);
 			Account account = userAccountManager.findById(resourceInfo
 					.getAccountId());
-			if (account.getUserId().equals(user.getId())) return true;
+			if (account.getUserId().equals(user.getId()))
+				return true;
 		} catch (NotFoundException e) {
 			logger.error(String.format("%s resource not found", resourceId));
 			return false;
 		}
-		
+
 		switch (operation) {
 		case DOWNLOAD:
 			try {
-				if (socialManager.checkPermission(user, metaService.getEntityByResource(resourceId))) {
+				if (socialManager.checkPermission(user,
+						metaService.getEntityByResource(resourceId))) {
 					logger.info(String.format(
 							"Access permission ok, user: %s, resource: %s",
 							user.getId(), resourceId));
@@ -150,8 +152,8 @@ public class ScAcl implements ACLService {
 	private Token generateToken(String resourceId) throws NotFoundException,
 			SmartcampusException {
 		Metadata meta = metaService.getMetadata(resourceId);
-		StorageService storageService = storageUtils.getStorageServiceByAccount(meta
-				.getAccountId());
+		StorageService storageService = storageUtils
+				.getStorageServiceByAccount(meta.getAccountId());
 		return storageService.getToken(meta.getAccountId(), resourceId);
 	}
 }

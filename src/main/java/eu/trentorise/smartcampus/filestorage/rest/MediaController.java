@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.MediaManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
@@ -50,7 +51,6 @@ import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
-import eu.trentorise.smartcampus.social.model.User;
 
 @Controller
 public class MediaController extends SCController {

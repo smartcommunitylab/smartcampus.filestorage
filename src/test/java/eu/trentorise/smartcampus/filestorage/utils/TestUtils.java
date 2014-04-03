@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.utils;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,7 +26,6 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.trentorise.smartcampus.filestorage.model.Account;
@@ -36,7 +33,6 @@ import eu.trentorise.smartcampus.filestorage.model.Configuration;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
-import eu.trentorise.smartcampus.social.model.User;
 
 @Service
 public class TestUtils {
@@ -59,12 +55,10 @@ public class TestUtils {
 	public static final String userId = null;
 
 	private static Random random = new Random();
+
 	/**
 	 * Utility methods
 	 */
-
-	@Autowired
-	SocialEngineOperation socialEngine;
 
 	public static Storage createAppAccount(String appId) {
 		Storage account = new Storage();
@@ -112,15 +106,6 @@ public class TestUtils {
 		res.setContentType("image/png");
 		res.setName("image.png");
 		return res;
-	}
-
-	public User createUser() throws WebApiException {
-		User user = new User();
-		it.unitn.disi.sweb.webapi.model.smartcampus.social.User socialUser = socialEngine
-				.createUser();
-		user.setSocialId("" + socialUser.getId());
-		user.setId("" + random.nextInt(1000));
-		return user;
 	}
 
 }

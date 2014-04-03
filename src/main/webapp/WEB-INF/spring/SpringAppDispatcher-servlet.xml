@@ -33,10 +33,6 @@
 
 	<context:property-placeholder location="classpath:filestorage.properties" />
 
-	<bean id="acClient" class="eu.trentorise.smartcampus.ac.provider.filters.AcClient">
-		<property name="endpointUrl" value="${ac.endpoint.url}" />
-	</bean>
-
 	<mongo:mongo host="${smartcampus.vas.web.mongo.host}" port="${smartcampus.vas.web.mongo.port}" />
 
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
@@ -45,6 +41,10 @@
 			value="${smartcampus.vas.web.mongo.db}" />
 	</bean>
 
+	
+	<!-- SocialEngine implementation -->
+	<bean id="socialManager" class="${socialengine.impl}" />
+	
 	<!-- Enabling upload files -->
 	<bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />

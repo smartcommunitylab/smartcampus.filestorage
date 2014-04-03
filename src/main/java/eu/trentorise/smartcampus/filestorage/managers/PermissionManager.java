@@ -16,18 +16,17 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
-import eu.trentorise.smartcampus.social.model.User;
+import eu.trentorise.smartcampus.filestorage.social.SocialEngine;
 
 /**
  * <i>PermissionManager</i> checks the permissions about resources and storage
@@ -54,7 +53,7 @@ public class PermissionManager {
 	MetadataService metaService;
 
 	@Autowired
-	SocialManager socialManager;
+	SocialEngine socialManager;
 
 	/**
 	 * checks if a user can access to a storage account
@@ -185,10 +184,6 @@ public class PermissionManager {
 		try {
 			return socialManager.checkPermission(user,
 					metaService.getEntityByResource(resourceId));
-		} catch (WebApiException e) {
-			logger.error(String.format(
-					"Social exception getting sharing permission of user %s on resource %s:"
-							+ e.getMessage(), user.getId(), resourceId));
 		} catch (NotFoundException e) {
 			logger.error(String.format("Resource %s not found", resourceId));
 		}

@@ -16,8 +16,6 @@
 
 package eu.trentorise.smartcampus.filestorage.managers;
 
-import it.unitn.disi.sweb.webapi.client.WebApiException;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -31,15 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.services.impl.ScAcl;
-import eu.trentorise.smartcampus.filestorage.utils.SocialEngineOperation;
 import eu.trentorise.smartcampus.filestorage.utils.TestUtils;
-import eu.trentorise.smartcampus.social.model.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(value = "/spring/SpringAppDispatcher-servlet.xml")

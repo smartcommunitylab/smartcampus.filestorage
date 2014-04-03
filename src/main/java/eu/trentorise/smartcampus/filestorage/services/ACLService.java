@@ -16,10 +16,10 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
+import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
-import eu.trentorise.smartcampus.social.model.User;
 
 /**
  * This interface collects operation about access control list and permission on
