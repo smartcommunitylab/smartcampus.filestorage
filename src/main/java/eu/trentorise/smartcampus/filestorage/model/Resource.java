@@ -50,6 +50,10 @@ public class Resource {
 	 * file size
 	 */
 	private long size;
+	/**
+	 * id of the reosurce in the external storage
+	 */
+	private String externalId;
 
 	public String getName() {
 		return name;
@@ -89,6 +93,14 @@ public class Resource {
 
 	public void setSize(long size) {
 		this.size = size;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
 	}
 
 }

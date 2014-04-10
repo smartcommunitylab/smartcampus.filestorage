@@ -47,6 +47,8 @@
 		</dependency>
 
 		<!-- Utilities -->
+		
+            
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils-core</artifactId>
@@ -67,12 +69,25 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.2</version>
 		</dependency>
+		<!-- external storage api -->
+		<dependency>
+			<groupId>com.google.http-client</groupId>
+			<artifactId>google-http-client-jackson2</artifactId>
+			<version>1.17.0-rc</version>
+		</dependency>
 
 		<dependency>
 			<groupId>dropbox</groupId>
 			<artifactId>dropbox-sdk</artifactId>
 			<version>1.5.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-drive</artifactId>
+			<version>v2-rev119-1.17.0-rc</version>
+		</dependency>
+
 
 		<!-- User filestorage.client to test the REST layer -->
 		<dependency>

@@ -30,6 +30,7 @@ import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.services.impl.DropboxStorage;
+import eu.trentorise.smartcampus.filestorage.services.impl.GoogleDriveStorage;
 import eu.trentorise.smartcampus.filestorage.services.impl.LocalStorage;
 
 /**
@@ -101,6 +102,9 @@ public class StorageUtils {
 			break;
 		case LOCAL:
 			service = beanFactory.getBean(LocalStorage.class);
+			break;
+		case GDRIVE:
+			service = beanFactory.getBean(GoogleDriveStorage.class);
 			break;
 		default:
 			throw new SmartcampusException("Storage type not supported");

@@ -29,6 +29,7 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.social.model.User;
 
@@ -127,6 +128,7 @@ public class MetadataManager {
 		metadata.setContentType(resource.getContentType());
 		metadata.setSize(resource.getSize());
 		metadata.setLastModifiedTs(System.currentTimeMillis());
+		metadata.setFileExternalId(resource.getExternalId());
 		metadataSrv.update(metadata);
 	}
 
@@ -199,13 +201,25 @@ public class MetadataManager {
 
 	public Metadata toMetadata(String accountId, User user, Resource resource,
 			boolean createSocialData) throws SmartcampusException {
+		Account account = null;
+		try {
+			account = accountManager.findById(accountId);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+		}
 		Metadata metadata = new Metadata();
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());
 		metadata.setName(resource.getName());
 		metadata.setResourceId(resource.getId());
 		metadata.setAccountId(accountId);
-		metadata.setFileExternalId(resource.getName());
+		if (account.getStorageType().equals(StorageType.DROPBOX)) {
+			metadata.setFileExternalId(resource.getName());
+		} else if (account.getStorageType().equals(StorageType.GDRIVE)) {
+
+			metadata.setFileExternalId(resource.getExternalId());
+		}
+
 		metadata.setSize(resource.getContent() != null ? resource.getContent().length
 				: resource.getSize());
 		// account data

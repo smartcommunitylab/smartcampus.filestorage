@@ -19,7 +19,6 @@ package eu.trentorise.smartcampus.filestorage.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLConnection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -373,10 +372,12 @@ public class MediaController extends SCController {
 
 		InputStream is = request.getInputStream();
 		String filename = request.getHeader("filename");
-		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		long size = Long.valueOf(request.getHeader("size"));
+		String mimeType = request.getHeader("mimeType");
 		Resource resource = new Resource();
 		resource.setName(filename);
 		resource.setContentType(mimeType);
+		resource.setSize(size);
 		String resourceId;
 		try {
 			resourceId = mediaManager.storage(accountId, null, is, resource,
@@ -403,10 +404,12 @@ public class MediaController extends SCController {
 		}
 		InputStream is = request.getInputStream();
 		String filename = request.getHeader("filename");
-		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		String mimeType = request.getHeader("mimeType");
+		long size = Long.valueOf(request.getHeader("size"));
 		Resource resource = new Resource();
 		resource.setName(filename);
 		resource.setContentType(mimeType);
+		resource.setSize(size);
 		String resourceId;
 		try {
 			resourceId = mediaManager.storage(accountId, null, is, resource,
@@ -433,11 +436,13 @@ public class MediaController extends SCController {
 		}
 		InputStream is = request.getInputStream();
 		String filename = request.getHeader("filename");
-		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		long size = Long.valueOf(request.getHeader("size"));
+		String mimeType = request.getHeader("mimeType");
 		Resource resource = new Resource();
 		resource.setName(filename);
 		resource.setContentType(mimeType);
 		resource.setId(resourceId);
+		resource.setSize(size);
 		mediaManager.replace(resource, is);
 
 	}
@@ -453,11 +458,13 @@ public class MediaController extends SCController {
 		}
 		InputStream is = request.getInputStream();
 		String filename = request.getHeader("filename");
-		String mimeType = URLConnection.guessContentTypeFromName(filename);
+		long size = Long.valueOf(request.getHeader("size"));
+		String mimeType = request.getHeader("mimeType");
 		Resource resource = new Resource();
 		resource.setName(filename);
 		resource.setContentType(mimeType);
 		resource.setId(resourceId);
+		resource.setSize(size);
 		mediaManager.replace(resource, is);
 
 	}
@@ -474,6 +481,7 @@ public class MediaController extends SCController {
 		res.setContent(file.getBytes());
 		res.setContentType(file.getContentType());
 		res.setName(file.getOriginalFilename());
+		res.setSize(file.getSize());
 		return res;
 	}
 
