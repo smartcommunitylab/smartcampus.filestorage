@@ -19,7 +19,7 @@
 		</dependency>
 
 
-	<!-- Spring -->
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -48,12 +48,21 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>eu.trentorise.smartcampus</groupId>
 			<artifactId>resource.api</artifactId>
 			<version>1.2</version>
 		</dependency>
+
+
+		<!-- Socialengine -->
+		<dependency>
+			<groupId>eu.trentorise.smartcampus</groupId>
+			<artifactId>socialservice.client</artifactId>
+			<version>3.0</version>
+		</dependency>
+
 
 		<!-- mongodb functionalities -->
 		<dependency>
@@ -140,6 +149,11 @@
 			<version>1.0.5.RELEASE</version>
 		</dependency>
 
+		<dependency>
+			<groupId>eu.trentorise.smartcampus</groupId>
+			<artifactId>aac.client</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

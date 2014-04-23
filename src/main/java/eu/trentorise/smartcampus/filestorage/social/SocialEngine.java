@@ -1,7 +1,7 @@
 package eu.trentorise.smartcampus.filestorage.social;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 
 public interface SocialEngine {
 
@@ -17,18 +17,18 @@ public interface SocialEngine {
 	 *             exception thrown by social engine
 	 */
 
-	public String createEntity(Resource resource, User user);
+	public String createEntity(Resource resource, OauthUser user);
 
 	/**
 	 * deletes a social entity
 	 * 
-	 * @param eid
+	 * @param entityId
 	 *            id of the social entity to delete
 	 * @return true if operation gone fine, false otherwise
 	 * @throws WebApiException
 	 *             exception thrown by social engine
 	 */
-	public boolean deleteEntity(long eid);
+	public boolean deleteEntity(long entityId);
 
 	/**
 	 * checks if an entity is shared with a user
@@ -41,7 +41,7 @@ public interface SocialEngine {
 	 * @throws WebApiException
 	 *             exception thrown by social engine
 	 */
-	public boolean checkPermission(User user, String entityId);
+	public boolean checkPermission(OauthUser user, String entityId);
 
 	/**
 	 * checks if social entity is owned by the given user
@@ -52,5 +52,5 @@ public interface SocialEngine {
 	 *            social entity id
 	 * @return true if entity is owned by the user, false otherwise
 	 */
-	public boolean isOwnedBy(User user, String entityId);
+	public boolean isOwnedBy(OauthUser user, String entityId);
 }

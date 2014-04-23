@@ -23,13 +23,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.social.SocialEngine;
 
@@ -70,7 +70,7 @@ public class MetadataManager {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public Metadata create(String accountId, User user, Resource resource,
+	public Metadata create(String accountId, OauthUser user, Resource resource,
 			boolean createSocialData) throws AlreadyStoredException,
 			SmartcampusException {
 
@@ -178,7 +178,7 @@ public class MetadataManager {
 	 * @throws SecurityException
 	 *             social entity is not owned by the user
 	 */
-	public Metadata updateSocialData(User owner, String resourceId,
+	public Metadata updateSocialData(OauthUser owner, String resourceId,
 			String entityId) throws NotFoundException, SecurityException {
 		Metadata meta = findByResource(resourceId);
 
@@ -192,8 +192,9 @@ public class MetadataManager {
 		return meta;
 	}
 
-	public Metadata toMetadata(String accountId, User user, Resource resource,
-			boolean createSocialData) throws SmartcampusException {
+	public Metadata toMetadata(String accountId, OauthUser user,
+			Resource resource, boolean createSocialData)
+			throws SmartcampusException {
 		Metadata metadata = new Metadata();
 		metadata.setContentType(resource.getContentType());
 		metadata.setCreationTs(System.currentTimeMillis());

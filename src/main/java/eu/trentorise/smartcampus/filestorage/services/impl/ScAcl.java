@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
@@ -28,6 +27,7 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -54,7 +54,8 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isPermitted(Operation operation, String resourceId, User user) {
+	public boolean isPermitted(Operation operation, String resourceId,
+			OauthUser user) {
 		Metadata resourceInfo = null;
 		try {
 			resourceInfo = metaService.getMetadata(resourceId);
@@ -92,7 +93,7 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Operation[] getPermissions(String resourceId, User user) {
+	public Operation[] getPermissions(String resourceId, OauthUser user) {
 		throw new IllegalArgumentException("Operation not implemented");
 	}
 
@@ -100,7 +101,7 @@ public class ScAcl implements ACLService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token getSessionToken(Operation operation, User user,
+	public Token getSessionToken(Operation operation, OauthUser user,
 			String resourceId, boolean owned) throws SmartcampusException,
 			SecurityException {
 		Token token = null;
@@ -135,7 +136,7 @@ public class ScAcl implements ACLService {
 		return token;
 	}
 
-	private boolean isMyResource(User user, String resourceId) {
+	private boolean isMyResource(OauthUser user, String resourceId) {
 		Metadata resourceInfo;
 		try {
 			resourceInfo = metaService.getMetadata(resourceId);

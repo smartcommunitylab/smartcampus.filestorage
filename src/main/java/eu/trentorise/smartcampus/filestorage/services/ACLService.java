@@ -16,10 +16,10 @@
 
 package eu.trentorise.smartcampus.filestorage.services;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 
 /**
  * This interface collects operation about access control list and permission on
@@ -41,7 +41,8 @@ public interface ACLService {
 	 *            user
 	 * @return true if operation is permitted, false otherwise
 	 */
-	public boolean isPermitted(Operation operation, String resourceId, User user);
+	public boolean isPermitted(Operation operation, String resourceId,
+			OauthUser user);
 
 	/**
 	 * retrieves the operations permitted to a user on a resource
@@ -52,7 +53,7 @@ public interface ACLService {
 	 *            user
 	 * @return the array of operation permitted
 	 */
-	public Operation[] getPermissions(String resourceId, User user);
+	public Operation[] getPermissions(String resourceId, OauthUser user);
 
 	/**
 	 * retrieves the Token to performs given operation on the resource
@@ -71,7 +72,7 @@ public interface ACLService {
 	 * @throws SecurityException
 	 *             if user has no privileges to do the operation on the resource
 	 */
-	public Token getSessionToken(Operation operation, User user,
+	public Token getSessionToken(Operation operation, OauthUser user,
 			String resourceId, boolean owned) throws SmartcampusException,
 			SecurityException;
 

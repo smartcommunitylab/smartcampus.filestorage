@@ -49,11 +49,10 @@ import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
-import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
 
 @Controller
-public class MediaController extends SCController {
+public class MediaController extends FSController {
 
 	@Autowired
 	MediaManager mediaManager;
@@ -79,8 +78,8 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/app/{appId}/{accountId}")
 	public @ResponseBody
-	Metadata storeResource(@PathVariable String appId,
-			@PathVariable String accountId,
+	Metadata storeResource(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String accountId,
 			@RequestParam("file") MultipartFile resource,
 			@RequestParam(defaultValue = "true") boolean createSocialData)
 			throws AlreadyStoredException, SmartcampusException,
@@ -88,12 +87,13 @@ public class MediaController extends SCController {
 
 		Account account = accountManager.findById(accountId);
 		User user = getUserObject(account.getUserId());
-
-		if (!permissionManager.checkAccountPermission(user, account)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setClientToken(getAuthToken(request));
+		if (!permissionManager.checkAccountPermission(oauthUser, account)) {
 			throw new SecurityException();
 		}
 		try {
-			String resourceId = mediaManager.storage(accountId, user,
+			String resourceId = mediaManager.storage(accountId, oauthUser,
 					getResource(resource), createSocialData).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
@@ -103,19 +103,21 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/user/{appId}/{accountId}")
 	public @ResponseBody
-	Metadata storeMyResource(@PathVariable String appId,
-			@PathVariable String accountId,
+	Metadata storeMyResource(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String accountId,
 			@RequestParam("file") MultipartFile resource,
 			@RequestParam(defaultValue = "true") boolean createSocialData)
 			throws AlreadyStoredException, SmartcampusException,
 			NotFoundException {
 		User user = getUserObject(getUserId());
-
-		if (!permissionManager.checkAccountPermission(user, appId, accountId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		if (!permissionManager.checkAccountPermission(oauthUser, appId,
+				accountId)) {
 			throw new SecurityException();
 		}
 		try {
-			String resourceId = mediaManager.storage(accountId, user,
+			String resourceId = mediaManager.storage(accountId, oauthUser,
 					getResource(resource), createSocialData).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
@@ -143,13 +145,16 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
-	void replaceMyResource(@PathVariable String appId,
+	void replaceMyResource(HttpServletRequest request,
+			@PathVariable String appId,
 			@PathVariable("resourceId") String resourceId,
 			@RequestParam("file") MultipartFile resource)
 			throws SmartcampusException, NotFoundException {
 		User user = getUserObject(getUserId());
-
-		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		if (!permissionManager.checkResourcePermission(oauthUser, appId,
+				resourceId)) {
 			throw new SecurityException();
 		}
 
@@ -174,12 +179,14 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/resource/user/{appId}/{resourceId}")
 	public @ResponseBody
-	void removeMyResource(@PathVariable String appId,
-			@PathVariable String resourceId) throws SmartcampusException,
-			NotFoundException {
+	void removeMyResource(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String resourceId)
+			throws SmartcampusException, NotFoundException {
 		User user = getUserObject(getUserId());
-
-		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		if (!permissionManager.checkResourcePermission(oauthUser, appId,
+				resourceId)) {
 			throw new SecurityException();
 		}
 		mediaManager.remove(resourceId);
@@ -199,29 +206,36 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/metadata/user/{appId}/{accountId}")
 	public @ResponseBody
-	Metadata createMyMetadata(@PathVariable String appId,
-			@PathVariable String accountId, @RequestBody Resource resource,
+	Metadata createMyMetadata(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String accountId,
+			@RequestBody Resource resource,
 			@RequestParam(defaultValue = "true") boolean createSocialData)
 			throws SmartcampusException, SecurityException, NotFoundException,
 			AlreadyStoredException {
 		User user = getUserObject(getUserId());
-
-		if (!permissionManager.checkAccountPermission(user, appId, accountId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		if (!permissionManager.checkAccountPermission(oauthUser, appId,
+				accountId)) {
 			new SecurityException();
 		}
-		return metadataManager.create(accountId, user, resource,
+		return metadataManager.create(accountId, oauthUser, resource,
 				createSocialData);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
 	public @ResponseBody
-	Metadata getMyResourceMetadata(@PathVariable String appId,
-			@PathVariable String resourceId) throws SmartcampusException,
-			SecurityException, NotFoundException {
+	Metadata getMyResourceMetadata(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String resourceId)
+			throws SmartcampusException, SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
-
-		if (!permissionManager.checkResourcePermission(user, appId, resourceId)
-				&& !permissionManager.checkSharingPermission(user, resourceId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		oauthUser.setClientToken(getAuthToken(request));
+		if (!permissionManager.checkResourcePermission(oauthUser, appId,
+				resourceId)
+				&& !permissionManager.checkSharingPermission(oauthUser,
+						resourceId)) {
 			throw new SecurityException();
 		}
 		return metadataManager.findByResource(resourceId);
@@ -259,63 +273,75 @@ public class MediaController extends SCController {
 			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException, NotFoundException {
 		User user = getUserObject(getUserId());
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
 		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		return scAcl
-				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, oauthUser, resourceId,
+				true);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/resource/app/{appId}/{resourceId}")
 	public @ResponseBody
-	Token getMyResourceApp(@PathVariable String appId,
-			@PathVariable String resourceId) throws SmartcampusException,
-			SecurityException, NotFoundException {
+	Token getMyResourceApp(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String resourceId)
+			throws SmartcampusException, SecurityException, NotFoundException {
 		String userId = metadataManager.getOwner(resourceId);
 		User user = getUserObject(userId);
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setClientToken(getAuthToken(request));
 		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		return scAcl
-				.getSessionToken(Operation.DOWNLOAD, user, resourceId, true);
+		return scAcl.getSessionToken(Operation.DOWNLOAD, oauthUser, resourceId,
+				true);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/sharedresource/user/{appId}/{resourceId}")
 	public @ResponseBody
-	Token getMySharedResource(@PathVariable String appId,
-			@PathVariable String resourceId) throws SmartcampusException,
-			SecurityException, NotFoundException {
-		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
-			throw new SecurityException();
-		}
-		User user = getUserObject(getUserId());
-
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
-				false);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/sharedresource/app/{appId}/{userId}/{resourceId}")
-	public @ResponseBody
-	Token getSharedResource(@PathVariable String userId,
+	Token getMySharedResource(HttpServletRequest request,
 			@PathVariable String appId, @PathVariable String resourceId)
 			throws SmartcampusException, SecurityException, NotFoundException {
 		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
 			throw new SecurityException();
 		}
-		User user = getUserObject(userId);
+		User user = getUserObject(getUserId());
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
 
-		return scAcl.getSessionToken(Operation.DOWNLOAD, user, resourceId,
+		return scAcl.getSessionToken(Operation.DOWNLOAD, oauthUser, resourceId,
+				false);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/sharedresource/app/{appId}/{userId}/{resourceId}")
+	public @ResponseBody
+	Token getSharedResource(HttpServletRequest request,
+			@PathVariable String userId, @PathVariable String appId,
+			@PathVariable String resourceId) throws SmartcampusException,
+			SecurityException, NotFoundException {
+		if (!permissionManager.checkResourcePermission(appId, resourceId)) {
+			throw new SecurityException();
+		}
+		User user = getUserObject(userId);
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setClientToken(getAuthToken(request));
+
+		return scAcl.getSessionToken(Operation.DOWNLOAD, oauthUser, resourceId,
 				false);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/thumbnail/user/{appId}/{resourceId}")
 	public @ResponseBody
-	void getThumbnail(HttpServletResponse response, @PathVariable String appId,
-			@PathVariable String resourceId) throws SmartcampusException,
-			SecurityException, NotFoundException, IOException {
+	void getThumbnail(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable String appId, @PathVariable String resourceId)
+			throws SmartcampusException, SecurityException, NotFoundException,
+			IOException {
 
 		User user = getUserObject(getUserId());
-		if (!permissionManager.checkSharingPermission(user, resourceId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setUserToken(getAuthToken(request));
+		if (!permissionManager.checkSharingPermission(oauthUser, resourceId)) {
 			throw new SecurityException();
 		}
 
@@ -332,28 +358,38 @@ public class MediaController extends SCController {
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/app/{appId}/{resourceId}/{entityId}")
 	public @ResponseBody
-	Metadata updateSocialData(@PathVariable String appId,
-			@PathVariable String resourceId, @PathVariable String entityId)
-			throws SmartcampusException, SecurityException, NotFoundException {
+	Metadata updateSocialData(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String resourceId,
+			@PathVariable String entityId) throws SmartcampusException,
+			SecurityException, NotFoundException {
 
 		String userId = metadataManager.getOwner(resourceId);
 		User user = getUserObject(userId);
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setClientToken(getAuthToken(request));
 
-		return metadataManager.updateSocialData(user, resourceId, entityId);
+		return metadataManager
+				.updateSocialData(oauthUser, resourceId, entityId);
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "/updatesocial/user/{appId}/{resourceId}/{entityId}")
 	public @ResponseBody
-	Metadata updateMySocialData(@PathVariable String appId,
-			@PathVariable String resourceId, @PathVariable String entityId)
-			throws SmartcampusException, SecurityException, NotFoundException {
+	Metadata updateMySocialData(HttpServletRequest request,
+			@PathVariable String appId, @PathVariable String resourceId,
+			@PathVariable String entityId) throws SmartcampusException,
+			SecurityException, NotFoundException {
 
 		User user = getUserObject(getUserId());
-		if (!permissionManager.checkResourcePermission(user, appId, resourceId)) {
+		OauthUser oauthUser = new OauthUser(user);
+		oauthUser.setClientToken(getAuthToken(request));
+
+		if (!permissionManager.checkResourcePermission(oauthUser, appId,
+				resourceId)) {
 			throw new SecurityException();
 		}
 
-		return metadataManager.updateSocialData(user, resourceId, entityId);
+		return metadataManager
+				.updateSocialData(oauthUser, resourceId, entityId);
 	}
 
 	private Resource getResource(String resourceId, MultipartFile file)

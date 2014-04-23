@@ -20,11 +20,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.social.SocialEngine;
 
@@ -65,7 +65,7 @@ public class PermissionManager {
 	 * @return true if user can access, false otherwise
 	 * @see Account
 	 */
-	public boolean checkAccountPermission(User user, Account account) {
+	public boolean checkAccountPermission(OauthUser user, Account account) {
 		return user.getId().equals(account.getUserId());
 	}
 
@@ -98,7 +98,7 @@ public class PermissionManager {
 	 * @throws NotFoundException
 	 *             if account doesn't exist
 	 */
-	public boolean checkAccountPermission(User user, String accountId)
+	public boolean checkAccountPermission(OauthUser user, String accountId)
 			throws NotFoundException {
 		Account account = accountManager.findById(accountId);
 		return user.getId().equals("" + account.getUserId());
@@ -114,7 +114,7 @@ public class PermissionManager {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	public boolean checkAccountPermission(User user, String appId,
+	public boolean checkAccountPermission(OauthUser user, String appId,
 			String accountId) throws NotFoundException {
 		Account account = accountManager.findById(accountId);
 		return user.getId().equals(account.getUserId())
@@ -132,7 +132,7 @@ public class PermissionManager {
 	 * @throws NotFoundException
 	 *             if resource doesn't exist
 	 */
-	public boolean checkResourcePermission(User user, String resourceId)
+	public boolean checkResourcePermission(OauthUser user, String resourceId)
 			throws NotFoundException {
 		Metadata meta = metaManager.findByResource(resourceId);
 		return user.getId().equals(
@@ -165,7 +165,7 @@ public class PermissionManager {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	public boolean checkResourcePermission(User user, String appId,
+	public boolean checkResourcePermission(OauthUser user, String appId,
 			String resourceId) throws NotFoundException {
 		Metadata meta = metaManager.findByResource(resourceId);
 		Account account = accountManager.findById(meta.getAccountId());
@@ -180,7 +180,7 @@ public class PermissionManager {
 	 * @param resourceId
 	 * @return
 	 */
-	public boolean checkSharingPermission(User user, String resourceId) {
+	public boolean checkSharingPermission(OauthUser user, String resourceId) {
 		try {
 			return socialManager.checkPermission(user,
 					metaService.getEntityByResource(resourceId));

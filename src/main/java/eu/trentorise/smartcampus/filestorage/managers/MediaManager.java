@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.trentorise.smartcampus.User;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
@@ -30,6 +29,7 @@ import eu.trentorise.smartcampus.filestorage.model.Operation;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Token;
+import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 import eu.trentorise.smartcampus.filestorage.services.ACLService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
 import eu.trentorise.smartcampus.filestorage.utils.StorageUtils;
@@ -72,9 +72,9 @@ public class MediaManager {
 	 * @throws SmartcampusException
 	 *             general exception
 	 */
-	public Resource storage(String accountId, User user, Resource resource,
-			boolean createSocialData) throws AlreadyStoredException,
-			SmartcampusException {
+	public Resource storage(String accountId, OauthUser user,
+			Resource resource, boolean createSocialData)
+			throws AlreadyStoredException, SmartcampusException {
 
 		StorageService storageService = storageUtils
 				.getStorageServiceByAccount(accountId);
@@ -146,7 +146,7 @@ public class MediaManager {
 	 * @throws SecurityException
 	 *             if user haven't privileges to access the resource
 	 */
-	public Token getResourceToken(User user, String rid, Operation op)
+	public Token getResourceToken(OauthUser user, String rid, Operation op)
 			throws SmartcampusException, SecurityException {
 
 		return scAcl.getSessionToken(op, user, rid, true);
