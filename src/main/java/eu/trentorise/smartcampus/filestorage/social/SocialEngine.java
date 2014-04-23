@@ -8,27 +8,31 @@ public interface SocialEngine {
 	/**
 	 * creates a social entity
 	 * 
-	 * @param resource
-	 *            resource to bind with new social entity
 	 * @param user
 	 *            user owner of the resource
+	 * @param resource
+	 *            resource to bind with new social entity
+	 * 
 	 * @return the id of the new entity
 	 * @throws WebApiException
 	 *             exception thrown by social engine
 	 */
 
-	public String createEntity(Resource resource, OauthUser user);
+	public String createEntity(OauthUser user, Resource resource);
 
 	/**
 	 * deletes a social entity
 	 * 
+	 * @param user
+	 *            user owner
 	 * @param entityId
 	 *            id of the social entity to delete
+	 * 
 	 * @return true if operation gone fine, false otherwise
 	 * @throws WebApiException
 	 *             exception thrown by social engine
 	 */
-	public boolean deleteEntity(long entityId);
+	public boolean deleteEntity(OauthUser user, String entityId);
 
 	/**
 	 * checks if an entity is shared with a user

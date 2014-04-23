@@ -21,10 +21,6 @@ public class SCSocialEngine implements SocialEngine {
 	private static SocialService socialService;
 
 	@Autowired
-	@Value("${smartcampus.appId}")
-	private String appId;
-
-	@Autowired
 	@Value("${smartcampus.socialengine.endpoint}")
 	private String socialEndpoint;
 
@@ -46,24 +42,6 @@ public class SCSocialEngine implements SocialEngine {
 
 	private TokenData authToken;
 
-	/*
-	 * @PostConstruct private void init() {
-	 * 
-	 * socialService = new SocialService(socialEndpoint);
-	 * 
-	 * // aacService = new AACService(aacEndpoint, scClientId, scClientSecret);
-	 * // // EntityType type = new EntityType("computer file", //
-	 * "application/octet-stream"); // try { // fileEntityType =
-	 * socialService.createEntityType(getAuthToken(), // type); // } catch
-	 * (SecurityException e) { //
-	 * logger.error("Security error creating computer file entity type: " // +
-	 * e.getMessage()); // } catch (SocialServiceException e) { //
-	 * logger.error("General error creating computer file entity type: " // +
-	 * e.getMessage()); // } catch (AACException e) { //
-	 * logger.error("Authentication exception getting authentication token: " //
-	 * + e.getMessage()); // } }
-	 */
-
 	public AACService getAACClient() {
 		if (aacService == null) {
 			aacService = new AACService(aacEndpoint, scClientId, scClientSecret);
@@ -81,19 +59,21 @@ public class SCSocialEngine implements SocialEngine {
 	}
 
 	@Override
-	public String createEntity(Resource resource, OauthUser user) {
+	public String createEntity(OauthUser user, Resource resource) {
 		/**
 		 * I don't know the social APPID in which create the entity
 		 */
+		logger.info("createEntity not implemented");
 		return null;
 	}
 
 	@Override
-	public boolean deleteEntity(long entityId) {
+	public boolean deleteEntity(OauthUser user, String entityId) {
 		/**
-		 * TODO not implemented for the moment
+		 * I don't know the social APPID space containing entity
 		 */
-		return true;
+		logger.info("deleteEntity not implemented");
+		return false;
 	}
 
 	@Override

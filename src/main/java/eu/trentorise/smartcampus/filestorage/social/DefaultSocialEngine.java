@@ -6,12 +6,12 @@ import eu.trentorise.smartcampus.filestorage.rest.OauthUser;
 public class DefaultSocialEngine implements SocialEngine {
 
 	@Override
-	public String createEntity(Resource resource, OauthUser user) {
+	public String createEntity(OauthUser user, Resource resource) {
 		return null;
 	}
 
 	@Override
-	public boolean deleteEntity(long entityId) {
+	public boolean deleteEntity(OauthUser user, String entityId) {
 		return true;
 	}
 

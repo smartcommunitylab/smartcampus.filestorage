@@ -80,8 +80,7 @@ public class MediaController extends FSController {
 	public @ResponseBody
 	Metadata storeResource(HttpServletRequest request,
 			@PathVariable String appId, @PathVariable String accountId,
-			@RequestParam("file") MultipartFile resource,
-			@RequestParam(defaultValue = "true") boolean createSocialData)
+			@RequestParam("file") MultipartFile resource)
 			throws AlreadyStoredException, SmartcampusException,
 			NotFoundException {
 
@@ -94,7 +93,7 @@ public class MediaController extends FSController {
 		}
 		try {
 			String resourceId = mediaManager.storage(accountId, oauthUser,
-					getResource(resource), createSocialData).getId();
+					getResource(resource), false).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
@@ -105,8 +104,7 @@ public class MediaController extends FSController {
 	public @ResponseBody
 	Metadata storeMyResource(HttpServletRequest request,
 			@PathVariable String appId, @PathVariable String accountId,
-			@RequestParam("file") MultipartFile resource,
-			@RequestParam(defaultValue = "true") boolean createSocialData)
+			@RequestParam("file") MultipartFile resource)
 			throws AlreadyStoredException, SmartcampusException,
 			NotFoundException {
 		User user = getUserObject(getUserId());
@@ -118,7 +116,7 @@ public class MediaController extends FSController {
 		}
 		try {
 			String resourceId = mediaManager.storage(accountId, oauthUser,
-					getResource(resource), createSocialData).getId();
+					getResource(resource), false).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (IOException e) {
 			throw new SmartcampusException(e);
@@ -208,10 +206,8 @@ public class MediaController extends FSController {
 	public @ResponseBody
 	Metadata createMyMetadata(HttpServletRequest request,
 			@PathVariable String appId, @PathVariable String accountId,
-			@RequestBody Resource resource,
-			@RequestParam(defaultValue = "true") boolean createSocialData)
-			throws SmartcampusException, SecurityException, NotFoundException,
-			AlreadyStoredException {
+			@RequestBody Resource resource) throws SmartcampusException,
+			SecurityException, NotFoundException, AlreadyStoredException {
 		User user = getUserObject(getUserId());
 		OauthUser oauthUser = new OauthUser(user);
 		oauthUser.setUserToken(getAuthToken(request));
@@ -219,8 +215,7 @@ public class MediaController extends FSController {
 				accountId)) {
 			new SecurityException();
 		}
-		return metadataManager.create(accountId, oauthUser, resource,
-				createSocialData);
+		return metadataManager.create(accountId, oauthUser, resource, false);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/metadata/user/{appId}/{resourceId}")
@@ -231,7 +226,6 @@ public class MediaController extends FSController {
 		User user = getUserObject(getUserId());
 		OauthUser oauthUser = new OauthUser(user);
 		oauthUser.setUserToken(getAuthToken(request));
-		oauthUser.setClientToken(getAuthToken(request));
 		if (!permissionManager.checkResourcePermission(oauthUser, appId,
 				resourceId)
 				&& !permissionManager.checkSharingPermission(oauthUser,

@@ -97,9 +97,15 @@ public class MetadataManager {
 			logger.info(String.format("Deleted metadata of resource %s",
 					resourceId));
 			if (eid != null) {
-				socialManager.deleteEntity(Long.parseLong(eid));
-				logger.info(String.format(
-						"Deleted entity associated to resource %s", resourceId));
+				if (socialManager.deleteEntity(null, eid)) {
+					logger.info(String.format(
+							"Deleted entity %s associated to resource %s", eid,
+							resourceId));
+				} else {
+					logger.warn(String
+							.format("Cannot delete entity %s associated to resource %s",
+									eid, resourceId));
+				}
 			} else {
 				logger.info(String.format(
 						"Resource %s not associated to any entity", resourceId));
@@ -214,7 +220,7 @@ public class MetadataManager {
 			throw new SmartcampusException("Account not found");
 		}
 		if (createSocialData) {
-			metadata.setSocialId(socialManager.createEntity(resource, user)
+			metadata.setSocialId(socialManager.createEntity(user, resource)
 					.toString());
 		}
 		return metadata;
