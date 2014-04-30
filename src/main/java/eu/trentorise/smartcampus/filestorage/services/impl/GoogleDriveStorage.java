@@ -4,27 +4,35 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dropbox.client2.session.AppKeyPair;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files.Insert;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
@@ -39,6 +47,7 @@ import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
 import eu.trentorise.smartcampus.filestorage.model.Storage;
+import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
 import eu.trentorise.smartcampus.filestorage.services.StorageService;
@@ -50,17 +59,16 @@ import eu.trentorise.smartcampus.filestorage.services.StorageService;
  */
 @Service
 public class GoogleDriveStorage implements StorageService {
-	private String LOCAL_URL = "http://localhost:8080/core.filestorage";
 	private final long ONE_HOUR = 3600000;
-
-	private static final Logger logger = Logger
-			.getLogger(GoogleDriveStorage.class);
-
+	@Value("${local.url}")
+	private String localUrl;
+	private String FILESTORAGE_URI = "core.filestorage/";
+	private String GOOGLE_REDIRECT_URI = "localstorage/google/";
 	private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
-
 	private static final String APP_KEY = "APP_KEY";
 	private static final String APP_SECRET = "APP_SECRET";
-
+	private static final Logger logger = Logger
+			.getLogger(GoogleDriveStorage.class);
 	@Autowired
 	private AccountManager accountManager;
 
@@ -76,7 +84,6 @@ public class GoogleDriveStorage implements StorageService {
 	@Override
 	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
-		// check if file already exists int
 		return store(accountId, resource, null);
 	}
 
@@ -87,8 +94,6 @@ public class GoogleDriveStorage implements StorageService {
 		if (inputStream == null) {
 			inputStream = new ByteArrayInputStream(resource.getContent());
 		}
-		// check if file already exists int
-
 		String refreshToken = null;
 		AppKeyPair app = null;
 		try {
@@ -119,13 +124,13 @@ public class GoogleDriveStorage implements StorageService {
 			uploader.setDirectUploadEnabled(false);
 			File file = insert.execute();
 			if (resource.getId() == null) {
-				// TODO per ora l'id è quello di google drive
 				resource.setId(new ObjectId().toString());
 			}
 			resource.setExternalId(file.getId());
 			inputStream.close();
 			return resource;
 		} catch (IOException e) {
+			logger.error("Storing file error");
 			throw new SmartcampusException(e);
 		}
 
@@ -135,6 +140,12 @@ public class GoogleDriveStorage implements StorageService {
 	public void replace(Resource resource) throws NotFoundException,
 			SmartcampusException {
 		replace(resource, null);
+	}
+
+	private AppKeyPair getAppTokenByStorage(String storageId)
+			throws NotFoundException {
+		Storage appAccount = appAccountManager.getStorageById(storageId);
+		return getAppToken(appAccount.getConfigurations());
 	}
 
 	@Override
@@ -162,7 +173,6 @@ public class GoogleDriveStorage implements StorageService {
 		credential.setRefreshToken(refreshToken);
 		Drive service = new Drive.Builder(new NetHttpTransport(),
 				new JacksonFactory(), credential).build();
-
 		try {
 			service.files().delete(meta.getFileExternalId()).execute();
 			File body = new File();
@@ -189,19 +199,14 @@ public class GoogleDriveStorage implements StorageService {
 	public void remove(String rid) throws NotFoundException,
 			SmartcampusException {
 		Metadata metadata = metaService.getMetadata(rid);
-		// get user token
-
 		String refreshToken = null;
 		AppKeyPair app = null;
-
 		try {
 			refreshToken = getUserToken(metadata.getAccountId());
 			app = getAppToken(metadata.getAccountId());
 		} catch (NotFoundException e2) {
 			throw new SmartcampusException(e2);
 		}
-		// find resource name
-
 		GoogleCredential credential = new GoogleCredential.Builder()
 				.setJsonFactory(new JacksonFactory())
 				.setTransport(new NetHttpTransport())
@@ -213,7 +218,7 @@ public class GoogleDriveStorage implements StorageService {
 		try {
 			service.files().delete(metadata.getFileExternalId()).execute();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error deleting file");
 		}
 
 	}
@@ -247,7 +252,7 @@ public class GoogleDriveStorage implements StorageService {
 		try {
 			file = service.files().get(metadata.getFileExternalId()).execute();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error retrieving the file in google drive storage");
 		}
 
 		localRes.setId(new ObjectId().toString());
@@ -259,11 +264,11 @@ public class GoogleDriveStorage implements StorageService {
 		try {
 			localManager.save(localRes);
 		} catch (AlreadyStoredException e) {
-			e.printStackTrace();
+			logger.error("Saving LocalResource in database failed");
 		}
 
 		Token userSessionToken = new Token();
-		userSessionToken.setUrl(LOCAL_URL + "/gdrivestorage/" + accountId + "/"
+		userSessionToken.setUrl(localUrl + "/gdrivestorage/" + accountId + "/"
 				+ localRes.getId());
 		userSessionToken.setMethodREST("GET");
 		userSessionToken.setStorageType(appAccount.getStorageType());
@@ -299,8 +304,7 @@ public class GoogleDriveStorage implements StorageService {
 					.execute();
 			return resp.getContent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Thumbnail retriving failed");
 		}
 
 		return null;
@@ -316,16 +320,55 @@ public class GoogleDriveStorage implements StorageService {
 	public void startSession(String storageId, String userId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		// TODO Auto-generated method stub
-
+		HttpSession session = request.getSession();
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		HttpTransport httpTransport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+				httpTransport, jsonFactory, app.key, app.secret,
+				Arrays.asList(DriveScopes.DRIVE)).setApprovalPrompt("force")
+				.setAccessType("offline").build();
+		String url = flow
+				.newAuthorizationUrl()
+				.setRedirectUri(
+						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI
+								+ userId + "/" + storageId).build();
+		session.setAttribute("flow", flow);
+		logger.debug("Started session, created url: " + url);
+		response.sendRedirect(url);
 	}
 
 	@Override
 	public Account finishSession(String storageId, String userId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		AppKeyPair app = getAppTokenByStorage(storageId);
+		String code = (String) request.getSession().getAttribute("code");
+		GoogleAuthorizationCodeFlow flow = (GoogleAuthorizationCodeFlow) request
+				.getSession().getAttribute("flow");
+		GoogleTokenResponse tokenResponse = flow
+				.newTokenRequest(code)
+				.setRedirectUri(
+						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI
+								+ userId + "/" + storageId).execute();
+		GoogleCredential credential = new GoogleCredential.Builder()
+				.setJsonFactory(new JacksonFactory())
+				.setTransport(new NetHttpTransport())
+				.setClientSecrets(app.key, app.secret).build();
+		credential.setFromTokenResponse(tokenResponse);
+		String refreshToken = credential.getRefreshToken();
+		Account a = new Account();
+		Storage storage = appAccountManager.getStorageById(storageId);
+		a.setAppId(storage.getAppId());
+		a.setUserId(userId);
+		a.setName(null);
+		a.setStorageType(StorageType.GDRIVE);
+		a.setConfigurations(Arrays
+				.asList(new Configuration[] { new Configuration(REFRESH_TOKEN,
+						refreshToken) }));
+		a.setId(new ObjectId().toString());
+		logger.debug("Finished session and created account: " + a.getId());
+		return a;
 	}
 
 	private String getUserToken(String accountId) throws NotFoundException {
@@ -358,7 +401,6 @@ public class GoogleDriveStorage implements StorageService {
 			}
 		}
 		return new AppKeyPair(appKey, appSecret);
-
 	}
 
 	private String getUserToken(List<Configuration> confs) {
@@ -372,7 +414,6 @@ public class GoogleDriveStorage implements StorageService {
 				refreshToken = tmp.getValue();
 			}
 		}
-
 		return refreshToken;
 	}
 
@@ -399,8 +440,7 @@ public class GoogleDriveStorage implements StorageService {
 					.buildGetRequest(new GenericUrl(url)).execute();
 			return resp.getContent();
 		} catch (IOException e) {
-			// An error occurred.
-			e.printStackTrace();
+			logger.error("Error returning the resource stream");
 			return null;
 		}
 	}
