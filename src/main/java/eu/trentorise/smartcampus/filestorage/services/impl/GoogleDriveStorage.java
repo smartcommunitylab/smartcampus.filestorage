@@ -63,7 +63,7 @@ public class GoogleDriveStorage implements StorageService {
 	@Value("${local.url}")
 	private String localUrl;
 	private String FILESTORAGE_URI = "core.filestorage/";
-	private String GOOGLE_REDIRECT_URI = "localstorage/google/";
+	private String GOOGLE_REDIRECT_URI = "localstorage/google";
 	private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
 	private static final String APP_KEY = "APP_KEY";
 	private static final String APP_SECRET = "APP_SECRET";
@@ -145,6 +145,7 @@ public class GoogleDriveStorage implements StorageService {
 	private AppKeyPair getAppTokenByStorage(String storageId)
 			throws NotFoundException {
 		Storage appAccount = appAccountManager.getStorageById(storageId);
+
 		return getAppToken(appAccount.getConfigurations());
 	}
 
@@ -331,10 +332,12 @@ public class GoogleDriveStorage implements StorageService {
 		String url = flow
 				.newAuthorizationUrl()
 				.setRedirectUri(
-						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI
-								+ userId + "/" + storageId).build();
+						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI)
+				.build();
 		session.setAttribute("flow", flow);
-		logger.debug("Started session, created url: " + url);
+		session.setAttribute("userId", userId);
+		session.setAttribute("storageId", storageId);
+		logger.info("Started session, created url: " + url);
 		response.sendRedirect(url);
 	}
 
@@ -344,13 +347,14 @@ public class GoogleDriveStorage implements StorageService {
 			throws Exception {
 		AppKeyPair app = getAppTokenByStorage(storageId);
 		String code = (String) request.getSession().getAttribute("code");
-		GoogleAuthorizationCodeFlow flow = (GoogleAuthorizationCodeFlow) request
-				.getSession().getAttribute("flow");
+		HttpSession session = request.getSession();
+		GoogleAuthorizationCodeFlow flow = (GoogleAuthorizationCodeFlow) session
+				.getAttribute("flow");
 		GoogleTokenResponse tokenResponse = flow
 				.newTokenRequest(code)
 				.setRedirectUri(
-						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI
-								+ userId + "/" + storageId).execute();
+						localUrl + FILESTORAGE_URI + GOOGLE_REDIRECT_URI)
+				.execute();
 		GoogleCredential credential = new GoogleCredential.Builder()
 				.setJsonFactory(new JacksonFactory())
 				.setTransport(new NetHttpTransport())

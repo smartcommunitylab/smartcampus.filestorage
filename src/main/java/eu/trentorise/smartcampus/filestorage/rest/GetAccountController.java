@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,17 +162,19 @@ public class GetAccountController extends SCController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/localstorage/google/{userId}/{storageId}")
+	@RequestMapping(method = RequestMethod.GET, value = "/localstorage/google")
 	public @ResponseBody
-	void storeAccount(@PathVariable("userId") String userId,
-			@PathVariable("storageId") String storageId,
-			HttpServletResponse response, HttpServletRequest request)
+	void storeAccount(HttpServletResponse response, HttpServletRequest request)
 			throws SmartcampusException, NotFoundException, Exception {
+		HttpSession session = request.getSession();
+
+		String userId = (String) session.getAttribute("userId");
+		String storageId = (String) session.getAttribute("storageId");
 		StorageService storageService = storageUtils
 				.getStorageServiceByStorage(storageId);
 		Storage storage = storageManager.getStorageById(storageId);
 		String code = request.getParameter("code");
-		request.getSession().setAttribute("code", code);
+		session.setAttribute("code", code);
 		logger.debug("Store Account Servlet, " + storage.getStorageType()
 				+ " id: " + storage.getId());
 		String error = request.getParameter("error");
