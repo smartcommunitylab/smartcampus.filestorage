@@ -314,7 +314,7 @@ public class GoogleDriveStorage implements StorageService {
 	@Override
 	public boolean authorizationSessionRequired() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
