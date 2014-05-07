@@ -110,8 +110,35 @@ public class GetAccountController extends SCController {
 		request.getSession().setAttribute("authorizationRequest", req);
 		StorageService storageService = storageUtils
 				.getStorageServiceByStorage(req.storageId);
-		storageService.startSession(req.storageId, req.userId, request,
-				response);
+		Storage storage = storageManager.getStorageById(req.storageId);
+		if (storageService.authorizationSessionRequired()) {
+			storageService.startSession(req.storageId, req.userId, request,
+					response);
+		} else {
+			try {
+
+				Account a = storageService.finishSession(req.storageId,
+						req.userId, request, response);
+				if (a == null || !a.isValid()) {
+					throw new IllegalArgumentException("Account is not valid");
+				}
+				a = accountManager.save(a);
+				if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
+					redirect(response, a.getId(), StringUtils.appURL(request)
+							+ "/authorize/done", null);
+				} else {
+					redirect(response, a.getId(), storage.getRedirect(), null);
+				}
+			} catch (Exception e) {
+				if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
+					redirect(response, null, StringUtils.appURL(request)
+							+ "/authorize/done", "authorization failed");
+				} else {
+					redirect(response, null, storage.getRedirect(),
+							"authorization failed");
+				}
+			}
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/authorize/done")

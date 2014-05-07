@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.LocalResourceManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.LocalResource;
@@ -31,6 +32,7 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
@@ -62,6 +64,9 @@ public class LocalStorage implements StorageService {
 
 	@Autowired
 	MetadataManager metadataManager;
+
+	@Autowired
+	StorageManager storageManager;
 
 	@Autowired
 	private MetadataService metaService;
@@ -411,15 +416,20 @@ public class LocalStorage implements StorageService {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public Account finishSession(String storageId, String userId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Account a = new Account();
+		Storage storage = storageManager.getStorageById(storageId);
+		a.setAppId(storage.getAppId());
+		a.setUserId(userId);
+		a.setName(null);
+		a.setStorageType(StorageType.LOCAL);
+		a.setId(new ObjectId().toString());
+		return a;
 	}
 
 	private Boolean isFileExist(String path) {
