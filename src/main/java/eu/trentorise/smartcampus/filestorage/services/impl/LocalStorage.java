@@ -321,7 +321,7 @@ public class LocalStorage implements StorageService {
 			logger.error("Cannot save LocalResource data in database");
 		}
 
-		token.setUrl(LOCAL_URL + "/localstorage/" + localRes.getId());
+		token.setUrl(localStoragePath + "/localstorage/" + localRes.getId());
 		token.setMethodREST("GET");
 		token.setStorageType(StorageType.LOCAL);
 		return token;
