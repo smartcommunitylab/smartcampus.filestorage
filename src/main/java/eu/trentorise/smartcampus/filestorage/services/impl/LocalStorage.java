@@ -48,8 +48,8 @@ public class LocalStorage implements StorageService {
 	@Autowired
 	@Value("${local.storage.path}")
 	private String localStoragePath;
-
-	private String LOCAL_URL = "http://localhost:8080/core.filestorage";
+	@Value("${local.url}")
+	private String localUrl;
 	private final long ONE_HOUR = 3600000;
 	private static final Logger logger = Logger.getLogger(LocalStorage.class);
 	private final int IMAGE_HEIGHT = 100;
@@ -321,7 +321,8 @@ public class LocalStorage implements StorageService {
 			logger.error("Cannot save LocalResource data in database");
 		}
 
-		token.setUrl(localStoragePath + "/localstorage/" + localRes.getId());
+		token.setUrl(localUrl + "/core.filestorage/localstorage/"
+				+ localRes.getId());
 		token.setMethodREST("GET");
 		token.setStorageType(StorageType.LOCAL);
 		return token;
@@ -334,7 +335,7 @@ public class LocalStorage implements StorageService {
 		int imgFinalWidth;
 		Metadata metadata = metaService.getMetadata(resourceId);
 		Account account = accountManager.findById(metadata.getAccountId());
-		if (!isFileExist(localStoragePath + "\\" + account.getAppId() + "\\"
+		if (!isFileExist(localStoragePath + "/" + account.getAppId() + "/"
 				+ account.getUserId() + "\\thumbnails")) {
 			File accountFolder = new File(localStoragePath + "\\"
 					+ account.getAppId() + "\\" + account.getUserId()
