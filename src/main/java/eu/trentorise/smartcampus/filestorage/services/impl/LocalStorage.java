@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import eu.trentorise.smartcampus.filestorage.managers.AccountManager;
 import eu.trentorise.smartcampus.filestorage.managers.LocalResourceManager;
 import eu.trentorise.smartcampus.filestorage.managers.MetadataManager;
+import eu.trentorise.smartcampus.filestorage.managers.StorageManager;
 import eu.trentorise.smartcampus.filestorage.model.Account;
 import eu.trentorise.smartcampus.filestorage.model.AlreadyStoredException;
 import eu.trentorise.smartcampus.filestorage.model.LocalResource;
@@ -31,6 +32,7 @@ import eu.trentorise.smartcampus.filestorage.model.Metadata;
 import eu.trentorise.smartcampus.filestorage.model.NotFoundException;
 import eu.trentorise.smartcampus.filestorage.model.Resource;
 import eu.trentorise.smartcampus.filestorage.model.SmartcampusException;
+import eu.trentorise.smartcampus.filestorage.model.Storage;
 import eu.trentorise.smartcampus.filestorage.model.StorageType;
 import eu.trentorise.smartcampus.filestorage.model.Token;
 import eu.trentorise.smartcampus.filestorage.services.MetadataService;
@@ -66,6 +68,9 @@ public class LocalStorage implements StorageService {
 	@Autowired
 	private MetadataService metaService;
 
+	@Autowired
+	StorageManager storageManager;
+
 	@Override
 	public Resource store(String accountId, Resource resource,
 			InputStream inputStream) throws AlreadyStoredException,
@@ -76,15 +81,15 @@ public class LocalStorage implements StorageService {
 				File folder = new File(localStoragePath);
 				folder.mkdirs();
 			}
-			if (!isFileExist(localStoragePath + "\\" + account.getAppId()
-					+ "\\" + account.getUserId())) {
-				File accountFolder = new File(localStoragePath + "\\"
-						+ account.getAppId() + "\\" + account.getUserId());
+			if (!isFileExist(localStoragePath + "/" + account.getAppId() + "/"
+					+ account.getUserId())) {
+				File accountFolder = new File(localStoragePath + "/"
+						+ account.getAppId() + "/" + account.getUserId());
 				accountFolder.mkdirs();
 			}
 
-			File fileToStore = new File(localStoragePath + "\\"
-					+ account.getAppId() + "\\" + account.getUserId() + "\\"
+			File fileToStore = new File(localStoragePath + "/"
+					+ account.getAppId() + "/" + account.getUserId() + "/"
 					+ resource.getName());
 			// Rename the file if it's already exist
 			if (fileToStore.exists()) {
@@ -92,11 +97,11 @@ public class LocalStorage implements StorageService {
 				File file_temp = fileToStore;
 				while (file_temp.exists()) {
 					file_temp = new File(localStoragePath
-							+ "\\"
+							+ "/"
 							+ account.getAppId()
-							+ "\\"
+							+ "/"
 							+ account.getUserId()
-							+ "\\"
+							+ "/"
 							+ FilenameUtils.removeExtension(fileToStore
 									.getName()) + "(" + cont + ")."
 							+ FilenameUtils.getExtension(fileToStore.getName()));
@@ -173,8 +178,8 @@ public class LocalStorage implements StorageService {
 		Metadata metadata = metadataManager.findByResource(resource.getId());
 		Account account = accountManager.findById(metadata.getAccountId());
 		// String extension = FilenameUtils.getExtension(resource.getName());
-		File fileToReplace = new File(localStoragePath + "\\"
-				+ account.getAppId() + "\\" + account.getUserId() + "\\"
+		File fileToReplace = new File(localStoragePath + "/"
+				+ account.getAppId() + "/" + account.getUserId() + "/"
 				+ metadata.getName());
 		if (!fileToReplace.exists()) {
 			throw new NotFoundException();
@@ -182,19 +187,19 @@ public class LocalStorage implements StorageService {
 			try {
 				deleteThumbnail(metadata, account);
 				fileToReplace.delete();
-				fileToReplace = new File(localStoragePath + "\\"
-						+ account.getAppId() + "\\" + account.getUserId()
-						+ "\\" + resource.getName());
+				fileToReplace = new File(localStoragePath + "/"
+						+ account.getAppId() + "/" + account.getUserId() + "/"
+						+ resource.getName());
 				if (fileToReplace.exists()) {
 					Integer cont = 1;
 					File file_temp = fileToReplace;
 					while (file_temp.exists()) {
 						file_temp = new File(localStoragePath
-								+ "\\"
+								+ "/"
 								+ account.getAppId()
-								+ "\\"
+								+ "/"
 								+ account.getUserId()
-								+ "\\"
+								+ "/"
 								+ FilenameUtils.removeExtension(fileToReplace
 										.getName())
 								+ "("
@@ -265,9 +270,9 @@ public class LocalStorage implements StorageService {
 	}
 
 	private void deleteThumbnail(Metadata metadata, Account account) {
-		File thumbToDelete = new File(localStoragePath + "\\"
-				+ account.getAppId() + "\\" + account.getUserId()
-				+ "\\thumbnails\\thumb_"
+		File thumbToDelete = new File(localStoragePath + "/"
+				+ account.getAppId() + "/" + account.getUserId()
+				+ "/thumbnails/thumb_"
 				+ FilenameUtils.getBaseName(metadata.getName()) + ".jpg");
 		if (thumbToDelete.exists()) {
 			if (!thumbToDelete.delete()) {
@@ -285,8 +290,8 @@ public class LocalStorage implements StorageService {
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
 		deleteThumbnail(metadata, account);
-		File fileToDelete = new File(localStoragePath + "\\"
-				+ account.getAppId() + "\\" + account.getUserId() + "\\"
+		File fileToDelete = new File(localStoragePath + "/"
+				+ account.getAppId() + "/" + account.getUserId() + "/"
 				+ metadata.getName());
 		if (!fileToDelete.exists()) {
 			throw new NotFoundException();
@@ -305,8 +310,8 @@ public class LocalStorage implements StorageService {
 
 		Metadata metadata = metadataManager.findByResource(rid);
 		Account account = accountManager.findById(metadata.getAccountId());
-		File fileToGet = new File(localStoragePath + "\\" + account.getAppId()
-				+ "\\" + account.getUserId() + "\\" + metadata.getName());
+		File fileToGet = new File(localStoragePath + "/" + account.getAppId()
+				+ "/" + account.getUserId() + "/" + metadata.getName());
 		if (!fileToGet.exists()) {
 			throw new NotFoundException();
 		}
@@ -336,18 +341,18 @@ public class LocalStorage implements StorageService {
 		Metadata metadata = metaService.getMetadata(resourceId);
 		Account account = accountManager.findById(metadata.getAccountId());
 		if (!isFileExist(localStoragePath + "/" + account.getAppId() + "/"
-				+ account.getUserId() + "\\thumbnails")) {
-			File accountFolder = new File(localStoragePath + "\\"
-					+ account.getAppId() + "\\" + account.getUserId()
-					+ "\\thumbnails");
+				+ account.getUserId() + "/thumbnails")) {
+			File accountFolder = new File(localStoragePath + "/"
+					+ account.getAppId() + "/" + account.getUserId()
+					+ "/thumbnails");
 			accountFolder.mkdirs();
 		}
 		String mimeType = metadata.getContentType();
 		if (mimeType != null && mimeType.split("/")[0].equals("image")) {
 			InputStream is = null;
-			File thumbToStore = new File(localStoragePath + "\\"
-					+ metadata.getAppId() + "\\" + account.getUserId()
-					+ "\\thumbnails\\" + "\\thumb_"
+			File thumbToStore = new File(localStoragePath + "/"
+					+ metadata.getAppId() + "/" + account.getUserId()
+					+ "/thumbnails/" + "/thumb_"
 					+ FilenameUtils.getBaseName(metadata.getName() + ".jpg"));
 			if (thumbToStore.exists()) {
 				try {
@@ -361,8 +366,8 @@ public class LocalStorage implements StorageService {
 				// creation of the thumbnail in server-side
 				try {
 					BufferedImage source = ImageIO.read(new File(
-							localStoragePath + "\\" + metadata.getAppId()
-									+ "\\" + account.getUserId() + "\\"
+							localStoragePath + "/" + metadata.getAppId() + "/"
+									+ account.getUserId() + "/"
 									+ metadata.getName()));
 					if (source.getHeight() >= IMAGE_HEIGHT) {
 						imgFinalHeight = IMAGE_HEIGHT;
@@ -376,11 +381,10 @@ public class LocalStorage implements StorageService {
 					img.createGraphics()
 							.drawImage(
 									ImageIO.read(
-											new File(localStoragePath + "\\"
-													+ metadata.getAppId()
-													+ "\\"
-													+ account.getUserId()
-													+ "\\" + metadata.getName()))
+											new File(localStoragePath + "/"
+													+ metadata.getAppId() + "/"
+													+ account.getUserId() + "/"
+													+ metadata.getName()))
 											.getScaledInstance(imgFinalWidth,
 													imgFinalHeight,
 													Image.SCALE_SMOOTH), 0, 0,
@@ -419,8 +423,14 @@ public class LocalStorage implements StorageService {
 	public Account finishSession(String storageId, String userId,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Account a = new Account();
+		Storage storage = storageManager.getStorageById(storageId);
+		a.setAppId(storage.getAppId());
+		a.setUserId(userId);
+		a.setName(null);
+		a.setStorageType(StorageType.LOCAL);
+		a.setId(new ObjectId().toString());
+		return a;
 	}
 
 	private Boolean isFileExist(String path) {
@@ -439,7 +449,6 @@ public class LocalStorage implements StorageService {
 	@Override
 	public void replace(Resource resource) throws NotFoundException,
 			SmartcampusException {
-		// TODO Auto-generated method stub
 		replace(resource, null);
 	}
 

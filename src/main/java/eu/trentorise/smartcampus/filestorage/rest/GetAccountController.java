@@ -42,21 +42,22 @@ import eu.trentorise.smartcampus.resourceprovider.controller.SCController;
 import eu.trentorise.smartcampus.resourceprovider.model.AuthServices;
 
 /**
- * Controller used to operate the user account creation authorization
- * for specific types of storages.
+ * Controller used to operate the user account creation authorization for
+ * specific types of storages.
  * <p/>
- * The procedure starts from obtaining a temporary authorization URL (/requestAuth), that is used to 
- * initiate the procedure from the client app or from the server-side app.
- * Then, using the generated URL, the procedure is initiated in a browser. The user is involved in
- * the authorization process and finally, the browser is redirected to the success page
- * with the status code specifying the outcome. In this moment the account is registered and
- * can be requested. If the storage has the redirect URI assigned, the status will be notified
- * on the that address, otherwise, the result is redirected to /authorize/done address.
- * the outcome is represented with the status (ok/error) request param and with optional 
- * error_message.
- *  
+ * The procedure starts from obtaining a temporary authorization URL
+ * (/requestAuth), that is used to initiate the procedure from the client app or
+ * from the server-side app. Then, using the generated URL, the procedure is
+ * initiated in a browser. The user is involved in the authorization process and
+ * finally, the browser is redirected to the success page with the status code
+ * specifying the outcome. In this moment the account is registered and can be
+ * requested. If the storage has the redirect URI assigned, the status will be
+ * notified on the that address, otherwise, the result is redirected to
+ * /authorize/done address. the outcome is represented with the status
+ * (ok/error) request param and with optional error_message.
+ * 
  * @author raman
- *
+ * 
  */
 @Controller
 public class GetAccountController extends SCController {
@@ -70,90 +71,132 @@ public class GetAccountController extends SCController {
 	@Autowired
 	private StorageManager storageManager;
 
-	
 	static Map<String, AuthorizationRequest> cache = new HashMap<String, AuthorizationRequest>();
 
 	@RequestMapping(method = RequestMethod.GET, value = "/requestAuth/{appId}")
 	public @ResponseBody
-	String getAuthorizationURL(HttpServletRequest request, HttpServletResponse response, @PathVariable String appId) throws IOException {
+	String getAuthorizationURL(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable String appId)
+			throws IOException {
 
 		Storage storage = storageManager.getStorageByAppId(appId);
 		if (storage == null) {
-			throw new IllegalArgumentException("No storage for specified app ID");
+			throw new IllegalArgumentException(
+					"No storage for specified app ID");
 		}
-		
+
 		String k = UUID.randomUUID().toString();
-		
+
 		cache.put(k, new AuthorizationRequest(getUserId(), storage.getId()));
 		String pre = StringUtils.appURL(request);
-		return pre+"/authorize/" + k;
+		return pre + "/authorize/" + k;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/authorize/{k}")
-	public void authorize(HttpServletRequest request, HttpServletResponse response, @PathVariable String k) throws Exception {
+	public void authorize(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable String k)
+			throws Exception {
 		AuthorizationRequest req = cache.remove(k);
 		if (req == null) {
 			throw new SecurityException("Incorrect authorization request key");
 		}
 		request.getSession().setAttribute("authorizationRequest", req);
-		StorageService storageService = storageUtils.getStorageServiceByStorage(req.storageId);
-		storageService.startSession(req.storageId, req.userId, request, response);
+		StorageService storageService = storageUtils
+				.getStorageServiceByStorage(req.storageId);
+		Storage storage = storageManager.getStorageById(req.storageId);
+		if (storageService.authorizationSessionRequired()) {
+			storageService.startSession(req.storageId, req.userId, request,
+					response);
+		} else {
+			try {
+
+				Account a = storageService.finishSession(req.storageId,
+						req.userId, request, response);
+				if (a == null || !a.isValid()) {
+					throw new IllegalArgumentException("Account is not valid");
+				}
+				a = accountManager.save(a);
+				if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
+					redirect(response, a.getId(), StringUtils.appURL(request)
+							+ "/authorize/done", null);
+				} else {
+					redirect(response, a.getId(), storage.getRedirect(), null);
+				}
+			} catch (Exception e) {
+				if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
+					redirect(response, null, StringUtils.appURL(request)
+							+ "/authorize/done", "authorization failed");
+				} else {
+					redirect(response, null, storage.getRedirect(),
+							"authorization failed");
+				}
+			}
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/authorize/done")
-	public @ResponseBody String done() throws Exception {
+	public @ResponseBody
+	String done() throws Exception {
 		return "";
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/authorize/success")
-	public void storeAccount(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		AuthorizationRequest req = (AuthorizationRequest) request.getSession().getAttribute("authorizationRequest");
+	public void storeAccount(HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		AuthorizationRequest req = (AuthorizationRequest) request.getSession()
+				.getAttribute("authorizationRequest");
 		if (req == null) {
 			throw new SecurityException("No authorization info available");
 		}
-		
+
 		Storage storage = storageManager.getStorageById(req.storageId);
 		if (storage == null) {
 			throw new IllegalArgumentException("Storage is not valid");
 		}
 
-		StorageService storageService = storageUtils.getStorageServiceByStorage(req.storageId);
+		StorageService storageService = storageUtils
+				.getStorageServiceByStorage(req.storageId);
 		try {
-			Account a = storageService.finishSession(req.storageId, req.userId, request, response);
+			Account a = storageService.finishSession(req.storageId, req.userId,
+					request, response);
 			if (a == null || !a.isValid()) {
 				throw new IllegalArgumentException("Account is not valid");
 			}
 			a = accountManager.save(a);
 			if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
-				redirect(response, a.getId(), StringUtils.appURL(request)+"/authorize/done", null);
+				redirect(response, a.getId(), StringUtils.appURL(request)
+						+ "/authorize/done", null);
 			} else {
 				redirect(response, a.getId(), storage.getRedirect(), null);
 			}
 		} catch (Exception e) {
 			if (StringUtils.isNullOrEmpty(storage.getRedirect(), true)) {
-				redirect(response, null, StringUtils.appURL(request)+"/authorize/done", "authorization failed");
+				redirect(response, null, StringUtils.appURL(request)
+						+ "/authorize/done", "authorization failed");
 			} else {
-				redirect(response, null, storage.getRedirect(), "authorization failed");
+				redirect(response, null, storage.getRedirect(),
+						"authorization failed");
 			}
 		}
-		
+
 	}
 
 	/**
 	 * @param redirect
 	 * @param message
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private void redirect(HttpServletResponse response, String id, String redirect, String message) throws IOException {
+	private void redirect(HttpServletResponse response, String id,
+			String redirect, String message) throws IOException {
 		if (redirect.indexOf('?') > 0) {
 			redirect += "&";
 		} else {
 			redirect += "?";
 		}
 		if (message == null && !StringUtils.isNullOrEmpty(id, true)) {
-			redirect += "status=ok&accountId="+id;
+			redirect += "status=ok&accountId=" + id;
 		} else {
-			redirect += "status=error&error_message="+message;
+			redirect += "status=error&error_message=" + message;
 		}
 		response.sendRedirect(redirect);
 	}
@@ -162,18 +205,18 @@ public class GetAccountController extends SCController {
 	protected AuthServices getAuthServices() {
 		return authServices;
 	}
-	
+
 	private static class AuthorizationRequest implements Serializable {
 		private static final long serialVersionUID = -6631409364756775381L;
 
 		String userId;
 		String storageId;
-		
+
 		public AuthorizationRequest(String userId, String storageId) {
 			super();
 			this.userId = userId;
 			this.storageId = storageId;
 		}
-		
+
 	}
 }
