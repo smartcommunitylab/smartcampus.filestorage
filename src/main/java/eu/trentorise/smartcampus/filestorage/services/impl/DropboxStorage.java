@@ -90,46 +90,7 @@ public class DropboxStorage implements StorageService {
 	@Override
 	public Resource store(String accountId, Resource resource)
 			throws AlreadyStoredException, SmartcampusException {
-
-		// check if file already exists int
-		try {
-			metaService.getResourceByFilename(accountId, resource.getName());
-			throw new AlreadyStoredException();
-		} catch (NotFoundException e1) {
-
-			AccessTokenPair token = null;
-			AppKeyPair app = null;
-			try {
-				token = getUserToken(accountId);
-				app = getAppToken(accountId);
-				logger.info("Retrieved dropbox account informations");
-			} catch (NotFoundException e2) {
-				throw new SmartcampusException(e2);
-			}
-
-			WebAuthSession sourceSession = new WebAuthSession(app,
-					Session.AccessType.APP_FOLDER, token);
-			DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
-					sourceSession);
-
-			InputStream in = new ByteArrayInputStream(resource.getContent());
-			try {
-				sourceClient.putFile(resource.getName(), in,
-						resource.getContent().length, null, null);
-				sourceSession.unlink();
-				in.close();
-				logger.info("Resource stored on dropbox");
-				if (resource.getId() == null) {
-					resource.setId(new ObjectId().toString());
-				}
-				return resource;
-			} catch (IOException e) {
-				throw new SmartcampusException(e);
-			} catch (DropboxException e) {
-				throw new SmartcampusException(e);
-			}
-		}
-
+		return store(accountId, resource, null);
 	}
 
 	/**
@@ -138,37 +99,7 @@ public class DropboxStorage implements StorageService {
 	@Override
 	public void replace(Resource resource) throws NotFoundException,
 			SmartcampusException {
-		if (resource.getId() == null) {
-			throw new NotFoundException();
-		}
-
-		Metadata meta = metaService.getMetadata(resource.getId());
-
-		AccessTokenPair token = null;
-		AppKeyPair app = null;
-		try {
-			token = getUserToken(meta.getAccountId());
-			app = getAppToken(meta.getAccountId());
-		} catch (NotFoundException e2) {
-			throw new SmartcampusException(e2);
-		}
-
-		WebAuthSession sourceSession = new WebAuthSession(app,
-				Session.AccessType.APP_FOLDER, token);
-		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
-				sourceSession);
-
-		InputStream in = new ByteArrayInputStream(resource.getContent());
-		try {
-			sourceClient.putFileOverwrite(meta.getName(), in,
-					resource.getContent().length, null);
-			sourceSession.unlink();
-			in.close();
-		} catch (IOException e) {
-			throw new SmartcampusException(e);
-		} catch (DropboxException e) {
-			throw new SmartcampusException(e);
-		}
+		replace(resource, null);
 	}
 
 	/**
@@ -375,13 +306,85 @@ public class DropboxStorage implements StorageService {
 			InputStream inputStream) throws AlreadyStoredException,
 			SmartcampusException {
 		// TODO Use previous method, implement new logic
-		return store(accountId, resource);
+		// check if file already exists int
+		try {
+			metaService.getResourceByFilename(accountId, resource.getName());
+			throw new AlreadyStoredException();
+		} catch (NotFoundException e1) {
+
+			AccessTokenPair token = null;
+			AppKeyPair app = null;
+			try {
+				token = getUserToken(accountId);
+				app = getAppToken(accountId);
+				logger.info("Retrieved dropbox account informations");
+			} catch (NotFoundException e2) {
+				throw new SmartcampusException(e2);
+			}
+
+			WebAuthSession sourceSession = new WebAuthSession(app,
+					Session.AccessType.APP_FOLDER, token);
+			DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+					sourceSession);
+
+			if (inputStream == null) {
+				inputStream = new ByteArrayInputStream(resource.getContent());
+			}
+			try {
+				sourceClient.putFile(resource.getName(), inputStream,
+						resource.getSize(), null, null);
+				sourceSession.unlink();
+				inputStream.close();
+				logger.info("Resource stored on dropbox");
+				if (resource.getId() == null) {
+					resource.setId(new ObjectId().toString());
+				}
+				return resource;
+			} catch (IOException e) {
+				throw new SmartcampusException(e);
+			} catch (DropboxException e) {
+				throw new SmartcampusException(e);
+			}
+		}
 	}
 
 	@Override
 	public void replace(Resource resource, InputStream inputStream)
 			throws NotFoundException, SmartcampusException {
-		replace(resource);
+		if (resource.getId() == null) {
+			throw new NotFoundException();
+		}
 
+		Metadata meta = metaService.getMetadata(resource.getId());
+
+		AccessTokenPair token = null;
+		AppKeyPair app = null;
+		try {
+			token = getUserToken(meta.getAccountId());
+			app = getAppToken(meta.getAccountId());
+		} catch (NotFoundException e2) {
+			throw new SmartcampusException(e2);
+		}
+
+		WebAuthSession sourceSession = new WebAuthSession(app,
+				Session.AccessType.APP_FOLDER, token);
+		DropboxAPI<?> sourceClient = new DropboxAPI<WebAuthSession>(
+				sourceSession);
+
+		if (inputStream == null) {
+			inputStream = new ByteArrayInputStream(resource.getContent());
+
+		}
+
+		try {
+			sourceClient.putFileOverwrite(meta.getName(), inputStream,
+					resource.getSize(), null);
+			sourceSession.unlink();
+			inputStream.close();
+		} catch (IOException e) {
+			throw new SmartcampusException(e);
+		} catch (DropboxException e) {
+			throw new SmartcampusException(e);
+		}
 	}
 }
