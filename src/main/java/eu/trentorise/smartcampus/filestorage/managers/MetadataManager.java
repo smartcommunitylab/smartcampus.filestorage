@@ -119,16 +119,38 @@ public class MetadataManager {
 	 * 
 	 * @param resource
 	 *            resource to update
+	 * @param internalStorage
+	 *            true if used by a localStorage (updating rename the resource
+	 *            if already exist [res(1].ext res(2).ext and so on)
 	 * @throws NotFoundException
 	 *             if metadata for given resource doesn't exist
 	 */
 	public void update(Resource resource) throws NotFoundException {
+		update(resource, false);
+	}
+
+	/**
+	 * Temporary method used only by LocalStorage. LocalStorage implements
+	 * renaming of resource in updating, if resource already exist (like a file
+	 * system)
+	 * 
+	 * @param resource
+	 * @throws NotFoundException
+	 */
+	public void update4Local(Resource resource) throws NotFoundException {
+		update(resource, true);
+	}
+
+	private void update(Resource resource, boolean isValidRenaming)
+			throws NotFoundException {
 		Metadata metadata = metadataSrv.getMetadata(resource.getId());
-		metadata.setName(resource.getName());
+		if (isValidRenaming) {
+			metadata.setName(resource.getName());
+		}
 		metadata.setContentType(resource.getContentType());
 		metadata.setSize(resource.getSize());
 		metadata.setLastModifiedTs(System.currentTimeMillis());
-		metadata.setFileExternalId(resource.getExternalId());
+		// metadata.setFileExternalId(resource.getExternalId());
 		metadataSrv.update(metadata);
 	}
 

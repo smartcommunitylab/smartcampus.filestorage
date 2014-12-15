@@ -264,7 +264,7 @@ public class LocalStorage implements StorageService {
 		replaceResource.setContentType(metadata.getContentType());
 		replaceResource.setName(resource.getName());
 		replaceResource.setSize(resource.getSize());
-		metadataManager.update(replaceResource);
+		metadataManager.update4Local(replaceResource);
 		logger.info(String.format("Replaced file %s", metadata.getName()));
 
 	}
