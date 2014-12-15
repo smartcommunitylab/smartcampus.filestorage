@@ -384,11 +384,8 @@ public class MediaController extends SCController {
 					createSocialData).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (AlreadyStoredException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SmartcampusException(e);
 		}
-		return null;
-
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resource/create/stream/app/{appId}/{accountId}")
@@ -416,10 +413,8 @@ public class MediaController extends SCController {
 					createSocialData).getId();
 			return metadataManager.findByResource(resourceId);
 		} catch (AlreadyStoredException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SmartcampusException(e);
 		}
-		return null;
 
 	}
 
